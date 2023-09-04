@@ -14,7 +14,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-        - name: Replace Secret
+      - name: Replace Secret
         run: |
           sed -i 's|{{VCENTER_PASSWORD}}|'"${{ secrets.VCENTER_PASSWORD }}"'|' manifests/portworx/px-vsphere-secret.yaml
         working-directory: manifests/portworx
