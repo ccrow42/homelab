@@ -3,17 +3,6 @@ kind: kubernetes
 application: utilities
 
 targets:
-  pre-stage-lab:
-    account: stage-lab
-    namespace: metallb-system
-    strategy: rolling
-  pre-prod-lab:
-    account: prod-lab
-    namespace: metallb-system
-    strategy: rolling
-    constraints:
-      dependsOn:
-      - pre-stage-lab
   stage-lab:
     account: stage-lab
     namespace: metallb-system
@@ -28,7 +17,7 @@ targets:
     constraints:
       dependsOn:
       - stage-lab
-      - pre-prod-lab
+
 
 manifests:
   - path: /manifests/metallb/metallb-native.yaml
