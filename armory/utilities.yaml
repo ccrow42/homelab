@@ -14,7 +14,7 @@ targets:
     dependsOn: stage-lab
 
 manifests:
-  - path: ../manifests/utilities/cmdhook.yml
+  - path: /manifests/utilities/cmdhook.yml
     targets: ['prod-lab','stage-lab']
 
   
