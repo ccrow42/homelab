@@ -4,14 +4,15 @@ application: utilities
 
 targets:
   stage-lab:
-    account: cluster01
+    account: stage-lab
     namespace: armory-rna
     strategy: rolling
   prod-lab:
     account: prod-lab
     namespace: armory-rna
     strategy: rolling
-    dependsOn: stage-lab
+    dependsOn:
+    - stage-lab
 
 manifests:
   - path: /manifests/utilities/cmdhook.yml
