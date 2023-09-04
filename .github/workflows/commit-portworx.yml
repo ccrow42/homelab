@@ -1,0 +1,29 @@
+name: deploy latest utilities
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'manifests/portworx/*' # Replace with the path to the file or directory you want to monitor
+
+jobs:
+  build:
+    name: deploy from main
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        - name: Replace Secret
+        run: |
+          sed -i 's|{{VCENTER_PASSWORD}}|'"${{ secrets.VCENTER_PASSWORD }}"'|' manifests/portworx/px-vsphere-secret.yaml
+        working-directory: manifests/portworx
+      - name: Deployment
+        uses: armory/cli-deploy-action@main
+        with:
+          clientId: "${{ secrets.CDAAS_CLIENT_ID }}"
+          clientSecret: "${{ secrets.CDAAS_CLIENT_SECRET }}"
+          path-to-file: "/armory/portworx.yaml"
+
+
+
