@@ -31,11 +31,11 @@ targets:
       - pre-prod-lab
 
 manifests:
-  - path: /manifests/metallb-native.yaml
+  - path: /manifests/metallb/metallb-native.yaml
     targets: ['pre-prod-lab','pre-stage-lab']
-  - path: /manifests/metallb-prod.yml
+  - path: /manifests/metallb/metallb-prod.yml
     targets: ['prod-lab']
-  - path: /manifests/metallb-stage.yml
+  - path: /manifests/metallb/metallb-stage.yml
     targets: ['stage-lab']
 
   
