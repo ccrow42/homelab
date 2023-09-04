@@ -1,4 +1,4 @@
-name: deploy latest utilities
+name: deploy latest portworx
 
 on:
   push:
@@ -16,8 +16,8 @@ jobs:
         uses: actions/checkout@v2
       - name: Replace Secret
         run: |
-          sed -i 's|{{VCENTER_PASSWORD}}|'"${{ secrets.VCENTER_PASSWORD }}"'|' manifests/portworx/px-vsphere-secret.yaml
-        working-directory: manifests/portworx
+          sed -i 's|{{VCENTER_PASSWORD}}|'"${{ secrets.VCENTER_PASSWORD }}"'|' /manifests/portworx/px-vsphere-secret.yaml
+        working-directory: /manifests/portworx
       - name: Deployment
         uses: armory/cli-deploy-action@main
         with:
