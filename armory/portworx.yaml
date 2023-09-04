@@ -38,7 +38,7 @@ manifests:
   - path: /manifests/portworx/px-stage.yaml
     targets: ['stage-lab']
   - path: /manifests/portworx/px-prod.yaml
-    targets: ['pre-prod-lab']    
+    targets: ['prod-lab']    
 
   
 strategies:
