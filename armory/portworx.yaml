@@ -1,6 +1,6 @@
 version: v1
 kind: kubernetes
-application: utilities
+application: portworx
 
 targets:
   pre-stage-lab:
