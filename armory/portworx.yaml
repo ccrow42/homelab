@@ -5,25 +5,25 @@ application: utilities
 targets:
   ns-stage-lab:
     account: stage-lab
-    namespace: armory-rna
+    namespace: portworx
     strategy: rolling
   ns-prod-lab:
     account: prod-lab
-    namespace: armory-rna
+    namespace: portworx
     strategy: rolling
     constraints:
       dependsOn:
       - ns-stage-lab
   secret-stage-lab:
     account: stage-lab
-    namespace: armory-rna
+    namespace: portworx
     strategy: rolling
     constraints:
       dependsOn:
       - ns-prod-lab
   secret-prod-lab:
     account: prod-lab
-    namespace: armory-rna
+    namespace: portworx
     strategy: rolling
     constraints:
       dependsOn:
