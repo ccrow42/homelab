@@ -11,8 +11,9 @@ targets:
     account: prod-lab
     namespace: armory-rna
     strategy: rolling
-    dependsOn:
-    - stage-lab
+    constraints:
+      dependsOn:
+      - stage-lab
 
 manifests:
   - path: /manifests/utilities/cmdhook.yml
