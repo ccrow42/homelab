@@ -33,9 +33,9 @@ targets:
 manifests:
   - path: /manifests/metallb/metallb-native.yaml
     targets: ['pre-prod-lab','pre-stage-lab']
-  - path: /manifests/metallb/metallb-prod.yml
+  - path: /manifests/metallb/metallb-prod.yaml
     targets: ['prod-lab']
-  - path: /manifests/metallb/metallb-stage.yml
+  - path: /manifests/metallb/metallb-stage.yaml
     targets: ['stage-lab']
 
   
