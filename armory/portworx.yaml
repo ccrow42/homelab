@@ -3,24 +3,10 @@ kind: kubernetes
 application: utilities
 
 targets:
-  ns-stage-lab:
-    account: stage-lab
-    namespace: portworx
-    strategy: rolling
-  ns-prod-lab:
-    account: prod-lab
-    namespace: portworx
-    strategy: rolling
-    constraints:
-      dependsOn:
-      - ns-stage-lab
   secret-stage-lab:
     account: stage-lab
     namespace: portworx
     strategy: rolling
-    constraints:
-      dependsOn:
-      - ns-prod-lab
   secret-prod-lab:
     account: prod-lab
     namespace: portworx
@@ -31,8 +17,6 @@ targets:
 
 
 manifests:
-  - path: /manifests/portworx/namespace.yaml
-    targets: ['ns-prod-lab','ns-stage-lab']
   - path: /manifests/portworx/px-vsphere-secret.yaml
     targets: ['secret-prod-lab','secret-stage-lab']
 
