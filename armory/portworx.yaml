@@ -3,11 +3,11 @@ kind: kubernetes
 application: utilities
 
 targets:
-  secret-stage-lab:
+  pre-stage-lab:
     account: stage-lab
     namespace: portworx
     strategy: rolling
-  secret-prod-lab:
+  pre-prod-lab:
     account: prod-lab
     namespace: portworx
     strategy: rolling
@@ -19,6 +19,8 @@ targets:
 manifests:
   - path: /manifests/portworx/px-vsphere-secret.yaml
     targets: ['secret-prod-lab','secret-stage-lab']
+  - path: /manifests/portworx/px-operator.yaml
+    targets: ['pre-prod-lab','pre-stage-lab']
 
   
 strategies:
