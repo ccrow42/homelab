@@ -1,0 +1,26 @@
+version: v1
+kind: kubernetes
+application: utilities
+
+targets:
+  stage-lab:
+    account: cluster01
+    namespace: armory-rna
+    strategy: rolling
+  prod-lab:
+    account: prod-lab
+    namespace: armory-rna
+    strategy: rolling
+    dependsOn: stage-lab
+
+manifests:
+  - path: utilities/cmdhook.yml
+    targets: ['prod-lab','stage-lab']
+
+  
+strategies:
+  rolling:
+    canary:
+      steps:
+        - setWeight:
+            weight: 100
