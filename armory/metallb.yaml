@@ -1,0 +1,47 @@
+version: v1
+kind: kubernetes
+application: utilities
+
+targets:
+  pre-stage-lab:
+    account: stage-lab
+    namespace: portworx
+    strategy: rolling
+  pre-prod-lab:
+    account: prod-lab
+    namespace: portworx
+    strategy: rolling
+    constraints:
+      dependsOn:
+      - pre-stage-lab
+  stage-lab:
+    account: stage-lab
+    namespace: portworx
+    strategy: rolling
+    constraints:
+      dependsOn:
+      - pre-stage-lab
+  prod-lab:
+    account: prod-lab
+    namespace: portworx
+    strategy: rolling
+    constraints:
+      dependsOn:
+      - stage-lab
+      - pre-prod-lab
+
+manifests:
+  - path: /manifests/metallb-native.yaml
+    targets: ['pre-prod-lab','pre-stage-lab']
+  - path: /manifests/metallb-prod.yml
+    targets: ['prod-lab']
+  - path: /manifests/metallb-stage.yml
+    targets: ['stage-lab']
+
+  
+strategies:
+  rolling:
+    canary:
+      steps:
+        - setWeight:
+            weight: 100

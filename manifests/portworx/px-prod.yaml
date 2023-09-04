@@ -5,6 +5,7 @@ metadata:
   name: px-cluster-prod
   namespace: portworx
   annotations:
+    portworx.io/service-type: "portworx-api:LoadBalancer"
     portworx.io/install-source: "https://install.portworx.com/?operator=true&mc=false&kbver=1.26.7&ns=portworx&b=true&iop=6&vsp=true&vc=10.0.1.10&vcp=443&ds=esx-local3&s=%22type%3Dthin%2Csize%3D100%22&r=17001&c=px-cluster-e6803b7e-dce9-4a4e-8356-f820678fd87a&stork=true&csi=true&mon=true&tel=true&st=k8s&promop=true"
 spec:
   image: portworx/oci-monitor:3.0.0
