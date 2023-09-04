@@ -33,7 +33,7 @@ targets:
 manifests:
   - path: /manifests/portworx/namespace.yaml
     targets: ['ns-prod-lab','ns-stage-lab']
-  - path: /manifests/portworx/namespace.yaml
+  - path: /manifests/portworx/px-vsphere-secret.yaml
     targets: ['secret-prod-lab','secret-stage-lab']
 
   
