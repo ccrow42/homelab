@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'manifests/utilities.yaml' # Replace with the path to the file or directory you want to monitor
+      - '/manifests/utilities/*' # Replace with the path to the file or directory you want to monitor
 
 jobs:
   build:
