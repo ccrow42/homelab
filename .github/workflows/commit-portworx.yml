@@ -19,10 +19,10 @@ jobs:
         run: |
           sed -i 's|{{VCENTER_PASSWORD}}|'"${{ secrets.VCENTER_PASSWORD }}"'|' px-vsphere-secret.yaml
         working-directory: manifests/portworx
-      - name: Cat file
+      - name: Replace central db secret
         run: |
-          cat px-vsphere-secret.yaml
-        working-directory: manifests/portworx
+          sed -i 's|{{PXCDB_PASSWORD}}|'"${{ secrets.PXCDB_PASSWORD }}"'|' px-central.yaml
+        working-directory: manifests/px-central
       - name: Deployment
         uses: armory/cli-deploy-action@main
         with:
