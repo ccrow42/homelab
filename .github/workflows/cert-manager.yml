@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'manifests/utilities/*' # Replace with the path to the file or directory you want to monitor
+      - 'manifests/cert-manager/*' # Replace with the path to the file or directory you want to monitor
 
 jobs:
   build:
@@ -23,4 +23,4 @@ jobs:
         with:
           clientId: "${{ secrets.CDAAS_CLIENT_ID }}"
           clientSecret: "${{ secrets.CDAAS_CLIENT_SECRET }}"
-          path-to-file: "/armory/utilities.yaml"
+          path-to-file: "/armory/cert-manager.yaml"
