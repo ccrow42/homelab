@@ -1,6 +1,6 @@
 
 # Q: got an error when trying to apply a namespace yaml
-k create ns cert-manager
+k create ns portworx
 
 #this hasn't been tested yet
 k create ns cert-manager
