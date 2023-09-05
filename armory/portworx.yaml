@@ -29,6 +29,13 @@ targets:
       dependsOn:
       - stage-lab
       - pre-prod-lab
+  pxcentral-prod-lab:
+    account: prod-lab
+    namespace: portworx
+    strategy: rolling
+    constraints:
+      dependsOn:
+      - prod-lab
 
 manifests:
   - path: /manifests/portworx/px-vsphere-secret.yaml
@@ -39,7 +46,8 @@ manifests:
     targets: ['stage-lab']
   - path: /manifests/portworx/px-prod.yaml
     targets: ['prod-lab']    
-
+  - path: /manifests/px-central/px-central.yaml
+    targets: ['pxcentral-prod-lab']  
   
 strategies:
   rolling:
