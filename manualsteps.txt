@@ -1,6 +1,9 @@
 
 # Q: got an error when trying to apply a namespace yaml
-k create ns portworx
+k create ns cert-manager
+
+#this hasn't been tested yet
+k create ns cert-manager
 
 # Q: I tried to manually create the namespace here, but it would not apply, I did not remove the namespace kind from the manifest though
 kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.13.10/config/manifests/metallb-native.yaml --context stage

@@ -31,7 +31,7 @@ targets:
       - pre-prod-lab
   pxcentral-prod-lab:
     account: prod-lab
-    namespace: portworx
+    namespace: central
     strategy: rolling
     constraints:
       dependsOn:
