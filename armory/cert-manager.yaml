@@ -1,24 +1,22 @@
 version: v1
 kind: kubernetes
-application: utilities
+application: cert-manager
 
 targets:
   stage-lab:
     account: stage-lab
-    namespace: armory-rna
+    namespace: cert-manager
     strategy: rolling
   prod-lab:
     account: prod-lab
-    namespace: armory-rna
+    namespace: cert-manager
     strategy: rolling
     constraints:
       dependsOn:
       - stage-lab
 
 manifests:
-  - path: /manifests/utilities/cmdhook.yml
-    targets: ['prod-lab','stage-lab']
-  - path: /manifests/certmanager/*
+  - path: /manifests/cert-manager/*
     targets: ['prod-lab','stage-lab']
 
   

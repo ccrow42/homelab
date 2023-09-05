@@ -3,6 +3,20 @@ kind: kubernetes
 application: metallb
 
 targets:
+  pre-stage-lab:
+    account: stage-lab
+    namespace: metallb-system
+    strategy: rolling
+    constraints:
+      dependsOn:
+      - pre-stage-lab
+  pre-prod-lab:
+    account: prod-lab
+    namespace: metallb-system
+    strategy: rolling
+    constraints:
+      dependsOn:
+      - stage-lab
   stage-lab:
     account: stage-lab
     namespace: metallb-system
