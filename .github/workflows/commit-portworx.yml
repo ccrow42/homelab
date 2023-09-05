@@ -7,6 +7,7 @@ on:
     paths:
       - 'manifests/portworx/*' # Replace with the path to the file or directory you want to monitor
       - 'armory/portworx.yaml'
+      - 'manifests/px-central.yaml'
 
 jobs:
   build:
