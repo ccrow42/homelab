@@ -13,12 +13,12 @@ jobs:
     name: deploy from main
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
       - name: Replace Secret
         run: |
           sed -i 's|{{ROUTE53_SECRET}}|'"${{ secrets.ROUTE53_SECRET }}"'|' route53-credentials.yaml
-        working-directory: manifests/portworx
-      - name: Checkout code
-        uses: actions/checkout@v2
+        working-directory: manifests/cert-manager
       - name: Deployment
         uses: armory/cli-deploy-action@main
         with:
