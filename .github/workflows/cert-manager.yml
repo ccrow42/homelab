@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - 'manifests/cert-manager/*' # Replace with the path to the file or directory you want to monitor
+      - 'armory/cert-manager.yaml'
 
 jobs:
   build:
