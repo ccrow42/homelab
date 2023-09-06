@@ -5,7 +5,7 @@ application: minio
 targets:
   prod-lab:
     account: prod-lab
-    namespace: metallb-system
+    namespace: minio
     strategy: rolling
 
 
