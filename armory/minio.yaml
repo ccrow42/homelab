@@ -1,7 +1,7 @@
 version: v1
 kind: kubernetes
 application: minio
-
+#
 targets:
   prod-lab:
     account: prod-lab

@@ -24,7 +24,7 @@ jobs:
         with:
           clientId: "${{ secrets.CDAAS_CLIENT_ID }}"
           clientSecret: "${{ secrets.CDAAS_CLIENT_SECRET }}"
-          path-to-file: "/armory/portworx.yaml"
+          path-to-file: "/armory/minio.yaml"
 
 
 
