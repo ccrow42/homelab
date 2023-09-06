@@ -1,4 +1,4 @@
-name: deploy latest utilities
+name: deploy latest cert-manager
 
 on:
   push:

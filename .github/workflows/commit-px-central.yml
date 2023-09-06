@@ -1,4 +1,4 @@
-name: deploy latest portworx
+name: deploy latest px-central
 
 on:
   push:
