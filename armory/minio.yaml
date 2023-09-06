@@ -10,6 +10,8 @@ targets:
 
 
 manifests:
+  - path: /manifests/minio/namespace.yaml
+    targets: ['prod-lab']
   - path: /manifests/minio/minio.yaml
     targets: ['prod-lab']
   - path: /manifests/minio/minioproxyvolume.yaml
