@@ -16,7 +16,7 @@ jobs:
       - name: Replace Secret
         run: |
           sed -i 's|{{ROUTE53_SECRET}}|'"${{ secrets.ROUTE53_SECRET }}"'|' route53-credentials.yaml
-        working-directory: manifests/cert-manager
+        working-directory: manifests/portworx
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Deployment
