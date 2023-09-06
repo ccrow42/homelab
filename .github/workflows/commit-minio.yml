@@ -3,10 +3,10 @@ name: deploy latest minio
 on:
   push:
     branches:
-#      - main
+      - main
     paths:
-#      - 'manifests/minio/*' # Replace with the path to the file or directory you want to monitor
-#      - 'armory/minio.yaml'
+      - 'manifests/minio/*' # Replace with the path to the file or directory you want to monitor
+      - 'armory/minio.yaml'
 
 jobs:
   build:
