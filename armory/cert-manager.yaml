@@ -17,7 +17,7 @@ targets:
       - stage-lab
 
 manifests:
-  - path: /manifests/cert-manager/*
+  - path: /manifests/cert-manager
     targets: ['prod-lab','stage-lab']
 
   
