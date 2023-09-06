@@ -9,9 +9,6 @@ targets:
     account: prod-lab
     namespace: central
     strategy: rolling
-    constraints:
-      dependsOn:
-      - prod-lab
 
 manifests:  
   - path: /manifests/px-central/namespace.yaml
