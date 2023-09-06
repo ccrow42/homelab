@@ -14,10 +14,11 @@ targets:
       - prod-lab
 
 manifests:  
-  - path: /manifests/px-central/px-central.yaml
-    targets: ['prod-lab']  
   - path: /manifests/px-central/namespace.yaml
     targets: ['prod-lab']  
+  - path: /manifests/px-central/px-central.yaml
+    targets: ['prod-lab']  
+
   
 strategies:
   rolling:
