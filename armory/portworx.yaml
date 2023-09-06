@@ -39,10 +39,10 @@ manifests:
     targets: ['pre-prod-lab','pre-stage-lab']
   - path: /manifests/portworx/px-operator.yaml
     targets: ['pre-prod-lab','pre-stage-lab']
-  - path: /manifests/portworx/px-stage.yaml
-    targets: ['stage-lab']
-  - path: /manifests/portworx/px-prod.yaml
-    targets: ['prod-lab']    
+#  - path: /manifests/portworx/px-stage.yaml
+#    targets: ['stage-lab']
+#  - path: /manifests/portworx/px-prod.yaml
+#    targets: ['prod-lab']    
   
 strategies:
   rolling:
