@@ -16,21 +16,21 @@ targets:
     constraints:
       dependsOn:
       - pre-stage-lab
-#  stage-lab:
-#    account: stage-lab
-#    namespace: portworx
-#    strategy: rolling
-#    constraints:
-#      dependsOn:
-#      - pre-stage-lab
-#  prod-lab:
-#    account: prod-lab
-#    namespace: portworx
-#    strategy: rolling
-#    constraints:
-#      dependsOn:
-#      - stage-lab
-#      - pre-prod-lab
+  stage-lab:
+    account: stage-lab
+    namespace: portworx
+    strategy: rolling
+    constraints:
+      dependsOn:
+      - pre-stage-lab
+  prod-lab:
+    account: prod-lab
+    namespace: portworx
+    strategy: rolling
+    constraints:
+      dependsOn:
+      - stage-lab
+      - pre-prod-lab
 
 manifests:
   - path: /manifests/portworx/namespace.yaml
@@ -39,10 +39,10 @@ manifests:
     targets: ['pre-prod-lab','pre-stage-lab']
   - path: /manifests/portworx/px-operator.yaml
     targets: ['pre-prod-lab','pre-stage-lab']
-#  - path: /manifests/portworx/px-stage.yaml
-#    targets: ['stage-lab']
-#  - path: /manifests/portworx/px-prod.yaml
-#    targets: ['prod-lab']    
+  - path: /manifests/portworx/px-stage.yaml
+    targets: ['stage-lab']
+  - path: /manifests/portworx/px-prod.yaml
+    targets: ['prod-lab']    
   
 strategies:
   rolling:
