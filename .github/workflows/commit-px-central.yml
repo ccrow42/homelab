@@ -5,8 +5,8 @@ on:
     branches:
       - main
     paths:
-      - 'manifests/portworx/*' # Replace with the path to the file or directory you want to monitor
-      - 'armory/portworx.yaml'
+      - 'armory/px-central.yaml'
+      - 'manifests/px-central.yaml'
 
 jobs:
   build:
@@ -15,16 +15,16 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Replace Secret
+      - name: Replace central db secret
         run: |
-          sed -i 's|{{VCENTER_PASSWORD}}|'"${{ secrets.VCENTER_PASSWORD }}"'|' px-vsphere-secret.yaml
-        working-directory: manifests/portworx
+          sed -i 's|{{PXCDB_PASSWORD}}|'"${{ secrets.PXCDB_PASSWORD }}"'|' px-central.yaml
+        working-directory: manifests/px-central
       - name: Deployment
         uses: armory/cli-deploy-action@main
         with:
           clientId: "${{ secrets.CDAAS_CLIENT_ID }}"
           clientSecret: "${{ secrets.CDAAS_CLIENT_SECRET }}"
-          path-to-file: "/armory/portworx.yaml"
+          path-to-file: "/armory/px-central.yaml"
 
 
 

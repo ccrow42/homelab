@@ -1,0 +1,27 @@
+#dummy update 01
+
+version: v1
+kind: kubernetes
+application: px-central
+
+targets:
+  prod-lab:
+    account: prod-lab
+    namespace: central
+    strategy: rolling
+    constraints:
+      dependsOn:
+      - prod-lab
+
+manifests:  
+  - path: /manifests/px-central/px-central.yaml
+    targets: ['prod-lab']  
+  - path: /manifests/px-central/namespace.yaml
+    targets: ['prod-lab']  
+  
+strategies:
+  rolling:
+    canary:
+      steps:
+        - setWeight:
+            weight: 100

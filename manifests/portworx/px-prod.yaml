@@ -51,6 +51,6 @@ spec:
   - name: VSPHERE_VCENTER_PORT
     value: "443"
   - name: VSPHERE_DATASTORE_PREFIX
-    value: "esx2-local3"
+    value: "esx2-local1"
   - name: VSPHERE_INSTALL_MODE
     value: "shared"
