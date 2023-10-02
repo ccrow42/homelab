@@ -14,7 +14,7 @@ spec:
     internal: true
   cloudStorage:
     deviceSpecs:
-    - type=thin,size=100
+    - type=thin,size=150
   secretsProvider: k8s
   startPort: 17001
   stork:
@@ -51,6 +51,6 @@ spec:
   - name: VSPHERE_VCENTER_PORT
     value: "443"
   - name: VSPHERE_DATASTORE_PREFIX
-    value: "esx2-local1"
+    value: "esx2-local4"
   - name: VSPHERE_INSTALL_MODE
     value: "shared"

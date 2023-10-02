@@ -1,0 +1,73 @@
+apiVersion: v1
+items:
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      stork.libopenstorage.org/migrated: "true"
+      stork.libopenstorage.org/migrationName: migrationschedule-interval-2023-03-13-121957
+      stork.libopenstorage.org/migrationReplicas: "1"
+      stork.libopenstorage.org/migrationTime: 2023-03-13-122710
+      stork.libopenstorage.org/resource-hash: "8077834571854976383"
+    labels:
+      app: heimdall
+      stork.libopenstorage.org/migrated: "true"
+    name: heimdall
+    namespace: heimdall
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: heimdall
+    strategy:
+      rollingUpdate:
+        maxSurge: 0
+        maxUnavailable: 1
+      type: RollingUpdate
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: heimdall
+      spec:
+        containers:
+        - env:
+          - name: PGID
+            value: "100"
+          - name: PUID
+            value: "1041"
+          - name: TZ
+            value: America/UTC
+          image: ghcr.io/linuxserver/heimdall
+          imagePullPolicy: Always
+          name: heimdall
+          ports:
+          - containerPort: 80
+            name: http-80
+            protocol: TCP
+          - containerPort: 443
+            name: https-443
+            protocol: TCP
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /config
+            name: nfs-heimdall
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: stork
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: nfs-heimdall
+          persistentVolumeClaim:
+            claimName: heimdall-pvc
+        - name: heimdall-ssl
+          secret:
+            defaultMode: 420
+            secretName: heimdall-mydomain-tls
+kind: List
+metadata:
+  resourceVersion: ""

@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: prod-portworx-operator
+spec:
+  destination:
+    name: ''
+    namespace: portworx
+    server: 'https://10.0.1.136:6443'
+  source:
+    path: prod/px-operator
+    repoURL: 'https://github.com/ccrow42/argocd'
+    targetRevision: HEAD
+  sources: []
+  project: default
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: false

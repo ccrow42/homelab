@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+    meta.helm.sh/release-name: valheim-server
+    meta.helm.sh/release-namespace: valheim
+  labels:
+  name: valheim-server
+  namespace: valheim
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: valheim-server
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: valheim-server
+    spec:
+      containers:
+      - env:
+        - name: SERVER_NAME
+          value: crowheim
+        - name: WORLD_NAME
+          value: crowheim
+        - name: SERVER_PASS
+          value: weasel
+        - name: SERVER_PORT
+          value: "2456"
+        image: lloesche/valheim-server:latest
+        imagePullPolicy: Always
+        name: valheim-server
+        ports:
+        - containerPort: 2456
+          name: gameport
+          protocol: TCP
+        - containerPort: 2457
+          name: queryport
+          protocol: TCP
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /config
+          name: gamefiles
+        - mountPath: /opt/valheim
+          name: serverfiles
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: stork
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: gamefiles
+        persistentVolumeClaim:
+          claimName: valheim-server-world-data
+      - name: serverfiles
+        persistentVolumeClaim:
+          claimName: valheim-server-base-data

@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+  labels:
+    app: torprivoxy
+  name: torprivoxy
+  namespace: network
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: torprivoxy
+  strategy:
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: torprivoxy
+    spec:
+      containers:
+      - env:
+        - name: TZ
+          value: America/Los_Angeles
+        image: avpnusr/torprivoxy
+        imagePullPolicy: Always
+        name: torprivoxy
+        ports:
+        - containerPort: 8118
+          name: http-80
+          protocol: TCP
+        - containerPort: 9050
+          name: https-443
+          protocol: TCP
+      restartPolicy: Always
+      schedulerName: stork
+      terminationGracePeriodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    stork.libopenstorage.org/migrated: "true"
+    stork.libopenstorage.org/migrationName: migrationschedule-interval-2023-01-26-185013
+    stork.libopenstorage.org/migrationTime: 2023-01-26-190936
+    stork.libopenstorage.org/resource-hash: "3757209548898947264"
+  name: torprivoxy-service
+  namespace: network
+spec:
+  type: LoadBalancer
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: http-80
+    port: 8118
+  - name: https-443
+    port: 9050
+  selector:
+    app: torprivoxy

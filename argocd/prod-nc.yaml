@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: prod-nextcloud
+spec:
+  sources:
+  - repoURL: 'https://nextcloud.github.io/helm/'
+    chart: nextcloud
+    targetRevision: 3.5.13
+    helm:
+      valueFiles:
+      - $values/prod/nc/nextcloud-values.yaml
+  - repoURL: 'https://github.com/ccrow42/argocd'
+    ref: values
+  destination:
+    name: ''
+    namespace: 'nc'
+    server: 'https://10.0.1.136:6443'
+  project: default
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: false

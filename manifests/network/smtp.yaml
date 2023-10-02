@@ -1,0 +1,43 @@
+---
+ apiVersion: apps/v1
+ kind: Deployment
+ metadata:
+   name: smtp-deployment
+   namespace: network
+   labels:
+     app: smtp
+ spec:
+   replicas: 2
+   selector:
+      matchLabels:
+        app: smtp
+   template:
+     metadata:
+       labels:
+         app: smtp
+
+     spec:
+      containers:
+         - name: smtp
+           image: pure/smtp-relay
+           env:
+             - name: SMTP_HOSTNAME
+               value: "localhost"
+             - name: RELAY_NETWORKS
+               value: "10.0.0.0/8"
+           ports:
+             - containerPort: 25
+---
+kind: Service
+apiVersion: v1
+metadata:
+  namespace: network
+  name: smtp-service
+spec:
+  selector:
+    app: smtp
+  ports:
+  - protocol: TCP
+    port: 25
+    targetPort: 25
+  type: ClusterIP

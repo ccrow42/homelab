@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: prod-metallb
+spec:
+  destination:
+    name: ''
+    namespace: metallb-system
+    server: 'https://10.0.1.136:6443'
+  source:
+    path: prod/metallb
+    repoURL: 'https://github.com/ccrow42/argocd'
+    targetRevision: HEAD
+  sources: []
+  project: default
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: false
