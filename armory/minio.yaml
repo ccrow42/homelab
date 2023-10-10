@@ -4,7 +4,7 @@ application: minio
 #
 targets:
   prod-lab:
-    account: prod-lab
+    account: rke-prod
     namespace: minio
     strategy: rolling
 
