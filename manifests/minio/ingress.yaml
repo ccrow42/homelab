@@ -51,3 +51,4 @@ spec:
                 name: minio-console
                 port:
                   number: 9001
+# comment
