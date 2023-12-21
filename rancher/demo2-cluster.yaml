@@ -45,11 +45,12 @@ spec:
         etcdRole: true
         controlPlaneRole: true
         workerRole: false
+#        hostnamePrefix: ''
         quantity: 1
         unhealthyNodeTimeout: 0m
         machineConfigRef:
           kind: VmwarevsphereConfig
-          name: nc-demo2-pool1-zj2st
+          name: nc-demo2-control
         drainBeforeDelete: true
         machineOS: linux
         labels: {}
@@ -57,14 +58,18 @@ spec:
         etcdRole: false
         controlPlaneRole: false
         workerRole: true
+#        hostnamePrefix: ''
         quantity: 3
         unhealthyNodeTimeout: 0m
         machineConfigRef:
           kind: VmwarevsphereConfig
-          name: nc-demo2-pool2-g6ws7
+          name: nc-demo2-worker
         drainBeforeDelete: true
         machineOS: linux
         labels: {}
+    machineSelectorConfig:
+      - config:
+          protect-kernel-defaults: false
     registries:
       configs:
         {}
@@ -93,3 +98,6 @@ spec:
         ignoreDaemonSets: true
         skipWaitForDeleteTimeoutSeconds: 0
         timeout: 120
+#  machineSelectorConfig:
+#    - config: {}
+#__clone: true

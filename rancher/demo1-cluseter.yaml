@@ -50,7 +50,7 @@ spec:
         unhealthyNodeTimeout: 0m
         machineConfigRef:
           kind: VmwarevsphereConfig
-          name: vsphere-control
+          name: nc-demo1-control
         drainBeforeDelete: true
         machineOS: linux
         labels: {}
@@ -63,7 +63,7 @@ spec:
         unhealthyNodeTimeout: 0m
         machineConfigRef:
           kind: VmwarevsphereConfig
-          name: vsphere-worker
+          name: nc-demo1-worker
         drainBeforeDelete: true
         machineOS: linux
         labels: {}

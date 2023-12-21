@@ -22,15 +22,15 @@ folder: null
 gracefulShutdownTimeout: "0"
 hostsystem: null
 kind: VmwarevsphereConfig
-memorySize: "8192"
+memorySize: "12228"
 metadata:
   creationTimestamp: "2023-12-21T18:49:15Z"
-  generateName: nc-demo1-pool1-
+  generateName: nc-demo1-pool2-
   generation: 1
-  name: vsphere-control
+  name: nc-demo1-worker
   namespace: fleet-default
-  resourceVersion: "590813"
-  uid: f5dc5755-6b60-4dda-8fe6-63d07446b47d
+  resourceVersion: "590814"
+  uid: 3381e714-c2c7-4c0e-8471-14dbab9c3b8d
 network: []
 os: linux
 password: ""
