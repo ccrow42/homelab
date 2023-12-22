@@ -31,7 +31,7 @@ spec:
       containers:
       - env:
         - name: DST_CLUSTER_TOKEN
-        image: jamesits/dst-server:vanilla-slim
+        image: jamesits/dst-server:latest
         imagePullPolicy: IfNotPresent
         name: dst-server
         ports:

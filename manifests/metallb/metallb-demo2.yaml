@@ -1,0 +1,14 @@
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: demo2pool #the name of the pool you want to use
+  namespace: metallb-system
+spec:
+  addresses:
+  - 10.0.1.51 - 10.0.1.59 # be sure to update this with the address pool for your lab
+---
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: prod # the name of the advertisement
+  namespace: metallb-system

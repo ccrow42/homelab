@@ -1,5 +1,9 @@
-#dummy update 01
-# SOURCE: https://install.portworx.com/?comp=pxoperator&kbver=1.26.7&ns=portworx
+# SOURCE: https://install.portworx.com/?comp=pxoperator&kbver=1.26.8&ns=portworx
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: "portworx"
+---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -51,7 +55,7 @@ spec:
       containers:
       - name: portworx-operator
         imagePullPolicy: Always
-        image: portworx/px-operator:23.5.1
+        image: portworx/px-operator:23.10.1
         command:
         - /operator
         - --verbose
@@ -74,4 +78,12 @@ spec:
                     values:
                     - portworx-operator
               topologyKey: "kubernetes.io/hostname"
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/os
+                    operator: In
+                    values:
+                      - linux
       serviceAccountName: portworx-operator

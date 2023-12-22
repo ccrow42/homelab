@@ -1,0 +1,11 @@
+--2023-12-05 14:40:36--  https://install.portworx.com/3.0?comp=pxoperator
+Resolving install.portworx.com (install.portworx.com)... 35.197.113.27
+Connecting to install.portworx.com (install.portworx.com)|35.197.113.27|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 2057 (2.0K) [text/plain]
+Saving to: ‘3.0?comp=pxoperator’
+
+3.0?comp=pxoperator                      0%[                                                                            ]       0  --.-KB/s               3.0?comp=pxoperator                    100%[===========================================================================>]   2.01K  --.-KB/s    in 0s      
+
+2023-12-05 14:40:36 (3.04 GB/s) - ‘3.0?comp=pxoperator’ saved [2057/2057]
+
