@@ -59,7 +59,7 @@ spec:
         controlPlaneRole: false
         workerRole: true
 #        hostnamePrefix: ''
-        quantity: 1
+        quantity: 3
         unhealthyNodeTimeout: 0m
         machineConfigRef:
           kind: VmwarevsphereConfig
