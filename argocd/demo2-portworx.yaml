@@ -1,12 +1,25 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
+  name: demo2-px-operator
+spec:
+  destination:
+    name: 'demo2'
+    namespace: 'portworx'
+  source:
+    path: manifests/px-operator/resources
+    repoURL: 'https://github.com/ccrow42/homelab'
+    targetRevision: HEAD
+  project: default
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
   name: demo2-portworx
 spec:
   destination:
     name: 'demo2'
     namespace: 'portworx'
-#    server: 'https://rancher.lan.ccrow.org/k8s/clusters/c-m-7m6pptnr'
   source:
     path: manifests/portworx/overlays/demo2
     repoURL: 'https://github.com/ccrow42/homelab'

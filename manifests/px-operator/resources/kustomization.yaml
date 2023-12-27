@@ -1,0 +1,5 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- https://install.portworx.com/?comp=pxoperator&kbver=1.26.11&ns=portworx
