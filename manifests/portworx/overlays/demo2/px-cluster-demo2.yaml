@@ -1,0 +1,9 @@
+kind: StorageCluster
+apiVersion: core.libopenstorage.org/v1
+metadata:
+  name: px-cluster
+  namespace: portworx
+spec:
+  cloudStorage:
+    deviceSpecs:
+    - type=thin,size=40
