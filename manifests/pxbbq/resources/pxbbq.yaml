@@ -39,18 +39,3 @@ spec:
         readinessProbe:
           httpGet:
             port: 8080
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: pxbbq-svc
-  namespace: pxbbq
-  labels:
-    app: pxbbq-web
-spec:
-  ports:
-  - port: 80
-    targetPort: 8080
-  type: LoadBalancer
-  selector:
-    app: pxbbq-web

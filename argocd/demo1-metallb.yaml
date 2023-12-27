@@ -11,5 +11,6 @@ spec:
     repoURL: 'https://github.com/ccrow42/homelab'
     targetRevision: HEAD
   project: default
-
+  syncPolicy:
+    automated: {}
   
