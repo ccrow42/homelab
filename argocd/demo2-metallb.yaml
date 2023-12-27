@@ -1,0 +1,15 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: demo2-metallb
+spec:
+  destination:
+    name: 'demo2'
+    namespace: 'metallb-system'
+  source:
+    path: manifests/metallb/overlays/demo2
+    repoURL: 'https://github.com/ccrow42/homelab'
+    targetRevision: HEAD
+  project: default
+
+  
