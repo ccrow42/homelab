@@ -3,6 +3,8 @@ apiVersion: core.libopenstorage.org/v1
 metadata:
   name: px-cluster
   namespace: portworx
+  annotations:
+    portworx.io/service-type: "portworx-api:LoadBalancer"
 spec:
   cloudStorage:
     deviceSpecs:
