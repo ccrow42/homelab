@@ -5,6 +5,7 @@ metadata:
   namespace: portworx
   annotations:
     portworx.io/service-type: "portworx-api:LoadBalancer"
+    argocd.argoproj.io/sync-wave: "2"    
 spec:
   cloudStorage:
     deviceSpecs:
