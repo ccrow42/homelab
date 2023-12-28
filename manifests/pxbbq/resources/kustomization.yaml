@@ -5,3 +5,5 @@ resources:
 - namespace.yaml
 - mongodb.yaml
 - mongodb-pvc.yaml
+- pxbbq-svc.yaml
+- pxbbq.yaml
