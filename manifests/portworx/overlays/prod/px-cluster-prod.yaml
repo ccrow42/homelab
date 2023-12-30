@@ -10,5 +10,23 @@ spec:
     deviceSpecs:
     - type=thin,size=100
   env:
+  - name: VSPHERE_INSECURE
+    value: "true"
+  - name: VSPHERE_USER
+    valueFrom:
+      secretKeyRef:
+        name: px-vsphere-secret
+        key: VSPHERE_USER
+  - name: VSPHERE_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: px-vsphere-secret
+        key: VSPHERE_PASSWORD
+  - name: VSPHERE_VCENTER
+    value: "10.0.1.10"
+  - name: VSPHERE_VCENTER_PORT
+    value: "443"
   - name: VSPHERE_DATASTORE_PREFIX
     value: "esx2-local1"
+  - name: VSPHERE_INSTALL_MODE
+    value: "shared"
