@@ -1,0 +1,19 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: migratepvc
+  namespace: cmd
+spec:
+  template:
+    metadata:
+      name: migratepvc
+    spec:
+      serviceAccountName: cmd
+      containers:
+      - name: kubectl-container
+        image: bitnami/kubectl:1.27.8
+        command:
+         - "bin/bash"
+         - "-c"
+         - "kubectl get pods -A"
+      restartPolicy: Never 

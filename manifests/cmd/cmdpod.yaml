@@ -1,11 +1,16 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: kubectl-pod
+  name: cmd
   namespace: cmd
 spec:
   serviceAccountName: cmd
   containers:
-  - name: kubectl-container
-    image: ccrow42/cmd:latest
-    command: ["/bin/sh", "-c", "kubectl version; exit 0"]
+  - name: cmd-container
+    image: bitnami/kubectl:1.27.8
+    command: 
+      - "bin/bash"
+#      - "-c"
+#      - "kubectl get pods -A"
+  #rm: true  
+  
