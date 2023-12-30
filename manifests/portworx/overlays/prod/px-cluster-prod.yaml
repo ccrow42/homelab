@@ -11,4 +11,4 @@ spec:
     - type=thin,size=100
   env:
   - name: VSPHERE_DATASTORE_PREFIX
-    value: "esx2-local4"
+    value: "esx2-local1"
