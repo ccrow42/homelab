@@ -1,13 +1,13 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: prod-certmanager
+  name: prod-externalsvc
 spec:
   destination:
     name: 'prod'
-    namespace: 'cert-manager'
+    namespace: 'externalsvc'
   source:
-    path: manifests/cert-manager/overlays/prod
+    path: manifests/externalsvc
     repoURL: 'https://github.com/ccrow42/homelab'
     targetRevision: HEAD
   project: default
