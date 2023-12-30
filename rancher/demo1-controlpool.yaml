@@ -15,7 +15,7 @@ cpuCount: "4"
 creationType: template
 customAttribute: []
 datacenter: /Tac
-datastore: /Tac/datastore/esx2-local1
+datastore: /Tac/datastore/esx2-local4
 datastoreCluster: ""
 diskSize: "100000"
 folder: null

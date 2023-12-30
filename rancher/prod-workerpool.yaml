@@ -11,26 +11,26 @@ common:
   labels: null
   taints: []
 contentLibrary: templates
-cpuCount: "4"
+cpuCount: "6"
 creationType: template
 customAttribute: []
 datacenter: /Tac
-datastore: /Tac/datastore/esx2-local4
+datastore: /Tac/datastore/esx2-local1
 datastoreCluster: ""
 diskSize: "100000"
 folder: null
 gracefulShutdownTimeout: "0"
 hostsystem: null
 kind: VmwarevsphereConfig
-memorySize: "8192"
+memorySize: "16384"
 metadata:
   creationTimestamp: "2023-12-21T18:49:15Z"
-  generateName: nc-demo2-pool1-
+  generateName: nc-prod-pool2-
   generation: 1
-  name: nc-demo2-control
+  name: nc-prod-worker
   namespace: fleet-default
-  resourceVersion: "590813"
-  uid: f5dc5755-6b60-4dda-8fe6-63d07446b47d
+  resourceVersion: "590814"
+  uid: 3381e714-c2c7-4c0e-8471-14dbab9c3b8d
 network: []
 os: linux
 password: ""

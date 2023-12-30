@@ -1,0 +1,14 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  namespace: plex-ness
+  name: plex-data
+  labels:
+    app: plex
+spec:
+  storageClassName: portworx-proxy-volume-plexnorepl
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 30T

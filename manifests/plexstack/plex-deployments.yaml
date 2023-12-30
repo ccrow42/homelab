@@ -492,6 +492,7 @@ items:
     name: lidarr-deployment
     labels:
       app: lidarr
+    namespace: plexstack
   spec:
     replicas: 1
     selector:

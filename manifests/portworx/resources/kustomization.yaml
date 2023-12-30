@@ -3,4 +3,4 @@ kind: Kustomization
 
 resources:
 #- px-cluster.yaml
-- https://install.portworx.com/?operator=true&mc=false&kbver=1.26.11+rke2r1&ns=portworx&b=true&iop=6&vsp=true&vc=10.0.1.10&vcp=443&ds=esx2-local1&s=%22type%3Dthin%2Csize%3D80%22&c=px-cluster&stork=true&csi=true&mon=true&tel=false&st=k8s&promop=true
+- https://install.portworx.com/?operator=true&mc=false&kbver=1.26.11+rke2r1&ns=portworx&b=true&iop=6&vsp=true&vc=10.0.1.10&vcp=443&ds=esx2-local4&s=%22type%3Dthin%2Csize%3D80%22&c=px-cluster&stork=true&csi=true&mon=true&tel=false&st=k8s&promop=true

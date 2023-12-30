@@ -15,7 +15,7 @@ cpuCount: "4"
 creationType: template
 customAttribute: []
 datacenter: /Tac
-datastore: /Tac/datastore/esx2-local4
+datastore: /Tac/datastore/esx2-local1
 datastoreCluster: ""
 diskSize: "100000"
 folder: null
@@ -25,9 +25,9 @@ kind: VmwarevsphereConfig
 memorySize: "8192"
 metadata:
   creationTimestamp: "2023-12-21T18:49:15Z"
-  generateName: nc-demo2-pool1-
+  generateName: nc-prod-pool1-
   generation: 1
-  name: nc-demo2-control
+  name: nc-prod-control
   namespace: fleet-default
   resourceVersion: "590813"
   uid: f5dc5755-6b60-4dda-8fe6-63d07446b47d
