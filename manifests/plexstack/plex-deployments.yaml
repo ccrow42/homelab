@@ -406,6 +406,8 @@ items:
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
           volumeMounts:
+          - mountPath: "/plex-norepl"
+            name: sonarr-norepl
           - mountPath: /config
             name: sonarr-config
           - mountPath: /tv
@@ -431,6 +433,9 @@ items:
         - name: sonarr-archive
           persistentVolumeClaim:
             claimName: archive-data
+        - name: sonarr-norepl
+          persistentVolumeClaim:
+            claimName: plexnorepl-data
 - apiVersion: apps/v1
   kind: Deployment
   metadata:

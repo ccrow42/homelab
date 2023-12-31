@@ -153,3 +153,30 @@ spec:
   resources:
     requests:
       storage: 30T
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: portworx-proxy-volume-plexnorepl
+provisioner: kubernetes.io/portworx-volume
+parameters:
+  proxy_endpoint: "nfs://10.0.1.8"
+  proxy_nfs_exportpath: "/volume1/Plex-norepl"
+  mount_options: "vers=3.0"
+allowVolumeExpansion: true
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  namespace: plexstack
+  name: plexnorepl-data
+  labels:
+    app: plex
+spec:
+  storageClassName: portworx-proxy-volume-plexnorepl
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 3T
+---
