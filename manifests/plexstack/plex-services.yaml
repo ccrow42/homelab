@@ -73,7 +73,7 @@ items:
     - port: 8080
     selector:
       app: qbittorrent-rss
-    type: LoadBalancer
+    type: ClusterIP
 - apiVersion: v1
   kind: Service
   metadata:
@@ -139,7 +139,7 @@ items:
     name: tautulli-service
     namespace: plexstack
   spec:
-    type: LoadBalancer
+    type: ClusterIP
     clusterIP: 10.43.99.101
     clusterIPs:
     - 10.43.99.101
