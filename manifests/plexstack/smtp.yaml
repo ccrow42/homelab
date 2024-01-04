@@ -31,7 +31,7 @@
 kind: Service
 apiVersion: v1
 metadata:
-  namespace: network
+  namespace: plexstack
   name: smtp-service
 spec:
   selector:
