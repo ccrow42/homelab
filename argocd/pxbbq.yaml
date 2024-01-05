@@ -8,7 +8,7 @@ spec:
     name: 'in-cluster'
     namespace: 'argocd'
   source:
-    path: manifests/argocd/pxbbq
+    path: argocd/pxbbq
     repoURL: 'https://github.com/ccrow42/homelab'
     targetRevision: HEAD
   project: pxbbq
