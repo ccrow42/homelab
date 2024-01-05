@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: scaledown
+  namespace: pxbbq
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  serviceAccountName: cmd
+  containers:
+  - name: cmd-container
+    image: bitnami/kubectl:1.27.8
+    command: 
+      - "bin/bash"
+      - "-c"
+      - "kubectl -n pxbbq scale deployment mongo --replicas=0"
