@@ -16,3 +16,4 @@ spec:
       - "bin/bash"
       - "-c"
       - "kubectl -n pxbbq scale sts mongo --replicas=0"
+    restartPolicy: Never
