@@ -1,0 +1,21 @@
+apiVersion: stork.libopenstorage.org/v1alpha1
+kind: MigrationSchedule
+metadata:
+  name: migrationschedule
+  namespace: portworx
+  annotations:
+    # Add the below annotations when PX-Security is enabled on both the clusters
+    #openstorage.io/auth-secret-namespace: <the namespace where the kubernetes secret holding the auth token resides>
+    #openstorage.io/auth-secret-name: <the name of the kubernetes secret which holds the auth token>
+spec:
+  template:
+    spec:
+      clusterPair: migration-cluster-pair
+      includeResources: false
+      startApplications: false
+      includeVolumes: true
+      namespaces:
+      - pxbbq
+  schedulePolicyName: default-interval-policy
+  suspend: false
+  autoSuspend: true

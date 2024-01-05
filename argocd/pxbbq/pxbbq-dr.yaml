@@ -1,17 +1,15 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: migrate
+  name: prod-pxbbq-dr
   annotations:
-    argocd.argoproj.io/sync-wave: "-3"
-    argocd.argoproj.io/hook: PreSync
-    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+    argocd.argoproj.io/sync-wave: "0"
 spec:
   destination:
     name: 'demo1'
-    namespace: 'portworx'
+    namespace: 'pxbbq'
   source:
-    path: manifests/pxbbq/migrate
+    path: manifests/pxbbq/dr
     repoURL: 'https://github.com/ccrow42/homelab'
     targetRevision: HEAD
   project: pxbbq
