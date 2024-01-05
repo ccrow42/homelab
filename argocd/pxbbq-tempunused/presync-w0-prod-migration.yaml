@@ -1,0 +1,17 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: migrate
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  destination:
+    name: 'demo1'
+    namespace: 'cmd'
+  source:
+    path: manifests/pxbbq/migrate
+    repoURL: 'https://github.com/ccrow42/homelab'
+    targetRevision: HEAD
+  project: pxbbq
