@@ -39,5 +39,5 @@ spec:
         readinessProbe:
           httpGet:
             port: 8080
-        restartPolicy: Never
+      restartPolicy: Never
         
