@@ -9,7 +9,7 @@ metadata:
 spec:
   destination:
     name: 'demo1'
-    namespace: 'cmd'
+    namespace: 'portworx'
   source:
     path: manifests/pxbbq/migrate
     repoURL: 'https://github.com/ccrow42/homelab'
