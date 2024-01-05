@@ -13,3 +13,5 @@ spec:
     repoURL: 'https://github.com/ccrow42/homelab'
     targetRevision: HEAD
   project: pxbbq
+  syncPolicy:
+    automated: {}

@@ -13,3 +13,5 @@ spec:
       path: manifests/pxbbq/overlays/stage
       targetRevision: pxbbq-stage
   project: pxbbq
+  syncPolicy:
+    automated: {}
