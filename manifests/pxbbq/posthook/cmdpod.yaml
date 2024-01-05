@@ -1,5 +1,5 @@
 apiVersion: batch/v1
-kind: job
+kind: Job
 metadata:
   name: scaledown
   namespace: pxbbq
@@ -9,13 +9,14 @@ metadata:
     argocd.argoproj.io/hook-delete-policy: HookSucceeded
 spec:
   template:
-    serviceAccountName: cmd
-    restartPolicy: Never
-    containers:
-    - name: cmd-container
-      image: bitnami/kubectl:1.27.8
-      command: 
-        - "bin/bash"
-        - "-c"
-        - "kubectl -n pxbbq scale sts mongo --replicas=0"
+    spec:
+      serviceAccountName: cmd
+      restartPolicy: Never
+      containers:
+      - name: cmd-container
+        image: bitnami/kubectl:1.27.8
+        command: 
+          - "bin/bash"
+          - "-c"
+          - "kubectl -n pxbbq scale sts mongo --replicas=0"
 
