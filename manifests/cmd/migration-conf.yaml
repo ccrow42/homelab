@@ -1,0 +1,10 @@
+apiVersion: v1
+data:
+  migration.yaml: "apiVersion: stork.libopenstorage.org/v1alpha1\nkind: Migration\nmetadata:\n
+    \ name: migration01\n  namespace: portworx\nspec:\n  clusterPair: stage\n  includeResources:
+    true\n  startApplications: true\n  namespaces:\n    - pxbbq\n  purgeDeletedResources:
+    false\n#  selectors: \n#    pxmigration: \"true\"\n"
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: migration

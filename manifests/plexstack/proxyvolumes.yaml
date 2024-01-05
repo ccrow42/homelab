@@ -131,7 +131,7 @@ allowVolumeExpansion: true
 kind: StorageClass
 apiVersion: storage.k8s.io/v1
 metadata:
-  name: portworx-proxy-volume-plexnorepl
+  name: 
 provisioner: kubernetes.io/portworx-volume
 parameters:
   proxy_endpoint: "nfs://10.0.1.8"
@@ -147,7 +147,7 @@ metadata:
   labels:
     app: plex
 spec:
-  storageClassName: portworx-proxy-volume-plexnorepl
+  storageClassName: 
   accessModes:
     - ReadWriteMany
   resources:

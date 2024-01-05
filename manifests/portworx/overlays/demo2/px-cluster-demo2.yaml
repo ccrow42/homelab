@@ -9,3 +9,8 @@ spec:
   cloudStorage:
     deviceSpecs:
     - type=thin,size=40
+  stork:
+    enabled: true
+    args:
+      admin-namespace: "portworx"
+      webhook-controller: "true"
