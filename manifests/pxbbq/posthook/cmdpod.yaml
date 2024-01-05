@@ -13,6 +13,6 @@ spec:
   - name: cmd-container
     image: bitnami/kubectl:1.27.8
     command: 
-#      - "bin/bash"
-#      - "-c"
-      - "kubectl -n pxbbq scale deployment mongo --replicas=0"
+      - "bin/bash"
+      - "-c"
+      - "kubectl -n pxbbq scale sts mongo --replicas=0"
