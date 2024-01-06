@@ -11,11 +11,6 @@ import random
 username = os.getenv('MONGO_USER')
 password = os.getenv('MONGO_PASS')
 server = os.getenv('MONGO_NODE')
-s3url = os.getenv('S3_URL')
-accesskey = os.getenv('S3_ACCESSKEY')
-secretkey = os.getenv('S3_SECRETKEY')
-bucket = os.getenv('S3_BUCKET')
-
 
 print('test')
 
@@ -28,23 +23,32 @@ print (username)
 client = pymongo.MongoClient("mongodb://%s:%s@%s:27017/" % (username, password, server)) 
 
 # Access the specific database
-db = client["pxbbq"]
+db = client["porxbbq"]
 
 # Access the specific collection
-orders_collection = db["orders"]
+collection = db["orders"]
 
 # Use the count_documents() method to get the number of documents
-orders_document_count = orders_collection.count_documents({})
+document_count = collection.count_documents({})
 
-print(orders_document_count)
+print(document_count)
 
 
-# Access the specific collection
-registrations_collection = db["registrations"]
+client = Minio(s3url, accesskey, secretkey)
 
-# Use the count_documents() method to get the number of documents
-registrations_document_count = registrations_collection.count_documents({})
+def get_document_count(database_name, collection_name):
+  
+    document_count = "0"
 
-print(orders_document_count)
+    return document_count
 
+# Use the function
+
+@app.route('/')
+def armory_random():
+    docCount = get_document_count("porxbbq", "orders")
+    code = random.choice([200,404])
+    return ("%s orders served from PorxBBQ" % docCount), code
+
+app.run(host='0.0.0.0')
 
