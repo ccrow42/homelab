@@ -1,7 +1,10 @@
 export MONGO_USER='porxie'
 export MONGO_PASS='porxie'
 export MONGO_NODE='10.0.236.30'
-
+export S3_URL='minio.ccrow.org'
+export S3_ACCESSKEY='bbq-taster'
+export S3_SECRETKEY='lltBEt6eRo39IM68pPdY'
+export S3_BUCKET='bbq-taster'
 
 Stop all the containers
 
@@ -21,4 +24,4 @@ yq e '.spec.template.spec.containers[0].image' mongodb.yaml | head -n 1
 
 export MONGO_USER='porxie'
 export MONGO_PASS='porxie'
-export MONGO_NODE='10.0.1.62'
+export MONGO_NODE='10.0.1.63'

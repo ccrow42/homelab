@@ -31,14 +31,20 @@ client = pymongo.MongoClient("mongodb://%s:%s@%s:27017/" % (username, password, 
 db = client["pxbbq"]
 
 # Access the specific collection
-collection = db["orders"]
+orders_collection = db["orders"]
 
 # Use the count_documents() method to get the number of documents
-document_count = collection.count_documents({})
+orders_document_count = orders_collection.count_documents({})
 
-print(document_count)
+print(orders_document_count)
 
 
+# Access the specific collection
+registrations_collection = db["registrations"]
 
+# Use the count_documents() method to get the number of documents
+registrations_document_count = registrations_collection.count_documents({})
+
+print(orders_document_count)
 
 
