@@ -6,3 +6,5 @@ resources:
 - mongodb.yaml
 - pxbbq-svc.yaml
 - pxbbq.yaml
+- bbq-taster.yaml
+- bbq-taster-secret.yaml
