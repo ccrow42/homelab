@@ -12,6 +12,9 @@ spec:
     - repoURL: 'https://github.com/ccrow42/homelab'
       path: manifests/pxbbq/overlays/stage
       targetRevision: pxbbq-stage
+    - repoURL: 'https://github.com/ccrow42/homelab'
+      path: manifests/pxbbq/posthook
+      targetRevision: pxbbq-stage
   project: pxbbq
   syncPolicy:
     automated: {}

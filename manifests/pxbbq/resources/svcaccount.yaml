@@ -11,7 +11,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: cmd
-  namespace: cmd
+  namespace: pxbbq
 ---
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
@@ -20,7 +20,7 @@ metadata:
 subjects:
 - kind: ServiceAccount
   name: cmd
-  namespace: cmd
+  namespace: pxbbq
 roleRef:
   kind: ClusterRole
   name: cmd-role
