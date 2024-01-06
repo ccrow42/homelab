@@ -11,7 +11,14 @@ spec:
   template:
     spec:
       restartPolicy: Never
+      serviceAccountName: cmd
       containers:
+      - name: scaledown
+        image: bitnami/kubectl:1.27.8
+        command: 
+          - "bin/bash"
+          - "-c"
+          - "kubectl -n pxbbq scale sts mongo --replicas=0 && sleep 30"
       - name: pre-taste
         image: ccrow42/bbq-uploader:latest
         env:
