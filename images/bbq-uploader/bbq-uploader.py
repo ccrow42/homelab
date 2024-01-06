@@ -6,10 +6,6 @@ import io
 import datetime
 from minio import Minio
 
-#username = urllib.parse.quote_plus('porxie')
-#password = urllib.parse.quote_plus('porxie')
-#server = urllib.parse.quote_plus('10.0.1.53')
-
 username = os.getenv('MONGO_USER')
 password = os.getenv('MONGO_PASS')
 server = os.getenv('MONGO_NODE')
@@ -17,10 +13,7 @@ s3url = os.getenv('S3_URL')
 accesskey = os.getenv('S3_ACCESSKEY')
 secretkey = os.getenv('S3_SECRETKEY')
 bucket = os.getenv('S3_BUCKET')
-
-
-
-
+results_bucket = os.getenv('S3_RESULTS_BUCKET')
 
 
 # Create a connection to the MongoDB instance running on localhost

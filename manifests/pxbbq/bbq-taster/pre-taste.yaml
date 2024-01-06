@@ -1,22 +1,19 @@
----
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: batch/v1
+kind: Job
 metadata:
-  name: bbq-taster
+  name: pre-taste
   namespace: pxbbq
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: bbq-taster
   template:
-    metadata:
-      labels:
-        app: bbq-taster
     spec:
+      restartPolicy: Never
       containers:
-      - name: bbq-taster
-        image: ccrow42/bbq-taster:latest
+      - name: pre-taste
+        image: ccrow42/bbq-uploader:latest
         env:
         - name: MONGO_NODE
           valueFrom:
@@ -58,16 +55,5 @@ spec:
             secretKeyRef:
               name: bbq-taster
               key: s3url
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: bbq-taster
-  namespace: pxbbq
-spec:
-  selector:
-    app: bbq-taster
-  ports:
-  - protocol: TCP
-    port: 80
-    targetPort: 5000
+
+
