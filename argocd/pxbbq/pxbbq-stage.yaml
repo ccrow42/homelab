@@ -16,5 +16,3 @@ spec:
       path: manifests/pxbbq/bbq-taster
       targetRevision: pxbbq-stage
   project: pxbbq
-  syncPolicy:
-    automated: {}
