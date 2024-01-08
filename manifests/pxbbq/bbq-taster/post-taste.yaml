@@ -61,7 +61,7 @@ spec:
         command: 
           - "bin/bash"
           - "-c"
-          - "sleep 30 && kubectl -n pxbbq scale sts mongo --replicas=0"
+          - "sleep 30 && kubectl -n pxbbq scale sts mongo --replicas=0 && kubectl -n pxbbq scale deployment pxbbq-web --replicas=0"
       - name: query-url
         image: curlimages/curl:latest
         command: 
