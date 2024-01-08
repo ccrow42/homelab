@@ -60,7 +60,4 @@ spec:
   selector:
     app.kubernetes.io/name: mongo
     app.kubernetes.io/component: backend
-  template:
-    spec:
-      containers:
-        - image: mongo:6.0.2
+

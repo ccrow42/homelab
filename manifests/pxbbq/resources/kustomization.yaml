@@ -8,3 +8,4 @@ resources:
 - pxbbq.yaml
 - bbq-taster.yaml
 - bbq-taster-secret.yaml
+- mongodb-svc.yaml
