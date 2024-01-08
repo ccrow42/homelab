@@ -1,4 +1,3 @@
-# Dummy update 15
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -21,7 +20,7 @@ spec:
     spec:
       containers:
         - name: mongo
-          image: mongo:6.0.2 # 6.0.1 and 6.0.3 are good, 6.0.2 is bad. update
+          image: mongo:6.0.1 # 6.0.1 and 6.0.3 are good, 6.0.2 is bad. update
           env:
             - name: MONGO_INITDB_ROOT_USERNAME
               value: porxie
@@ -43,24 +42,5 @@ spec:
         - name: mongo-data-dir
           persistentVolumeClaim:
             claimName: mongodb-pvc
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: mongo
-  labels:
-    app.kubernetes.io/name: mongo
-    app.kubernetes.io/component: backend
-  namespace: pxbbq
-spec:
-  ports:
-    - port: 27017
-      targetPort: 27017
-  type: LoadBalancer
-  selector:
-    app.kubernetes.io/name: mongo
-    app.kubernetes.io/component: backend
-  template:
-    spec:
-      containers:
-        - image: mongo:6.0.2
+
+
