@@ -1,0 +1,37 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    acme.cert-manager.io/http01-edit-in-place: "true"
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    field.cattle.io/publicEndpoints: '[{"addresses":["10.0.1.127","10.0.1.138","10.0.1.142","10.0.1.145"],"port":443,"protocol":"HTTPS","serviceName":"amoc:amoc-wordpress","ingressName":"amoc:ingress-wordpress-ccrow","hostname":"www.ccrow.org","path":"/","allNodes":false},{"addresses":["10.0.1.127","10.0.1.138","10.0.1.142","10.0.1.145"],"port":443,"protocol":"HTTPS","serviceName":"amoc:amoc-wordpress","ingressName":"amoc:ingress-wordpress-ccrow","hostname":"ccrow.org","path":"/","allNodes":false}]'
+  name: ingress-wordpress-ccrow
+  namespace: amoc
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: www.ccrow.org
+    http:
+      paths:
+      - backend:
+          service:
+            name: amoc-wordpress
+            port:
+              number: 80
+        path: /
+        pathType: Prefix
+  - host: ccrow.org
+    http:
+      paths:
+      - backend:
+          service:
+            name: amoc-wordpress
+            port:
+              number: 80
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - www.ccrow.org
+    - ccrow.org
+    secretName: ccrow-tls
