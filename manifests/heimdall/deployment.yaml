@@ -58,7 +58,6 @@ items:
             name: nfs-heimdall
         dnsPolicy: ClusterFirst
         restartPolicy: Always
-        schedulerName: stork
         terminationGracePeriodSeconds: 30
         volumes:
         - name: nfs-heimdall
