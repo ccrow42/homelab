@@ -1,0 +1,102 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: radarr-pvc
+  namespace: plexstack
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: nfs-client
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: radarr-deployment
+  namespace: plexstack
+  labels:
+    app: radarr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: radarr
+  template:
+    metadata:
+      labels:
+        app: radarr
+    spec:
+      containers:
+        - name: radarr
+          image: ghcr.io/linuxserver/radarr
+          env:
+            - name: PUID
+              value: "999"
+            - name: PGID
+              value: "999"
+          ports:
+            - containerPort: 7878
+          volumeMounts:
+            - mountPath: /config
+              name: radarr-config
+            - mountPath: /downloads
+              name: radarr-downloads
+            - mountPath: /movies
+              name: radarr-movies
+            - mountPath: /movies-norepl
+              name: radarr-movies-norepl
+      volumes:
+        - name: radarr-config
+          persistentVolumeClaim:
+            claimName: radarr-pvc
+        - name: radarr-downloads
+          hostPath:
+            path: /mnt/uberplex/downloads
+        - name: radarr-movies
+          hostPath:
+            path: /mnt/movies/Movies
+        - name: radarr-movies-norepl
+          hostPath:
+            path: /mnt/plex-norepl/movies
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: radarr-service
+  namespace: plexstack
+spec:
+  selector:
+    app: radarr
+  ports:
+  - protocol: TCP
+    port: 7878
+    targetPort: 7878
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod-dns01
+    kubernetes.io/ingress.class: nginx
+  name: ingress-radarr
+  namespace: plexstack
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: radarr.lan.ccrow.org
+    http:
+      paths:
+      - backend:
+          service:
+            name: radarr-service
+            port:
+              number: 7878
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - radarr.lan.ccrow.org
+    secretName: radarr-tls
