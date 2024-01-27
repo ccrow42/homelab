@@ -17,7 +17,7 @@ metadata:
   name: pihole-svc
 subsets:
   - addresses:
-    - ip: 10.0.1.80
+    - ip: 10.0.1.4
     ports:
     - port: 8080
 ---

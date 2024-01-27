@@ -5,11 +5,15 @@ metadata:
   namespace: minio
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod-dns01
-    kubernetes.io/ingress.class: nginx
+#    traefik.ingress.kubernetes.io/router.tls: "true"
+#    kubernetes.io/ingress.class: "traefik"
+#    kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/proxy-body-size: "0"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+#    traefik.ingress.kubernetes.io/router.entrypoints: http
 spec:
+  ingressClassName: nginx
   tls:
     - hosts:
         - 'minio.ccrow.org'
@@ -32,10 +36,14 @@ metadata:
   name: ingress-minioconsole
   namespace: minio
   annotations:
+#    traefik.ingress.kubernetes.io/router.tls: "true"
     cert-manager.io/cluster-issuer: letsencrypt-prod-dns01
-    kubernetes.io/ingress.class: nginx
+#    kubernetes.io/ingress.class: "traefik"
+#    kubernetes.io/ingress.class: nginx
+#    traefik.ingress.kubernetes.io/router.entrypoints: http
 
 spec:
+  ingressClassName: nginx
   tls:
     - hosts:
         - minioconsole.lan.ccrow.org
@@ -51,4 +59,22 @@ spec:
                 name: minio-console
                 port:
                   number: 9001
-# comment
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: httpbun
+  namespace: minio
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: httpbun2.foo.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: minio-console
+            port:
+              number: 9001
+        path: /
+        pathType: Prefix
