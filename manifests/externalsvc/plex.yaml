@@ -17,7 +17,7 @@ metadata:
   name: plex-svc
 subsets:
   - addresses:
-    - ip: 10.0.1.144
+    - ip: 10.0.1.60
     ports:
     - port: 32400
 ---
