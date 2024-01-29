@@ -1,9 +1,14 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: plex-priv
+---
 #ref https://www.debontonline.com/2021/01/part-14-deploy-plexserver-yaml-with.html
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: plex-private-pvc
-  namespace: plexserver
+  namespace: plex-private
 spec:
   accessModes:
     - ReadWriteMany
@@ -18,7 +23,7 @@ metadata:
   labels:
     app: plexserver-private              # < label for tagging and reference
   name: plexserver-private                # < name of the deployment
-  namespace: plexserver           # < namespace where to place the deployment and pods               # < namespace where place the deployment and pods
+  namespace: plex-private           # < namespace where to place the deployment and pods               # < namespace where place the deployment and pods
 spec:
   replicas: 1                     # < number of pods to deploy
   revisionHistoryLimit: 0
@@ -102,7 +107,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: plex-private-udp              # < name of the service
-  namespace: plexserver       # < namespace where to place service
+  namespace: plex-private       # < namespace where to place service
   annotations:
     metallb.universe.tf/allow-shared-ip: plexserver # < annotation name to combine the Service IP, make sure it's same name as in the service UDP yaml
 spec:
@@ -140,7 +145,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: plex-private-tcp              # < name of the service
-  namespace: plexserver       # < namespace where to place service
+  namespace: plex-private       # < namespace where to place service
   annotations:
     metallb.universe.tf/allow-shared-ip: plexserver  # < annotation name to combine the Service IP, make sure it's same name as in the service UDP yaml
 spec:
