@@ -9,7 +9,7 @@ spec:
   resources:
     requests:
       storage: 10Gi
-  storageClassName: nfs-client
+  storageClassName: longhorn
 ---
 apiVersion: apps/v1
 kind: Deployment
