@@ -10,7 +10,7 @@ metadata:
     #  key: string
   namespace: fleet-default
 spec:
-  cloudCredentialSecretName: cattle-global-data:cc-wnkr8
+  cloudCredentialSecretName: cattle-global-data:cc-r779j
   clusterAgentDeploymentCustomization:
     appendTolerations:
     overrideAffinity:
