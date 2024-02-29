@@ -4,11 +4,6 @@ metadata:
   annotations:
     meta.helm.sh/release-name: valheim-server
     meta.helm.sh/release-namespace: valheim
-    service.beta.kubernetes.io/aws-load-balancer-type: nlb
-    stork.libopenstorage.org/migrated: "true"
-    stork.libopenstorage.org/migrationName: migrationschedule-interval-2023-01-26-185013
-    stork.libopenstorage.org/migrationTime: 2023-01-26-190924
-    stork.libopenstorage.org/resource-hash: "16177245998935120081"
   labels:
     app.kubernetes.io/managed-by: Helm
   name: valheim-server

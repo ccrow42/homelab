@@ -1,0 +1,9 @@
+apiVersion: snapshot.storage.k8s.io/v1
+kind: VolumeSnapshot
+metadata:
+  name: valheim-server-world
+  namespace: valheim
+spec:
+  source:
+    persistentVolumeClaimName: valheim-server-world-data
+  volumeSnapshotClassName: longhorn-durable
