@@ -1,0 +1,33 @@
+# This kustomization contains patches to update the following configurations without changing
+# the base deployment files:
+# - Your desired hostname
+# - The path to your media library
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: jellyfin
+
+# basic jellyfin server deployment resources
+bases:
+  - ../base/
+
+# updates base configuration with hostname and path to media files.
+patches:
+  - target:
+      kind: Ingress
+      name: jellyfin-ingress
+    patch: |-
+      - op: replace
+        path: /spec/tls/0/hosts/0
+        value: yourhost.yourdomain.com 
+      - op: replace
+        path: /spec/rules/0/host
+        value: yourhost.yourdomain.com 
+  - target:
+      kind: PersistentVolume
+      name: media-pv
+    patch: |-
+      - op: replace
+        path: /spec/hostPath/path
+        value: /path/to/your/media 
