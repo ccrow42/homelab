@@ -12,6 +12,13 @@ spec:
       labels:
         app: jellyfin
     spec:
+      tolerations:
+        - key: "arch"
+          operator: "Equal"
+          value: "amd64"
+          effect: "NoSchedule"
+      nodeSelector:
+        kubernetes.io/arch: amd64
       containers:
       - env:
         - name: NODE_NAME
@@ -36,16 +43,30 @@ spec:
         - containerPort: 8096
           protocol: TCP
         volumeMounts:
-        - mountPath: /data/media
-          name: media
-          readOnly: True
+        - mountPath: /data/movies
+          name: movies 
+        - mountPath: /data/plex-norepl
+          name: plex-norepl
+        - mountPath: /data/tv
+          name: tv
+        - mountPath: /data/music
+          name: music     
         - mountPath: /config
           name: jellyfin-config
       restartPolicy: Always
       volumes:
-      - name: media
-        persistentVolumeClaim:
-          claimName: media-pvc
       - name: jellyfin-config
         persistentVolumeClaim:
           claimName: jellyfin-config
+      - name: plex-norepl
+        hostPath:
+          path: /mnt/plex-norepl
+      - name: movies
+        hostPath:
+          path: /mnt/movies
+      - name: tv
+        hostPath:
+          path: /mnt/tv
+      - name: music
+        hostPath:
+          path: /mnt/music
