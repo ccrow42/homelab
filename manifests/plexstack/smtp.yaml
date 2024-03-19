@@ -7,7 +7,7 @@
    labels:
      app: smtp
  spec:
-   replicas: 2
+   replicas: 1
    selector:
       matchLabels:
         app: smtp
@@ -15,8 +15,14 @@
      metadata:
        labels:
          app: smtp
-
      spec:
+      tolerations:
+        - key: "arch"
+          operator: "Equal"
+          value: "amd64"
+          effect: "NoSchedule"
+      nodeSelector:
+        kubernetes.io/arch: amd64
       containers:
          - name: smtp
            image: pure/smtp-relay
