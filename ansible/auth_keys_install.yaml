@@ -7,4 +7,4 @@
       ansible.posix.authorized_key:
         user: ubuntu
         state: present
-        key: https://github.com/ccrow42/homelab/ansible/authorized_keys
+        key: https://raw.githubusercontent.com/ccrow42/homelab/main/ansible/authorized_keys
