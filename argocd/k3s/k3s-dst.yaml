@@ -4,9 +4,8 @@ metadata:
   name: k3s-dst
 spec:
   destination:
-    name: ''
     namespace: dst
-    server: 'https://10.0.1.136:6443'
+    name: 'in-cluster'
   source:
     path: manifests/dst
     repoURL: 'https://github.com/ccrow42/homelab'

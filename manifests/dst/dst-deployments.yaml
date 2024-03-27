@@ -38,6 +38,7 @@ spec:
       containers:
       - env:
         - name: DST_CLUSTER_TOKEN
+          value: "pds-g^KU_or9kAyGi^G6XzOY0WbXXugL5AtWsnRF834IP3HcfDeVMgF4EEVpE="
         image: jamesits/dst-server:latest
         imagePullPolicy: IfNotPresent
         name: dst-server
