@@ -6,7 +6,7 @@ kind: Kustomization
 resources:
   - deployment.yaml
   - ingress.yaml
-  - config-storage.yaml
+#  - config-storage.yaml
 #  - media-storage.yaml
   - service.yaml
   - namespace.yaml
