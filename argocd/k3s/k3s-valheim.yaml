@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: k3s-valheim
+spec:
+  destination:
+    namespace: valheim
+    name: 'in-cluster'
+  source:
+    path: manifests/valheim
+    repoURL: 'https://github.com/ccrow42/homelab'
+    targetRevision: HEAD
+  sources: []
+  project: default
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: false
