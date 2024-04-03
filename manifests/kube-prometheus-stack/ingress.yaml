@@ -22,4 +22,4 @@ spec:
   tls:
   - hosts:
     - grafana.lan.ccrow.org
-    secretName: jackett-tls
+    secretName: grafana-tls

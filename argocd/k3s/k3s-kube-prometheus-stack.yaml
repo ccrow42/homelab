@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: k3s-kube-prometheus-stack
+spec:
+  sources:
+  - repoURL: 'https://prometheus-community.github.io/helm-charts'
+    chart: kube-prometheus-stack
+    targetRevision: 57.2.0
+    # helm:
+    #   valueFiles:
+    #   - $values/prod/nc/nextcloud-values.yaml
+  # - repoURL: 'https://github.com/ccrow42/argocd'
+  #   ref: values
+  - path: manifests/kube-prometheus-stack
+    repoURL: 'https://github.com/ccrow42/homelab'
+    targetRevision: HEAD
+  destination:
+    name: 'in-cluster'
+    namespace: 'kube-prometheus-stack'
+  project: default
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: false
