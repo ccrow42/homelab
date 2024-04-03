@@ -14,7 +14,7 @@ spec:
       paths:
       - backend:
           service:
-            name: prometheus-grafana
+            name: k3s-kube-prometheus-stack-grafana
             port:
               number: 80
         path: /
