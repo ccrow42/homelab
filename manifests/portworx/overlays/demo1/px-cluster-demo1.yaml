@@ -7,7 +7,6 @@ metadata:
     portworx.io/service-type: "portworx-api:LoadBalancer"
     argocd.argoproj.io/sync-wave: "2"    
 spec:
-  maxStorageNodesPerZone: 3
   cloudStorage:
     deviceSpecs:
     - type=thin,size=40
@@ -17,6 +16,6 @@ spec:
       admin-namespace: "portworx"
       webhook-controller: "true"
   security:
-    enabled: true
+    enabled: false
     auth:
-      guestAccess: 'Disabled'
+      guestAccess: 'Enabled'
