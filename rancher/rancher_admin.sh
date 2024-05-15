@@ -81,6 +81,8 @@ Commands:
     create_context          Create a context for a cluster. Uses --pool to specify the cluster and --context to specify the context used to pull the server info
     install_sealed_secrets  Install sealed secrets to the cluster
     install_argocd          Install ArgoCD to the cluster
+    install_metallb         Install MetalLB to the cluster
+    install_portworx        Install Portworx to the cluster
 
 Options:
     -h, --help              Display this help message
@@ -102,6 +104,14 @@ USAGE
 requires_poolname () {
     if [[ -z ${POOL_NAME} ]]; then
         terminate "Pool name is required for this command" ${ERR_NO_ARGS}
+    fi
+}
+
+requires_argocd () {
+    if kubectl get namespace argocd; then
+        log "ArgoCD appears to be installed, proceeding"
+    else
+        terminate "ArgoCD is not installed. Please install ArgoCD first" ${ERR_ARGOCD_NOT_INSTALLED}
     fi
 }
 
@@ -217,6 +227,7 @@ install_argocd () {
 install_metallb () {
 
     requires_poolname
+    requires_argocd
 
     log "Installing MetalLB to ${POOL_NAME}"
     kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}"
@@ -227,24 +238,73 @@ install_metallb () {
     ARGOCD_PATH="${ARGOCD_PATH_ROOT}/metallb/overlays/${POOL_NAME}"
     ARGOCD_REPO_URL="${ARGOCD_REPO_URL}"
 
-    
-    if kubectl get namespace argocd; then
-        log "ArgoCD appears to be installed, proceeding"
-        ARGOAPP=$(< ${ARGOCD_APP_TEMPLATE})
-        ARGOAPP="${ARGOAPP//${ARGOCD_NAMESPACE_PLACEHOLDER}/${ARGOCD_NAMESPACE}}"
-        ARGOAPP="${ARGOAPP//${ARGOCD_APP_NAME_PLACEHOLDER}/${ARGOCD_APPNAME}}"
-        ARGOAPP="${ARGOAPP//${ARGOCD_REPO_URL_PLACEHOLDER}/${ARGOCD_REPO_URL}}"
-        ARGOAPP="${ARGOAPP//${ARGOCD_REPO_PATH_PLACEHOLDER}/${ARGOCD_PATH}}"
-        kubectl apply -f <(echo "${ARGOAPP}")
-    else
-        terminate "ArgoCD is not installed. Please install ArgoCD first" ${ERR_ARGOCD_NOT_INSTALLED}
-    fi
+    # Apply Application
+    ARGOAPP=$(< ${ARGOCD_APP_TEMPLATE})
+    ARGOAPP="${ARGOAPP//${ARGOCD_NAMESPACE_PLACEHOLDER}/${ARGOCD_NAMESPACE}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_APP_NAME_PLACEHOLDER}/${ARGOCD_APPNAME}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_REPO_URL_PLACEHOLDER}/${ARGOCD_REPO_URL}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_REPO_PATH_PLACEHOLDER}/${ARGOCD_PATH}}"
+    kubectl apply -f <(echo "${ARGOAPP}")
 
 
 }
+
+### Install PX Operator
+install_px_operator () {
+
+    requires_poolname
+    requires_argocd
+
+    log "Installing MetalLB to ${POOL_NAME}"
+    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}"
+    
+    # ArgoCD Variables
+    ARGOCD_APPNAME="px-operator"
+    ARGOCD_NAMESPACE="portworx"
+    ARGOCD_PATH="${ARGOCD_PATH_ROOT}/px-operator/overlays/${POOL_NAME}"
+    ARGOCD_REPO_URL="${ARGOCD_REPO_URL}"
+
+    # Apply Application
+    ARGOAPP=$(< ${ARGOCD_APP_TEMPLATE})
+    ARGOAPP="${ARGOAPP//${ARGOCD_NAMESPACE_PLACEHOLDER}/${ARGOCD_NAMESPACE}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_APP_NAME_PLACEHOLDER}/${ARGOCD_APPNAME}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_REPO_URL_PLACEHOLDER}/${ARGOCD_REPO_URL}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_REPO_PATH_PLACEHOLDER}/${ARGOCD_PATH}}"
+    kubectl apply -f <(echo "${ARGOAPP}")
+}
+
+### Install PX Operator
+install_px_ent () {
+
+    requires_poolname
+    requires_argocd
+
+    log "Installing MetalLB to ${POOL_NAME}"
+    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}"
+    
+    # ArgoCD Variables
+    ARGOCD_APPNAME="portworx"
+    ARGOCD_NAMESPACE="portworx"
+    ARGOCD_PATH="${ARGOCD_PATH_ROOT}/portworx/overlays/${POOL_NAME}"
+    ARGOCD_REPO_URL="${ARGOCD_REPO_URL}"
+
+    # Apply Application
+    ARGOAPP=$(< ${ARGOCD_APP_TEMPLATE})
+    ARGOAPP="${ARGOAPP//${ARGOCD_NAMESPACE_PLACEHOLDER}/${ARGOCD_NAMESPACE}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_APP_NAME_PLACEHOLDER}/${ARGOCD_APPNAME}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_REPO_URL_PLACEHOLDER}/${ARGOCD_REPO_URL}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_REPO_PATH_PLACEHOLDER}/${ARGOCD_PATH}}"
+    kubectl apply -f <(echo "${ARGOAPP}")
+}
+
+
 ### Meta Commands
 # These commands will call other commands for workflows
 
+install_portworx () {
+    install_px_operator
+    install_px_ent
+}
 
 
 ###### Script Run Section
