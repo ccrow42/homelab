@@ -37,6 +37,10 @@ CONFIG_FILE="${BASE_DIR}/rancher_conf.sh"
 # Standard Functions
 
 log () {
+    if [[ ${DISABLE_LOGS} == 1 ]]; then
+        echo "logs disabled"
+        return
+    fi
     echo $(date -u +"%Y-%m-%dT%H:%M:%SZ") "${@}"
 }
 
@@ -83,10 +87,13 @@ Commands:
     install_argocd          Install ArgoCD to the cluster
     install_metallb         Install MetalLB to the cluster
     install_portworx        Install Portworx to the cluster
+    install_minio           Install Minio to the cluster
+    install_utilities       Install binary utilities to the current host. Requires BINARY_DIR is set
 
 Options:
     -h, --help              Display this help message
     -d, --debug             Enable debug output
+    --disable-logs          Disable logging
     --context               The context to use for some kubectl command
     --pool                  specific the pool name. 
 
@@ -114,6 +121,23 @@ requires_argocd () {
         terminate "ArgoCD is not installed. Please install ArgoCD first" ${ERR_ARGOCD_NOT_INSTALLED}
     fi
 }
+
+requires_portworx () {
+    if kubectl get namespace portworx; then
+        log "Portworx appears to be installed, proceeding"
+    else
+        terminate "Portworx is not installed, install Portworx first" ${ERR_PORTWORX_NOT_INSTALLED}
+    fi
+}
+requires_mc () {
+    if [[ -z $(which mc) ]]; then
+        terminate "mc is not installed. Please install mc first" ${ERR_UTILITY_NOT_INSTALLED}
+    fi
+
+}
+
+
+
 
 ###### Main Functions
 
@@ -234,7 +258,7 @@ install_metallb () {
     
     # ArgoCD Variables
     ARGOCD_APPNAME="metallb"
-    ARGOCD_NAMESPACE="metallb"
+    ARGOCD_NAMESPACE="metallb-system"
     ARGOCD_PATH="${ARGOCD_PATH_ROOT}/metallb/overlays/${POOL_NAME}"
     ARGOCD_REPO_URL="${ARGOCD_REPO_URL}"
 
@@ -297,6 +321,123 @@ install_px_ent () {
     kubectl apply -f <(echo "${ARGOAPP}")
 }
 
+install_minio () {
+    requires_poolname
+    requires_argocd
+
+    log "Installing minio to ${POOL_NAME}"
+    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}"
+
+    # ArgoCD Variables
+    ARGOCD_APPNAME="minio"
+    ARGOCD_NAMESPACE="minio"
+
+    # Must point to a values file
+    ARGOCD_VALUE_FILES="\$values/${ARGOCD_HELM_VALUES_ROOT}/minio/${POOL_NAME}/values.yaml"
+    ARGOCD_REPO_URL="${ARGOCD_REPO_URL}"
+
+    # Helm specific options
+    ARGOCD_HELM_REPO="https://charts.min.io/"
+    ARGOCD_HELM_CHART_VERSION="5.2.0"
+    ARGOCD_HELM_CHART="minio"
+
+    # Apply Application
+    ARGOAPP=$(< ${ARGOCD_HELM_APP_TEMPLATE})
+    ARGOAPP="${ARGOAPP//${ARGOCD_NAMESPACE_PLACEHOLDER}/${ARGOCD_NAMESPACE}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_APP_NAME_PLACEHOLDER}/${ARGOCD_APPNAME}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_REPO_URL_PLACEHOLDER}/${ARGOCD_REPO_URL}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_HELM_VALUE_FILES_PLACEHOLDER}/${ARGOCD_VALUE_FILES}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_HELM_REPO_URL_PLACEHOLDER}/${ARGOCD_HELM_REPO}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_HELM_CHART_PLACEHOLDER}/${ARGOCD_HELM_CHART}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_HELM_TARGET_PLACEHOLDER}/${ARGOCD_HELM_CHART_VERSION}}"
+    #kubectl apply -f <(echo "${ARGOAPP}")
+    echo "${ARGOAPP}"
+    log "${ARGOCD_VALUE_FILES}"
+}
+
+
+#     log "Installing Minio to ${POOL_NAME}"
+#     kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}"
+
+#     helm repo add minio https://charts.min.io/ && helm repo update
+
+#     helm install minio \
+#         --set mode=standalone \
+#         --set persistence.storageClass=px-csi-db \
+#         --set persistence.size=10Gi \
+#         --set resources.requests.memory=1Gi \
+#         --set service.type=LoadBalancer \
+#         --namespace minio \
+#         --create-namespace \
+#         minio/minio
+
+#     ip_regex='^([0-9]{1,3}\.){3}[0-9]{1,3}$'
+#     until [[ $(kubectl -n minio get svc minio -o json | jq -cr '.status.loadBalancer.ingress[0].ip') =~ $ip_regex ]]; do 
+#         echo "Waiting for IP to be provisioned..."
+#         sleep 5
+#     done
+
+#     until [[ $(kubectl -n minio get deployments.apps minio -o json | jq -r '.status.readyReplicas') -le 2 ]]; do
+#         log "Waiting for Minio to be ready..."
+#         sleep 5
+#     done
+# }
+
+configure_minio () {
+    requires_mc
+    log "Configuring Minio"
+    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}"
+
+    MINIO_ENDPOINT=http://$(kubectl get svc -n minio minio -o jsonpath='{.status.loadBalancer.ingress[].ip}'):9000
+    MINIO_ACCESS_KEY=$(kubectl get secret -n minio minio -o jsonpath="{.data.rootUser}" | base64 --decode)
+    MINIO_SECRET_KEY=$(kubectl get secret -n minio minio -o jsonpath="{.data.rootPassword}" | base64 --decode)
+
+    mc alias set ${POOL_NAME} $MINIO_ENDPOINT $MINIO_ACCESS_KEY $MINIO_SECRET_KEY
+    mc mb ${POOL_NAME}/${BUCKET_NAME}
+    mc mb ${POOL_NAME}/${BUCKET_NAME}-objectlock --with-lock
+    mc retention set --default COMPLIANCE 7d ${POOL_NAME}/${POOL_NAME}${BUCKETNAME_PATTERN}-objectlock
+
+}
+
+# Install binary utilities locally
+install_utilities () {
+    requires_portworx
+    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}"
+
+    log "Installing utilities to ${BINARY_DIR}"
+
+    log "Installing storkctl to ${BINARY_DIR}"
+
+    STORK_POD=$(kubectl get pods -n portworx -l name=stork -o jsonpath='{.items[0].metadata.name}')
+    kubectl cp -n portworx $STORK_POD:storkctl/linux/storkctl ${BINARY_DIR}/storkctl  --retries=10
+    chmod +x ${BINARY_DIR}/storkctl
+
+    log "Installing mc to ${BINARY_DIR}"
+    wget -q -O ${BINARY_DIR}/mc https://dl.minio.io/client/mc/release/linux-amd64/mc
+    chmod +x ${BINARY_DIR}/mc
+
+}
+
+
+### Output Variables for environment
+env () {
+    requires_poolname
+    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}"
+    log "Exporting environment variables"
+    export MINIO_ACCESS_KEY=$(kubectl get secret -n minio minio -o jsonpath="{.data.rootUser}" | base64 --decode)
+    export MINIO_SECRET_KEY=$(kubectl get secret -n minio minio -o jsonpath="{.data.rootPassword}" | base64 --decode)
+    export MINIO_ENDPOINT=http://$(kubectl get svc -n minio minio -o jsonpath='{.status.loadBalancer.ingress[].ip}'):9000
+    export MINIO_BUCKET=${BUCKET_NAME}
+    export MINIO_BUCKET_OBJECTLOCK=${BUCKET_NAME}-objectlock
+    
+    log "Paste the following in to .bashrc"
+    echo "export MINIO_ENDPOINT=${MINIO_ENDPOINT}"
+    echo "export MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}"
+    echo "export MINIO_SECRET_KEY=${MINIO_SECRET_KEY}"
+    echo "export MINIO_BUCKET=${MINIO_BUCKET}"
+    echo "export MINIO_BUCKET_OBJECTLOCK=${MINIO_BUCKET_OBJECTLOCK}"
+
+}
 
 ### Meta Commands
 # These commands will call other commands for workflows
@@ -355,8 +496,17 @@ while [[ ${1} != "" ]]; do
         install_metallb)
             COMMAND="install_metallb"
         ;;
+        install_minio)
+            COMMAND="install_minio"
+        ;;
         install_portworx)
             COMMAND="install_portworx"
+        ;;
+        install_utilities)
+            COMMAND="install_utilities"
+        ;;
+        --disable-logs)
+            DISABLE_LOGS=1
         ;;
         --context)
             shift

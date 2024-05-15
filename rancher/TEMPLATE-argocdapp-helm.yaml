@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ARGOCD_APP_NAME_PLACEHOLDER
+  namespace: argocd
+spec:
+  sources:
+  - repoURL: ARGOCD_HELM_REPO_URL_PLACEHOLDER
+    chart: ARGOCD_HELM_CHART_PLACEHOLDER
+    targetRevision: ARGOCD_HELM_TARGET_PLACEHOLDER
+    helm:
+      valueFiles:
+      - ARGOCD_HELM_VALUE_FILES_PLACEHOLDER
+  - repoURL: 'ARGOCD_REPO_URL_PLACEHOLDER'
+    ref: values
+  destination:
+    name: 'in-cluster'
+    namespace: 'ARGOCD_NAMESPACE_PLACEHOLDER'
+  project: default
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: true
