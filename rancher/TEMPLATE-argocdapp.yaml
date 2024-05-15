@@ -1,0 +1,17 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ARGOCD_APP_NAME_PLACEHOLDER
+  namespace: argocd
+spec:
+  destination:
+    name: 'in-cluster'
+    namespace: 'ARGOCD_NAMESPACE_PLACEHOLDER'
+  source:
+    path: ARGOCD_REPO_PATH_PLACEHOLDER
+    repoURL: 'ARGOCD_REPO_URL_PLACEHOLDER'
+    targetRevision: HEAD
+  project: default
+  syncPolicy:
+    automated:
+      selfHeal: true

@@ -62,7 +62,7 @@ source $CONFIG_FILE || terminate "Could not source ${CONFIG_FILE}" ${ERR_CONF_FI
 #source ~/.bashrc || terminate "Could not source .bashrc which contains secrets" ${ERR_CONF_FILE_NOT_FOUND}
 log "Configuration files imported"
 
-###### Functions
+###### Helper Functions
 
 ### Usage Function
 usage() {
@@ -86,7 +86,7 @@ Options:
     -h, --help              Display this help message
     -d, --debug             Enable debug output
     --context               The context to use for some kubectl command
-    --pool                  specific the pool name. Default is demo
+    --pool                  specific the pool name. 
 
 Examples:
     ${SCRIPT_NAME}          connect
@@ -97,6 +97,15 @@ Helpful notes:
 
 USAGE
 }
+
+### requires_poolname
+requires_poolname () {
+    if [[ -z ${POOL_NAME} ]]; then
+        terminate "Pool name is required for this command" ${ERR_NO_ARGS}
+    fi
+}
+
+###### Main Functions
 
 ### This function will set up the rancher server context if it doesn't exist and switch to it. It should ALWAYS exist.
 kubectl_rancher_server () {
@@ -158,6 +167,7 @@ list_rancher_clusters () {
 
 ### Delete a cluster
 delete_rancher_cluster () {
+    requires_poolname
     log "Deleting the cluster ${POOL_NAME}"
     kubectl config use-context ${KUBECTL_CONTEXT}
     kubectl delete -n fleet-default clusters ${POOL_NAME}
@@ -167,6 +177,7 @@ delete_rancher_cluster () {
 
 ### Create a context for a cluster
 create_context () {
+    requires_poolname
     log "Creating a context for ${POOL_NAME}"
     CONTEXT_URL="$(kubectl --context ${KUBECTL_CONTEXT} config view --flatten --minify | yq .clusters[0].cluster.server)/k8s/clusters/$(kubectl --context ${KUBECTL_CONTEXT} -n fleet-default get clusters.provisioning.cattle.io ${POOL_NAME} -o yaml | yq .status.clusterName)"
     kubectl config set-cluster ${POOL_NAME} --server=${CONTEXT_URL}
@@ -175,6 +186,7 @@ create_context () {
 
 ### Install Sealed Secrets
 install_sealed_secrets () {
+    requires_poolname
     log "Installing sealed secrets to ${POOL_NAME}"
     
     kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}" ${ERR_POOL_NOT_FOUND}
@@ -193,6 +205,7 @@ install_sealed_secrets () {
 
 ### Install ArgoCD
 install_argocd () {
+    requires_poolname
     log "Installing ArgoCD to ${POOL_NAME}"
     kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}" ${ERR_POOL_NOT_FOUND}
     kubectl create namespace argocd
@@ -200,6 +213,35 @@ install_argocd () {
 
 }
 
+### Install Metallb
+install_metallb () {
+
+    requires_poolname
+
+    log "Installing MetalLB to ${POOL_NAME}"
+    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}"
+    
+    # ArgoCD Variables
+    ARGOCD_APPNAME="metallb"
+    ARGOCD_NAMESPACE="metallb"
+    ARGOCD_PATH="${ARGOCD_PATH_ROOT}/metallb/overlays/${POOL_NAME}"
+    ARGOCD_REPO_URL="${ARGOCD_REPO_URL}"
+
+    
+    if kubectl get namespace argocd; then
+        log "ArgoCD appears to be installed, proceeding"
+        ARGOAPP=$(< ${ARGOCD_APP_TEMPLATE})
+        ARGOAPP="${ARGOAPP//${ARGOCD_NAMESPACE_PLACEHOLDER}/${ARGOCD_NAMESPACE}}"
+        ARGOAPP="${ARGOAPP//${ARGOCD_APP_NAME_PLACEHOLDER}/${ARGOCD_APPNAME}}"
+        ARGOAPP="${ARGOAPP//${ARGOCD_REPO_URL_PLACEHOLDER}/${ARGOCD_REPO_URL}}"
+        ARGOAPP="${ARGOAPP//${ARGOCD_REPO_PATH_PLACEHOLDER}/${ARGOCD_PATH}}"
+        kubectl apply -f <(echo "${ARGOAPP}")
+    else
+        terminate "ArgoCD is not installed. Please install ArgoCD first" ${ERR_ARGOCD_NOT_INSTALLED}
+    fi
+
+
+}
 ### Meta Commands
 # These commands will call other commands for workflows
 
@@ -249,6 +291,9 @@ while [[ ${1} != "" ]]; do
         ;;
         install_argocd)
             COMMAND="install_argocd"
+        ;;
+        install_metallb)
+            COMMAND="install_metallb"
         ;;
         --context)
             shift
