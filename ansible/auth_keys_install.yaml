@@ -8,3 +8,23 @@
         user: ubuntu
         state: present
         key: https://raw.githubusercontent.com/ccrow42/homelab/main/ansible/authorized_keys
+    - name: Hardening sshd
+      block:
+       - name: Editing sshd config
+         lineinfile:
+           dest: "/etc/ssh/sshd_config"
+           regexp: "{{ item.regexp | default(omit) }}"
+           line: "{{ item.line }}"
+           state: "{{ item.state | default('present') }}"
+           validate: "sshd -t -f %s"
+         with_items:
+           - regexp: "^PermitRootLogin\ "
+             line: "PermitRootLogin no"
+           - regexp: "^PasswordAuthentication\ "
+             line: "PasswordAuthentication no"
+           - regexp: "^PermitEmptyPasswords\ "
+             line: "PermitEmptyPasswords no"
+       - name: Reload sshd
+         service:
+           name: sshd
+           state: reloaded
