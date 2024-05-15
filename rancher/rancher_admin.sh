@@ -355,6 +355,9 @@ while [[ ${1} != "" ]]; do
         install_metallb)
             COMMAND="install_metallb"
         ;;
+        install_portworx)
+            COMMAND="install_portworx"
+        ;;
         --context)
             shift
             CONTEXT=$1
