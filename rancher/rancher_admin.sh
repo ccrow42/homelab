@@ -80,6 +80,7 @@ Commands:
     connect                 Connect to the rancher server
     cleanup                 Cleanup the rancher config from kubectl files
     view                    View the current kubectl config
+    env                     Output environment variables for the current pool  
     create                  Create a new cluster
     delete                  Delete a cluster
     create_context          Create a context for a cluster. Uses --pool to specify the cluster and --context to specify the context used to pull the server info
@@ -89,13 +90,15 @@ Commands:
     install_portworx        Install Portworx to the cluster
     install_minio           Install Minio to the cluster
     install_utilities       Install binary utilities to the current host. Requires BINARY_DIR is set
+    install_demo            Install a demo environment.
 
 Options:
     -h, --help              Display this help message
     -d, --debug             Enable debug output
     --disable-logs          Disable logging
     --context               The context to use for some kubectl command
-    --pool                  specific the pool name. 
+    --pool                  specifies the pool name. 
+    --dr-pool               specifies a secondary pool for DR workflows
 
 Examples:
     ${SCRIPT_NAME}          connect
@@ -107,10 +110,16 @@ Helpful notes:
 USAGE
 }
 
-### requires_poolname
+
 requires_poolname () {
     if [[ -z ${POOL_NAME} ]]; then
         terminate "Pool name is required for this command" ${ERR_NO_ARGS}
+    fi
+}
+
+requires_drpoolname () {
+    if [[ -z ${DR_POOL_NAME} ]]; then
+        terminate "DR Pool name is required for this command" ${ERR_NO_ARGS}
     fi
 }
 
@@ -136,6 +145,14 @@ requires_mc () {
 
 }
 
+wait_ready_racher_cluster () {
+    kubectl config use-context ${KUBECTL_CONTEXT} || terminate "Could not switch to ${KUBECTL_CONTEXT}" 
+    log "Waiting for cluster to be ready, this may take a few minutes."
+    until [[ $(kubectl -n fleet-default get clusters ${POOL_NAME} -o jsonpath='{.status.conditions[?(@.type=="ControlPlaneReady")].status}') == "True" ]]; do
+        echo -n "."
+        sleep 10
+    done
+}
 
 
 
@@ -179,16 +196,22 @@ create_rancher_cluster () {
     
     # Variable Substitution
     CONTROL_POOL=$(< ${CONTROL_POOL_TEMPLATE})
+    debug "control pool: ${CONTROL_POOL}"
+    debug "control pool template: ${CONTROL_POOL_TEMPLATE}"
     CONTROL_POOL="${CONTROL_POOL//${POOL_NAME_PLACEHOLDER}/${POOL_NAME}}"
+    debug "new control pool: ${CONTROL_POOL}"
 
-    WORKER_POOL_TEMPLATE=$(< ${WORKER_POOL_TEMPLATE})
-    WORKER_POOL_TEMPLATE="${WORKER_POOL_TEMPLATE//${POOL_NAME_PLACEHOLDER}/${POOL_NAME}}"
+    WORKER_POOL=$(< ${WORKER_POOL_TEMPLATE})
+    debug "worker pool: ${WORKER_POOL}"
+    debug "worker pool template: ${WORKER_POOL_TEMPLATE}"
+    WORKER_POOL="${WORKER_POOL//${POOL_NAME_PLACEHOLDER}/${POOL_NAME}}"
+    debug "new worker pool: ${WORKER_POOL}"
 
     CLUSTER=$(< ${CLUSTER_TEMPLATE})
     CLUSTER="${CLUSTER//${POOL_NAME_PLACEHOLDER}/${POOL_NAME}}"
 
     kubectl apply -f <(echo "${CONTROL_POOL}")
-    kubectl apply -f <(echo "${WORKER_POOL_TEMPLATE}")
+    kubectl apply -f <(echo "${WORKER_POOL}")
     kubectl apply -f <(echo "${CLUSTER}")
 }
 
@@ -207,6 +230,11 @@ delete_rancher_cluster () {
     kubectl delete -n fleet-default clusters ${POOL_NAME}
     kubectl -n fleet-default delete VmwarevsphereConfig nc-${POOL_NAME}-control
     kubectl -n fleet-default delete VmwarevsphereConfig nc-${POOL_NAME}-worker
+
+    kubectl config delete-context ${POOL_NAME}
+    kubectl config delete-cluster ${POOL_NAME}
+
+    # Need to clean up cloud drives
 }
 
 ### Create a context for a cluster
@@ -227,7 +255,7 @@ install_sealed_secrets () {
     helm repo add sealed-secrets https://bitnami-labs.github.io/sealed-secrets
     helm repo update
     helm install sealed-secrets sealed-secrets/sealed-secrets -n kube-system
-
+    sleep 10
     # Sealed secret substitution
     SEALED_SECRET=$(< ${SEALED_SECRET_TEMPLATE})
     SEALED_SECRET="${SEALED_SECRET//${TLS_CERT_PLACEHOLDER}/${SEALED_SECRET_TLS_CERT}}"
@@ -244,6 +272,7 @@ install_argocd () {
     kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}" ${ERR_POOL_NOT_FOUND}
     kubectl create namespace argocd
     kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+
 
 }
 
@@ -350,38 +379,15 @@ install_minio () {
     ARGOAPP="${ARGOAPP//${ARGOCD_HELM_REPO_URL_PLACEHOLDER}/${ARGOCD_HELM_REPO}}"
     ARGOAPP="${ARGOAPP//${ARGOCD_HELM_CHART_PLACEHOLDER}/${ARGOCD_HELM_CHART}}"
     ARGOAPP="${ARGOAPP//${ARGOCD_HELM_TARGET_PLACEHOLDER}/${ARGOCD_HELM_CHART_VERSION}}"
-    #kubectl apply -f <(echo "${ARGOAPP}")
-    echo "${ARGOAPP}"
-    log "${ARGOCD_VALUE_FILES}"
+
+    # Create the minio namespace
+
+    kubectl create namespace minio
+
+    kubectl apply -f <(echo "${ARGOAPP}")
+    #echo "${ARGOAPP}"
+    #log "${ARGOCD_VALUE_FILES}"
 }
-
-
-#     log "Installing Minio to ${POOL_NAME}"
-#     kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}"
-
-#     helm repo add minio https://charts.min.io/ && helm repo update
-
-#     helm install minio \
-#         --set mode=standalone \
-#         --set persistence.storageClass=px-csi-db \
-#         --set persistence.size=10Gi \
-#         --set resources.requests.memory=1Gi \
-#         --set service.type=LoadBalancer \
-#         --namespace minio \
-#         --create-namespace \
-#         minio/minio
-
-#     ip_regex='^([0-9]{1,3}\.){3}[0-9]{1,3}$'
-#     until [[ $(kubectl -n minio get svc minio -o json | jq -cr '.status.loadBalancer.ingress[0].ip') =~ $ip_regex ]]; do 
-#         echo "Waiting for IP to be provisioned..."
-#         sleep 5
-#     done
-
-#     until [[ $(kubectl -n minio get deployments.apps minio -o json | jq -r '.status.readyReplicas') -le 2 ]]; do
-#         log "Waiting for Minio to be ready..."
-#         sleep 5
-#     done
-# }
 
 configure_minio () {
     requires_mc
@@ -422,20 +428,41 @@ install_utilities () {
 ### Output Variables for environment
 env () {
     requires_poolname
-    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}"
-    log "Exporting environment variables"
-    export MINIO_ACCESS_KEY=$(kubectl get secret -n minio minio -o jsonpath="{.data.rootUser}" | base64 --decode)
-    export MINIO_SECRET_KEY=$(kubectl get secret -n minio minio -o jsonpath="{.data.rootPassword}" | base64 --decode)
-    export MINIO_ENDPOINT=http://$(kubectl get svc -n minio minio -o jsonpath='{.status.loadBalancer.ingress[].ip}'):9000
-    export MINIO_BUCKET=${BUCKET_NAME}
-    export MINIO_BUCKET_OBJECTLOCK=${BUCKET_NAME}-objectlock
-    
-    log "Paste the following in to .bashrc"
-    echo "export MINIO_ENDPOINT=${MINIO_ENDPOINT}"
-    echo "export MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}"
-    echo "export MINIO_SECRET_KEY=${MINIO_SECRET_KEY}"
-    echo "export MINIO_BUCKET=${MINIO_BUCKET}"
-    echo "export MINIO_BUCKET_OBJECTLOCK=${MINIO_BUCKET_OBJECTLOCK}"
+
+        kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}"
+        log "Exporting environment variables"
+        MINIO_ACCESS_KEY=$(kubectl get secret -n minio minio -o jsonpath="{.data.rootUser}" | base64 --decode)
+        MINIO_SECRET_KEY=$(kubectl get secret -n minio minio -o jsonpath="{.data.rootPassword}" | base64 --decode)
+        MINIO_ENDPOINT=http://$(kubectl get svc -n minio minio -o jsonpath='{.status.loadBalancer.ingress[].ip}'):9000
+        MINIO_BUCKET=${BUCKET_NAME}
+        MINIO_BUCKET_OBJECTLOCK=${BUCKET_NAME}-objectlock
+        
+        
+        log "Paste the following in to .bashrc"
+        echo "export MINIO_ENDPOINT=${MINIO_ENDPOINT}"
+        echo "export MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}"
+        echo "export MINIO_SECRET_KEY=${MINIO_SECRET_KEY}"
+        echo "export MINIO_BUCKET=${MINIO_BUCKET}"
+        echo "export MINIO_BUCKET_OBJECTLOCK=${MINIO_BUCKET_OBJECTLOCK}"
+
+    if [[ -z ${DR_POOL_NAME} ]]; then
+        log "No DR Pool, proceeding with single pool env"
+        PORTWORX_API=$(kubectl -n portworx get svc portworx-api -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+        
+        echo "export PORTWORX_API=${PORTWORX_API}"
+
+    else
+        $POOL1=${POOL_NAME}
+        $POOL2=${DR_POOL_NAME}
+        
+        POOL1_PORTWORX_API=$(kubectl --context ${POOL1} -n portworx get svc portworx-api -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+        
+        echo "export POOL1_PORTWORX_API=${POOL1_PORTWORX_API}"
+
+        POOL2_PORTWORX_API=$(kubectl --context ${POOL2} -n portworx get svc portworx-api -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+        
+        echo "export POOL2_PORTWORX_API=${POOL2_PORTWORX_API}"
+    fi
 
 }
 
@@ -445,6 +472,71 @@ env () {
 install_portworx () {
     install_px_operator
     install_px_ent
+}
+
+install_demo () {
+    # we are going to use the pool1 and pool2 params for the demo
+    requires_poolname
+    POOL1=${POOL_NAME}
+    POOL2=${DR_POOL_NAME}
+    kubectl config use-context ${KUBECTL_CONTEXT} || terminate "Could not switch to ${KUBECTL_CONTEXT}" 
+
+    # Create first cluster
+    log "Creating first cluster"
+    create_rancher_cluster
+    wait_ready_racher_cluster
+    create_context
+
+    log "Switching to ${POOL_NAME}"
+    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}" 
+
+    install_sealed_secrets
+    install_argocd
+    sleep 10
+    install_metallb
+    install_portworx
+    install_minio
+
+
+    # We will test for the existence of a second pool and reset the variable below.
+    if [[ ! -n ${DR_POOL_NAME} ]]; then
+        log "DR Pool not set, skipping second cluster"
+        return
+    fi
+
+    POOL_NAME=${DR_POOL_NAME}
+    kubectl config use-context ${KUBECTL_CONTEXT} || terminate "Could not switch to ${KUBECTL_CONTEXT}" 
+
+    # Create second cluster
+    log "Creating second cluster"
+    create_rancher_cluster
+    wait_ready_racher_cluster
+    create_context
+
+    log "Switching to ${POOL_NAME}"
+    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}"     
+    install_sealed_secrets
+    install_argocd
+    sleep 10
+    install_metallb
+    install_portworx
+
+}
+
+px_clusterpair () {
+    requires_poolname
+    requires_drpoolname
+    log "Creating a cluster pair between ${POOL_NAME} and ${DR_POOL_NAME}"
+
+    # Make sure we capture the pool names because we are going to be moving them around
+    POOL1=${POOL_NAME}
+    POOL2=${DR_POOL_NAME}
+
+    log "Getting config files"
+    kubectl --context config view --flatten --minify > $BASE_DIR/${POOL1}_config.yaml
+    kubectl --context config view --flatten --minify > $BASE_DIR/${POOL2}_config.yaml
+
+
 }
 
 
@@ -474,6 +566,9 @@ while [[ ${1} != "" ]]; do
         ;;
         view)
             COMMAND="kubectl_view_configs"
+        ;;
+        env)
+            COMMAND="env"
         ;;
         create)
             COMMAND="create_rancher_cluster"
@@ -505,6 +600,9 @@ while [[ ${1} != "" ]]; do
         install_utilities)
             COMMAND="install_utilities"
         ;;
+        install_demo)
+            COMMAND="install_demo"
+        ;;
         --disable-logs)
             DISABLE_LOGS=1
         ;;
@@ -517,6 +615,11 @@ while [[ ${1} != "" ]]; do
             shift
             POOL_NAME=$1
             log "Setting pool to ${POOL_NAME}"
+        ;;
+        --dr-pool)
+            shift
+            DR_POOL_NAME=$1
+            log "Setting DR pool to ${DR_POOL_NAME}"
         ;;
         # Default case
         *)
