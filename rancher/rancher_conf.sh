@@ -60,3 +60,6 @@ ARGOCD_HELM_VALUES_ROOT="manifests"
 KUBECTL_CONTEXT="rancher"
 POOL_NAME=""
 BUCKET_NAME="bucket"
+S3_REGION="us-west-2"
+# should be set to --disable-ssl if you are using http, otherwise NULL
+DISABLE_SSL="--disable-ssl"

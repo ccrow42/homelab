@@ -90,6 +90,7 @@ Commands:
     install_portworx        Install Portworx to the cluster
     install_minio           Install Minio to the cluster
     install_utilities       Install binary utilities to the current host. Requires BINARY_DIR is set
+    px_clusterpair          Create a cluster pair between two clusters. Requires --pool and --dr-pool
     install_demo            Install a demo environment.
 
 Options:
@@ -144,6 +145,12 @@ requires_mc () {
     fi
 
 }
+requires_storkctl () {
+    if [[ -z $(which storkctl) ]]; then
+        terminate "storkctl is not installed. Please install storkctl first" ${ERR_UTILITY_NOT_INSTALLED}
+    fi
+}
+
 
 wait_ready_racher_cluster () {
     kubectl config use-context ${KUBECTL_CONTEXT} || terminate "Could not switch to ${KUBECTL_CONTEXT}" 
@@ -152,6 +159,15 @@ wait_ready_racher_cluster () {
         echo -n "."
         sleep 10
     done
+}
+wait_ready_portworx () {
+    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}" 
+    log "Waiting for Portworx to be ready, this may take a few minutes."
+    until [[ $(kubectl -n portworx get stc -o jsonpath='{.items[0].status.phase}') == "Running" ]]; do
+        echo -n "."
+        sleep 10
+    done
+
 }
 
 
@@ -452,14 +468,14 @@ env () {
         echo "export PORTWORX_API=${PORTWORX_API}"
 
     else
-        $POOL1=${POOL_NAME}
-        $POOL2=${DR_POOL_NAME}
+        POOL1=${POOL_NAME}
+        POOL2=${DR_POOL_NAME}
         
-        POOL1_PORTWORX_API=$(kubectl --context ${POOL1} -n portworx get svc portworx-api -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+        POOL1_PORTWORX_API="$(kubectl --context ${POOL1} -n portworx get svc portworx-api -o jsonpath='{.status.loadBalancer.ingress[0].ip}'):9001"
         
         echo "export POOL1_PORTWORX_API=${POOL1_PORTWORX_API}"
 
-        POOL2_PORTWORX_API=$(kubectl --context ${POOL2} -n portworx get svc portworx-api -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+        POOL2_PORTWORX_API="$(kubectl --context ${POOL2} -n portworx get svc portworx-api -o jsonpath='{.status.loadBalancer.ingress[0].ip}'):9001"
         
         echo "export POOL2_PORTWORX_API=${POOL2_PORTWORX_API}"
     fi
@@ -495,6 +511,7 @@ install_demo () {
     sleep 10
     install_metallb
     install_portworx
+    wait_ready_portworx
     install_minio
 
 
@@ -520,12 +537,14 @@ install_demo () {
     sleep 10
     install_metallb
     install_portworx
+    wait_ready_portworx
 
 }
 
 px_clusterpair () {
     requires_poolname
     requires_drpoolname
+    requries_storkctl
     log "Creating a cluster pair between ${POOL_NAME} and ${DR_POOL_NAME}"
 
     # Make sure we capture the pool names because we are going to be moving them around
@@ -533,10 +552,29 @@ px_clusterpair () {
     POOL2=${DR_POOL_NAME}
 
     log "Getting config files"
-    kubectl --context config view --flatten --minify > $BASE_DIR/${POOL1}_config.yaml
-    kubectl --context config view --flatten --minify > $BASE_DIR/${POOL2}_config.yaml
+    kubectl --context ${POOL1} config view --flatten --minify > $BASE_DIR/${POOL1}_config.yaml
+    kubectl --context ${POOL2} config view --flatten --minify > $BASE_DIR/${POOL2}_config.yaml
 
+    log "Getting environment variables"
+    env
+    log "Creating cluster pair"
+    storkctl create clusterpair demo \
+    --dest-kube-file $BASE_DIR/${POOL2}_config.yaml \
+    --src-kube-file $BASE_DIR/${POOL1}_config.yaml \
+    --dest-ep $POOL2_PORTWORX_API \
+    --src-ep $POOL1_PORTWORX_API \
+    --namespace portworx \
+    --provider s3 \
+    --s3-endpoint $MINIO_ENDPOINT \
+    --s3-access-key $MINIO_ACCESS_KEY \
+    --s3-secret-key $MINIO_SECRET_KEY \
+    --s3-region $S3_REGION \
+    $DISABLE_SSL \
 
+    log "Cluster pair created"
+    log "Cleaning up config files"
+    unlink $BASE_DIR/${POOL1}_config.yaml
+    unlink $BASE_DIR/${POOL2}_config.yaml
 }
 
 
@@ -599,6 +637,9 @@ while [[ ${1} != "" ]]; do
         ;;
         install_utilities)
             COMMAND="install_utilities"
+        ;;
+        px_clusterpair)
+            COMMAND="px_clusterpair"
         ;;
         install_demo)
             COMMAND="install_demo"
