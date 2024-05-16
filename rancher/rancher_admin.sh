@@ -19,6 +19,7 @@
 # - [ ] get the bearer token from the rancher server
 # - [ ] options to perform the initial setup of the rancher server
 # - [ ] Need to squelch errors in the wait_ready commands
+# - [ ] Add automatic dependency resolution
 
 
 ### What I know is missing:
@@ -88,7 +89,9 @@ Commands:
     install_argocd          Install ArgoCD to the cluster
     install_metallb         Install MetalLB to the cluster
     install_portworx        Install Portworx to the cluster
+    install_pxbbq           Install PXBBQ to the cluster
     install_minio           Install Minio to the cluster
+    configure_minio         Configure Minio with mc
     install_utilities       Install binary utilities to the current host. Requires BINARY_DIR is set
     px_clusterpair          Create a cluster pair between two clusters. Requires --pool and --dr-pool
     install_demo            Install a demo environment.
@@ -118,13 +121,11 @@ requires_poolname () {
         terminate "Pool name is required for this command" ${ERR_NO_ARGS}
     fi
 }
-
 requires_drpoolname () {
     if [[ -z ${DR_POOL_NAME} ]]; then
         terminate "DR Pool name is required for this command" ${ERR_NO_ARGS}
     fi
 }
-
 requires_argocd () {
     if kubectl get namespace argocd; then
         log "ArgoCD appears to be installed, proceeding"
@@ -132,7 +133,6 @@ requires_argocd () {
         terminate "ArgoCD is not installed. Please install ArgoCD first" ${ERR_ARGOCD_NOT_INSTALLED}
     fi
 }
-
 requires_portworx () {
     if kubectl get namespace portworx; then
         log "Portworx appears to be installed, proceeding"
@@ -150,6 +150,14 @@ requires_storkctl () {
     if [[ -z $(which storkctl) ]]; then
         terminate "storkctl is not installed. Please install storkctl first" ${ERR_UTILITY_NOT_INSTALLED}
     fi
+}
+requires_minio () {
+    if kubectl get namespace minio; then
+        log "Minio appears to be installed, proceeding"
+    else
+        terminate "Minio is not installed, install Minio first" ${ERR_MINIO_NOT_INSTALLED}
+    fi
+
 }
 
 
@@ -322,12 +330,12 @@ install_metallb () {
 ### Install PX Operator
 install_px_operator () {
 
+    log "Installing PX Operator to ${POOL_NAME}"
+    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}"
+
     requires_poolname
     requires_argocd
 
-    log "Installing MetalLB to ${POOL_NAME}"
-    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}"
-    
     # ArgoCD Variables
     ARGOCD_APPNAME="px-operator"
     ARGOCD_NAMESPACE="portworx"
@@ -343,14 +351,14 @@ install_px_operator () {
     kubectl apply -f <(echo "${ARGOAPP}")
 }
 
-### Install PX Operator
+### Install PX Enterprise
 install_px_ent () {
+
+    log "PX Enteprise to ${POOL_NAME}"
+    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}"
 
     requires_poolname
     requires_argocd
-
-    log "Installing MetalLB to ${POOL_NAME}"
-    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}"
     
     # ArgoCD Variables
     ARGOCD_APPNAME="portworx"
@@ -367,12 +375,63 @@ install_px_ent () {
     kubectl apply -f <(echo "${ARGOAPP}")
 }
 
-install_minio () {
+### Install PXBBQ
+install_pxbbq () {
+
+    log "Installing PXBBQ to ${POOL_NAME}"
+    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}"
+
     requires_poolname
     requires_argocd
+    requires_minio
+    requires_mc
+   
+    # ArgoCD Variables
+    ARGOCD_APPNAME="pxbbq"
+    ARGOCD_NAMESPACE="pxbbq"
+    ARGOCD_PATH="${ARGOCD_PATH_ROOT}/pxbbq/overlays/${POOL_NAME}"
+    ARGOCD_REPO_URL="${ARGOCD_REPO_URL}"
+
+    # Apply Application
+    ARGOAPP=$(< ${ARGOCD_APP_TEMPLATE})
+    ARGOAPP="${ARGOAPP//${ARGOCD_NAMESPACE_PLACEHOLDER}/${ARGOCD_NAMESPACE}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_APP_NAME_PLACEHOLDER}/${ARGOCD_APPNAME}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_REPO_URL_PLACEHOLDER}/${ARGOCD_REPO_URL}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_REPO_PATH_PLACEHOLDER}/${ARGOCD_PATH}}"
+    kubectl apply -f <(echo "${ARGOAPP}")
+
+    # We need to install a custom secret that will use info from env
+    env
+
+    cat <<EOF | kubectl apply -f -
+apiVersion: v1
+data:
+  mongonode: $(echo "mongo" | base64)
+  mongopass: $(echo "porxie" | base64)
+  mongouser: $(echo "porxie" | base64)
+  s3accesskey: $(echo ${MINIO_ACCESS_KEY} | base64)
+  s3bucket: $(echo "${POOL_NAME}-bbq-taster" | base64)
+  s3resultsbucket: $(echo "${POOL_NAME}-bbq-taster" | base64)
+  s3secretkey: $(echo ${MINIO_SECRET_KEY} | base64)
+  s3url: $(echo ${MINIO_ENDPOINT} | base64)
+kind: Secret
+metadata:
+  name: bbq-taster
+  namespace: pxbbq
+type: Opaque
+EOF
+
+
+
+}
+
+install_minio () {
 
     log "Installing minio to ${POOL_NAME}"
     kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}"
+
+    requires_poolname
+    requires_argocd
 
     # ArgoCD Variables
     ARGOCD_APPNAME="minio"
@@ -407,9 +466,11 @@ install_minio () {
 }
 
 configure_minio () {
-    requires_mc
     log "Configuring Minio"
     kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}"
+
+    requires_mc
+    requires_minio
 
     MINIO_ENDPOINT=http://$(kubectl get svc -n minio minio -o jsonpath='{.status.loadBalancer.ingress[].ip}'):9000
     MINIO_ACCESS_KEY=$(kubectl get secret -n minio minio -o jsonpath="{.data.rootUser}" | base64 --decode)
@@ -424,11 +485,11 @@ configure_minio () {
 
 # Install binary utilities locally
 install_utilities () {
-    requires_portworx
     kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}"
 
-    log "Installing utilities to ${BINARY_DIR}"
+    requires_portworx
 
+    log "Installing utilities to ${BINARY_DIR}"
     log "Installing storkctl to ${BINARY_DIR}"
 
     STORK_POD=$(kubectl get pods -n portworx -l name=stork -o jsonpath='{.items[0].metadata.name}')
@@ -444,10 +505,11 @@ install_utilities () {
 
 ### Output Variables for environment
 env () {
+    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}"
+    log "Exporting environment variables"
+
     requires_poolname
 
-        kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}"
-        log "Exporting environment variables"
         MINIO_ACCESS_KEY=$(kubectl get secret -n minio minio -o jsonpath="{.data.rootUser}" | base64 --decode)
         MINIO_SECRET_KEY=$(kubectl get secret -n minio minio -o jsonpath="{.data.rootPassword}" | base64 --decode)
         MINIO_ENDPOINT=http://$(kubectl get svc -n minio minio -o jsonpath='{.status.loadBalancer.ingress[].ip}'):9000
@@ -499,10 +561,11 @@ install_portworx () {
 
 install_demo () {
     # we are going to use the pool1 and pool2 params for the demo
+    kubectl config use-context ${KUBECTL_CONTEXT} || terminate "Could not switch to ${KUBECTL_CONTEXT}" 
     requires_poolname
     POOL1=${POOL_NAME}
     POOL2=${DR_POOL_NAME}
-    kubectl config use-context ${KUBECTL_CONTEXT} || terminate "Could not switch to ${KUBECTL_CONTEXT}" 
+
 
     # Create first cluster
     log "Creating first cluster"
@@ -646,8 +709,14 @@ while [[ ${1} != "" ]]; do
         install_minio)
             COMMAND="install_minio"
         ;;
+        configure_minio)
+            COMMAND="configure_minio"
+        ;;
         install_portworx)
             COMMAND="install_portworx"
+        ;;
+        install_pxbbq)
+            COMMAND="install_pxbbq"
         ;;
         install_utilities)
             COMMAND="install_utilities"

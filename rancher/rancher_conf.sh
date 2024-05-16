@@ -16,6 +16,7 @@ readonly ERR_POOL_NOT_FOUND=163
 readonly ERR_ARGOCD_NOT_INSTALLED=164
 readonly ERR_PORTWORX_NOT_INSTALLED=165
 readonly ERR_UTILITY_NOT_INSTALLED=166
+readonly ERR_MINIO_NOT_INSTALLED=167
 
 ### Placeholders
 # These placeholders appear in the TEMPLATE* files and should probably not be changed
