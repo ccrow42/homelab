@@ -96,6 +96,7 @@ Commands:
 Options:
     -h, --help              Display this help message
     -d, --debug             Enable debug output
+    -v,                     Print environment variables to the screen (may contain secrets)
     --disable-logs          Disable logging
     --context               The context to use for some kubectl command
     --pool                  specifies the pool name. 
@@ -453,33 +454,39 @@ env () {
         MINIO_BUCKET=${BUCKET_NAME}
         MINIO_BUCKET_OBJECTLOCK=${BUCKET_NAME}-objectlock
         
-        
-        log "Paste the following in to .bashrc"
-        echo "export MINIO_ENDPOINT=${MINIO_ENDPOINT}"
-        echo "export MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}"
-        echo "export MINIO_SECRET_KEY=${MINIO_SECRET_KEY}"
-        echo "export MINIO_BUCKET=${MINIO_BUCKET}"
-        echo "export MINIO_BUCKET_OBJECTLOCK=${MINIO_BUCKET_OBJECTLOCK}"
+        if [[ ${VIEWENV} == 1 ]]; then
+            echo ""
+            echo "###############################################"
+            echo "###### Paste the following in to .bashrc ######"
+            echo "###############################################"
+            echo "export MINIO_ENDPOINT=${MINIO_ENDPOINT}"
+            echo "export MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}"
+            echo "export MINIO_SECRET_KEY=${MINIO_SECRET_KEY}"
+            echo "export MINIO_BUCKET=${MINIO_BUCKET}"
+            echo "export MINIO_BUCKET_OBJECTLOCK=${MINIO_BUCKET_OBJECTLOCK}"
+        else
+            log "missing -v flag, not printing variables"
+        fi
 
     if [[ -z ${DR_POOL_NAME} ]]; then
-        log "No DR Pool, proceeding with single pool env"
         PORTWORX_API=$(kubectl -n portworx get svc portworx-api -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
-        
-        echo "export PORTWORX_API=${PORTWORX_API}"
-
+        if [[ ${VIEWENV} == 1 ]]; then
+            echo "export PORTWORX_API=${PORTWORX_API}"
+        fi
     else
         POOL1=${POOL_NAME}
         POOL2=${DR_POOL_NAME}
         
         POOL1_PORTWORX_API="$(kubectl --context ${POOL1} -n portworx get svc portworx-api -o jsonpath='{.status.loadBalancer.ingress[0].ip}'):9001"
-        
-        echo "export POOL1_PORTWORX_API=${POOL1_PORTWORX_API}"
-
         POOL2_PORTWORX_API="$(kubectl --context ${POOL2} -n portworx get svc portworx-api -o jsonpath='{.status.loadBalancer.ingress[0].ip}'):9001"
         
-        echo "export POOL2_PORTWORX_API=${POOL2_PORTWORX_API}"
+        if [[ ${VIEWENV} == 1 ]]; then
+            echo "export POOL1_PORTWORX_API=${POOL1_PORTWORX_API}"
+            echo "export POOL2_PORTWORX_API=${POOL2_PORTWORX_API}"
+        fi
     fi
-
+    echo ""
+    echo "###############################################"
 }
 
 ### Meta Commands
@@ -513,7 +520,7 @@ install_demo () {
     install_portworx
     wait_ready_portworx
     install_minio
-
+    # need to add a wait_ready_minio function
 
     # We will test for the existence of a second pool and reset the variable below.
     if [[ ! -n ${DR_POOL_NAME} ]]; then
@@ -538,6 +545,13 @@ install_demo () {
     install_metallb
     install_portworx
     wait_ready_portworx
+
+
+    # fixing pools
+    POOL_NAME=${POOL1}
+    DR_POOL_NAME=${POOL2}
+    log "Pools reset to ${POOL_NAME} and ${DR_POOL_NAME}"
+    px_clusterpair
 
 }
 
@@ -646,6 +660,9 @@ while [[ ${1} != "" ]]; do
         ;;
         --disable-logs)
             DISABLE_LOGS=1
+        ;;
+        -v)
+            VIEWENV=1
         ;;
         --context)
             shift
