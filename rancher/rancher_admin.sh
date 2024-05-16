@@ -18,7 +18,7 @@
 ### Roadmap
 # - [ ] get the bearer token from the rancher server
 # - [ ] options to perform the initial setup of the rancher server
-# - [ ] 
+# - [ ] Need to squelch errors in the wait_ready commands
 
 
 ### What I know is missing:
@@ -558,7 +558,7 @@ install_demo () {
 px_clusterpair () {
     requires_poolname
     requires_drpoolname
-    requries_storkctl
+    requires_storkctl
     log "Creating a cluster pair between ${POOL_NAME} and ${DR_POOL_NAME}"
 
     # Make sure we capture the pool names because we are going to be moving them around
