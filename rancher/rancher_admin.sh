@@ -89,6 +89,9 @@ Commands:
     install_argocd          Install ArgoCD to the cluster
     install_metallb         Install MetalLB to the cluster
     install_portworx        Install Portworx to the cluster
+    install_pxbackup        Install PXBackup to the cluster
+    install_lpp             Install local path provisioner
+    install_etcd            Install etcd to the cluster
     install_pxbbq           Install PXBBQ to the cluster
     install_minio           Install Minio to the cluster
     configure_minio         Configure Minio with mc
@@ -159,7 +162,14 @@ requires_minio () {
     fi
 
 }
+requires_lpp () {
+    if kubectl get namespace local-path-storage; then
+        log "Local Path Provisioner appears to be installed, proceeding"
+    else
+        terminate "Local Path Provisioner is not installed, install Minio first" 
+    fi
 
+}
 
 wait_ready_racher_cluster () {
     kubectl config use-context ${KUBECTL_CONTEXT} || terminate "Could not switch to ${KUBECTL_CONTEXT}" 
@@ -176,7 +186,14 @@ wait_ready_portworx () {
         echo -n "."
         sleep 10
     done
-
+}
+wait_ready_pxbackup () {
+    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}" 
+    log "Waiting for PXBackup to be ready, this may take a few minutes."
+    until [[ $(kubectl get po --namespace central --no-headers -ljob-name=pxcentral-post-install-hook  -o json | jq -rc '.items[0].status.phase') == "Succeeded" ]]; do
+        echo -n "."
+        sleep 10
+    done
 }
 
 
@@ -354,7 +371,7 @@ install_px_operator () {
 ### Install PX Enterprise
 install_px_ent () {
 
-    log "PX Enteprise to ${POOL_NAME}"
+    log "Installing PX Enteprise to ${POOL_NAME}"
     kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}"
 
     requires_poolname
@@ -364,6 +381,30 @@ install_px_ent () {
     ARGOCD_APPNAME="portworx"
     ARGOCD_NAMESPACE="portworx"
     ARGOCD_PATH="${ARGOCD_PATH_ROOT}/portworx/overlays/${POOL_NAME}"
+    ARGOCD_REPO_URL="${ARGOCD_REPO_URL}"
+
+    # Apply Application
+    ARGOAPP=$(< ${ARGOCD_APP_TEMPLATE})
+    ARGOAPP="${ARGOAPP//${ARGOCD_NAMESPACE_PLACEHOLDER}/${ARGOCD_NAMESPACE}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_APP_NAME_PLACEHOLDER}/${ARGOCD_APPNAME}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_REPO_URL_PLACEHOLDER}/${ARGOCD_REPO_URL}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_REPO_PATH_PLACEHOLDER}/${ARGOCD_PATH}}"
+    kubectl apply -f <(echo "${ARGOAPP}")
+}
+
+### Install Local Path Provisioner
+install_lpp () {
+
+    log "Installing Localpath Provisioner to ${POOL_NAME}"
+    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}"
+
+    requires_poolname
+    requires_argocd
+    
+    # ArgoCD Variables
+    ARGOCD_APPNAME="localpath"
+    ARGOCD_NAMESPACE="local-path-storage"
+    ARGOCD_PATH="${ARGOCD_PATH_ROOT}/local-path-provisioner/overlays/${POOL_NAME}"
     ARGOCD_REPO_URL="${ARGOCD_REPO_URL}"
 
     # Apply Application
@@ -421,7 +462,8 @@ metadata:
 type: Opaque
 EOF
 
-
+    mc mb ${POOL_NAME}/${POOL_NAME}-bbq-taster
+    mc mb ${POOL_NAME}/${POOL_NAME}-bbq-taster-results
 
 }
 
@@ -457,14 +499,82 @@ install_minio () {
     ARGOAPP="${ARGOAPP//${ARGOCD_HELM_TARGET_PLACEHOLDER}/${ARGOCD_HELM_CHART_VERSION}}"
 
     # Create the minio namespace
-
     kubectl create namespace minio
-
     kubectl apply -f <(echo "${ARGOAPP}")
-    #echo "${ARGOAPP}"
-    #log "${ARGOCD_VALUE_FILES}"
 }
 
+install_etcd () {
+
+    log "Installing etcd to ${POOL_NAME}"
+    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}"
+
+    requires_poolname
+    requires_argocd
+    requires_lpp
+
+    # ArgoCD Variables
+    ARGOCD_APPNAME="etcd"
+    ARGOCD_NAMESPACE="etcd"
+
+    # Must point to a values file
+    ARGOCD_VALUE_FILES="\$values/${ARGOCD_HELM_VALUES_ROOT}/etcd/${POOL_NAME}/values.yaml"
+    ARGOCD_REPO_URL="${ARGOCD_REPO_URL}"
+
+    # Helm specific options
+    ARGOCD_HELM_REPO="registry-1.docker.io/bitnamicharts"
+    ARGOCD_HELM_CHART_VERSION="10.0.9"
+    ARGOCD_HELM_CHART="etcd"
+
+    # Apply Application
+    ARGOAPP=$(< ${ARGOCD_HELM_APP_TEMPLATE})
+    ARGOAPP="${ARGOAPP//${ARGOCD_NAMESPACE_PLACEHOLDER}/${ARGOCD_NAMESPACE}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_APP_NAME_PLACEHOLDER}/${ARGOCD_APPNAME}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_REPO_URL_PLACEHOLDER}/${ARGOCD_REPO_URL}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_HELM_VALUE_FILES_PLACEHOLDER}/${ARGOCD_VALUE_FILES}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_HELM_REPO_URL_PLACEHOLDER}/${ARGOCD_HELM_REPO}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_HELM_CHART_PLACEHOLDER}/${ARGOCD_HELM_CHART}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_HELM_TARGET_PLACEHOLDER}/${ARGOCD_HELM_CHART_VERSION}}"
+
+    # Create the minio namespace
+    kubectl create namespace etcd
+    kubectl apply -f <(echo "${ARGOAPP}")
+}
+
+install_pxbackup () {
+
+    log "Installing pxbackup to ${POOL_NAME}"
+    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}"
+
+    requires_poolname
+    requires_argocd
+
+    # ArgoCD Variables
+    ARGOCD_APPNAME="pxbackup"
+    ARGOCD_NAMESPACE="central"
+
+    # Must point to a values file
+    ARGOCD_VALUE_FILES="\$values/${ARGOCD_HELM_VALUES_ROOT}/pxbackup/${POOL_NAME}/values.yaml"
+    ARGOCD_REPO_URL="${ARGOCD_REPO_URL}"
+
+    # Helm specific options
+    ARGOCD_HELM_REPO="http://charts.portworx.io/"
+    ARGOCD_HELM_CHART_VERSION="2.6.0"
+    ARGOCD_HELM_CHART="px-central"
+
+    # Apply Application
+    ARGOAPP=$(< ${ARGOCD_HELM_APP_TEMPLATE})
+    ARGOAPP="${ARGOAPP//${ARGOCD_NAMESPACE_PLACEHOLDER}/${ARGOCD_NAMESPACE}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_APP_NAME_PLACEHOLDER}/${ARGOCD_APPNAME}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_REPO_URL_PLACEHOLDER}/${ARGOCD_REPO_URL}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_HELM_VALUE_FILES_PLACEHOLDER}/${ARGOCD_VALUE_FILES}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_HELM_REPO_URL_PLACEHOLDER}/${ARGOCD_HELM_REPO}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_HELM_CHART_PLACEHOLDER}/${ARGOCD_HELM_CHART}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_HELM_TARGET_PLACEHOLDER}/${ARGOCD_HELM_CHART_VERSION}}"
+
+    # Create the minio namespace
+    kubectl create namespace pxbackup
+    kubectl apply -f <(echo "${ARGOAPP}")
+}
 configure_minio () {
     log "Configuring Minio"
     kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}"
@@ -479,7 +589,7 @@ configure_minio () {
     mc alias set ${POOL_NAME} $MINIO_ENDPOINT $MINIO_ACCESS_KEY $MINIO_SECRET_KEY
     mc mb ${POOL_NAME}/${BUCKET_NAME}
     mc mb ${POOL_NAME}/${BUCKET_NAME}-objectlock --with-lock
-    mc retention set --default COMPLIANCE 7d ${POOL_NAME}/${POOL_NAME}${BUCKETNAME_PATTERN}-objectlock
+    mc retention set --default COMPLIANCE 7d ${POOL_NAME}/${BUCKET_NAME}-objectlock
 
 }
 
@@ -714,6 +824,15 @@ while [[ ${1} != "" ]]; do
         ;;
         install_portworx)
             COMMAND="install_portworx"
+        ;;
+        install_pxbackup)
+            COMMAND="install_pxbackup"
+        ;;
+        install_lpp)
+            COMMAND="install_lpp"
+        ;;
+        install_etcd)
+            COMMAND="install_etcd"
         ;;
         install_pxbbq)
             COMMAND="install_pxbbq"

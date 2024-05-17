@@ -269,7 +269,7 @@ args: []
 
 ## @param replicaCount Number of etcd replicas to deploy
 ##
-replicaCount: 1
+replicaCount: 3
 ## Update strategy
 ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
 ## @param updateStrategy.type Update strategy type, can be set to RollingUpdate or OnDelete.
@@ -540,7 +540,7 @@ persistentVolumeClaimRetentionPolicy:
 service:
   ## @param service.type Kubernetes Service type
   ##
-  type: ClusterIP
+  type: LoadBalancer
   ## @param service.enabled create second service if equal true
   ##
   enabled: true
