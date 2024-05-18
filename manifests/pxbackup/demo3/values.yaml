@@ -33,7 +33,7 @@ oidc:
     keyCloakBackendUserName: keycloak
     keyCloakBackendPassword: keycloak
     clientId: "pxcentral"
-    updateAdminProfile: true
+    updateAdminProfile: false
 
   externalOIDC:
     enabled: false
