@@ -1,0 +1,18 @@
+apiVersion: stork.libopenstorage.org/v1alpha1
+kind: MigrationSchedule
+metadata:
+  name: schedule
+  namespace: portworx
+  annotations:
+spec:
+  template:
+    spec:
+      clusterPair: stage
+      includeResources: true
+      startApplications: true
+      includeVolumes: true
+      namespaces:
+      - pxbbq
+  schedulePolicyName: default-interval-policy
+  suspend: false
+  autoSuspend: true

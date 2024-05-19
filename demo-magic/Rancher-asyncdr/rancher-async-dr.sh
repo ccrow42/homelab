@@ -24,12 +24,13 @@ pxctl () {
 }
 
 kubectl config use-context ${SRCPOOL}
+kubectl apply -f pxbbq-schedule.yaml
 
 clear
 
 wait
 
-pei "# In this demo, we will be migrating a namespace from a source cluster to a destination cluster #"
+pei "# In this demo, we will be showing a DR failover of our PXBBQ application #"
 
 pei "# Let's order some BBQ!"
 pei "# Let's connect to the IP address of our webapp: #"
@@ -48,18 +49,29 @@ wait
 
 clear
 
-pei "# We will now migrate the pxbbq application #"
-pei "ccat migrate.yaml"
+pei "# We also have a schedule that will trigger a sync of our application #"
 
-pei "# Migration objects support transforms and label selectors. This one is simple. #" 
-
-pe "kubectl apply -f migrate.yaml"
+pe "ccat pxbbq-schedule.yaml"
 
 pe "watch storkctl get migrations -n portworx"
+
+wait
+clear
+
+pei "# Let's simulate a DR event #"
+
+pei "nodes=\$(kubectl get nodes -o jsonpath='{.items[*].metadata.name}')"
+pei "for node in \${nodes[@]}; do"
+pei "ssh -o StrictHostKeyChecking=no  ubuntu@\$node \"sudo halt\""
+pei "done"
+
 
 pei "# Let's change contexts to our destination cluster #"
 kubectl config use-context ${DSTPOOL}
 DEMO_PROMPT="${WHITE}➜ ${RED}Destination Cluster> ${COLOR_RESET}"
+
+pei "We will now activate the DR namespace"
+pe "storkctl activate migration -n pxbbq"
 
 pe "watch kubectl -n pxbbq get pods,pvc,svc"
 
@@ -72,7 +84,5 @@ wait
 pe "# We can see that our order is still there! #"
 
 # Reset the environment:
-kubectl delete ns pxbbq &
-kubectl --context ${SRCPOOL} -n portworx delete migration migrate01 &
 
 pei ""

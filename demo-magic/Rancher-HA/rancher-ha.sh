@@ -4,7 +4,7 @@
 TYPE_SPEED=20
 # see http://www.tldp.org/HOWTO/Bash-Prompt-HOWTO/bash-prompt-escape-sequences.html for escape sequences
 #
-DEMO_PROMPT="${GREEN}➜ ${CYAN}Rancher Autopilot Demo ${COLOR_RESET}"
+DEMO_PROMPT="${GREEN}➜ ${CYAN}Rancher HA Demo ${COLOR_RESET}"
 
 ### Environment Requirements:
 # We need to run the following:
@@ -26,7 +26,12 @@ clear
 wait
 
 pei "# We have a demo application running in our cluster #"
-pe "# Let's order some BBQ!"
+pei "# Let's order some BBQ!"
+pei "# Let's connect to the destination IP address: #"
+pei "IP=http://\$(kubectl -n pxbbq get svc pxbbq-svc -o jsonpath='{.status.loadBalancer.ingress[0].ip}')"
+pei "echo \$IP"
+
+wait
 
 pe "kubectl -n pxbbq get pods,pvc -o wide"
 
