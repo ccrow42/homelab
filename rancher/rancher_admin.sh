@@ -20,13 +20,20 @@
 # - [ ] options to perform the initial setup of the rancher server
 # - [ ] Need to squelch errors in the wait_ready commands
 # - [ ] Add automatic dependency resolution
+# - [ ] consider moving to --context instead of switching contexts
 
+### Short term fixes
+# - [x] fix leading places from cluster UUID in env function
+# - [ ] fix DISABLE_SSL logic in configure_pxbackup function. Current logic forces it to be true
+# - [x] write wait_ready_minio function
+# - [ ] add a sync function for install operations
+# - [ ] fix hard coded grafana yaml files
 
 ### What I know is missing:
 # - TEMPLATE cloneFrom is hardcoded
 
 ### Configuration Section
-
+# These vars are not populated by the rancher_conf.sh file
 # BEARER_TOKEN is the token that will be used to authenticate to the Rancher API
 # SEALED_SECRET_TLS_CERT and SEALED_SECRET_TLS_KEY are used for bitnomi's sealed secrets
 
@@ -67,6 +74,9 @@ source $CONFIG_FILE || terminate "Could not source ${CONFIG_FILE}" ${ERR_CONF_FI
 #source ~/.bashrc || terminate "Could not source .bashrc which contains secrets" ${ERR_CONF_FILE_NOT_FOUND}
 log "Configuration files imported"
 
+# Let's set a pxctl alias:
+alias pxctl='kubectl exec $(kubectl get pods -l name=portworx -n portworx -o jsonpath='{.items[0].metadata.name}') -n portworx -- /opt/pwx/bin/pxctl'
+
 ###### Helper Functions
 
 ### Usage Function
@@ -94,10 +104,16 @@ Commands:
     install_etcd            Install etcd to the cluster
     install_pxbbq           Install PXBBQ to the cluster
     install_minio           Install Minio to the cluster
+    install_grafana         Install Grafana to the cluster
+    install_pxbbq_taster    Install PXBBQ taster to the cluster
     configure_minio         Configure Minio with mc
+    configure_pxbackup      Configure PXBackup with demo schedules, buckets and clusters
     install_utilities       Install binary utilities to the current host. Requires BINARY_DIR is set
     px_clusterpair          Create a cluster pair between two clusters. Requires --pool and --dr-pool
-    install_demo            Install a demo environment.
+    install_demo_async      Install two clusters with Portworx, PXBBQ, minio
+    install_demo            Install 1 cluster with Portworx, PXBBQ, minio, pxbackup
+    install_cluster         Build a cluster with ArgoCD, MetalLB, LPP, and sealed secrets
+    reboot_cluster          Reboot the cluster
 
 Options:
     -h, --help              Display this help message
@@ -114,6 +130,7 @@ Examples:
 
 Helpful notes:
     You can seal an existing secret with: kubeseal --format=yaml < secret.yaml > sealed-secret.yaml
+    Do not run more than one "META" task at a time. Meta tasks run more complex workflows such as "install_demo"
 
 USAGE
 }
@@ -166,9 +183,16 @@ requires_lpp () {
     if kubectl get namespace local-path-storage; then
         log "Local Path Provisioner appears to be installed, proceeding"
     else
-        terminate "Local Path Provisioner is not installed, install Minio first" 
+        terminate "Local Path Provisioner is not installed, install Minio first" ${ERR_LPP_NOT_INSTALLED}
     fi
 
+}
+requires_pxbackup () {
+    if [[ $(kubectl get po --namespace central --no-headers -ljob-name=pxcentral-post-install-hook  -o json | jq -rc '.items[0].status.phase') == "Succeeded" ]]; then
+        log "PXBackup appears to be installed, proceeding"
+    else
+        terminate "PXBackup is not installed, install PXBackup first" ${ERR_PXBACKUP_NOT_INSTALLED}
+    fi
 }
 
 wait_ready_racher_cluster () {
@@ -180,21 +204,30 @@ wait_ready_racher_cluster () {
     done
 }
 wait_ready_portworx () {
-    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}" 
+    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}" ${ERR_POOL_NOT_FOUND}
     log "Waiting for Portworx to be ready, this may take a few minutes."
-    until [[ $(kubectl -n portworx get stc -o jsonpath='{.items[0].status.phase}') == "Running" ]]; do
+    until [[ $(kubectl -n portworx get stc -o jsonpath='{.items[0].status.phase}' 2> /dev/null) == "Running" ]]; do
         echo -n "."
         sleep 10
     done
 }
 wait_ready_pxbackup () {
-    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}" 
+    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}" ${ERR_POOL_NOT_FOUND}
     log "Waiting for PXBackup to be ready, this may take a few minutes."
     until [[ $(kubectl get po --namespace central --no-headers -ljob-name=pxcentral-post-install-hook  -o json | jq -rc '.items[0].status.phase') == "Succeeded" ]]; do
         echo -n "."
         sleep 10
     done
 }
+wait_ready_minio () {
+    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}" ${ERR_POOL_NOT_FOUND}
+    log "Waiting for Minio to be ready, this may take a few minutes."
+    until [[ $(kubectl -n minio get deployments.apps minio -o jsonpath={'.status.readyReplicas'}) -ge 1 ]]; do
+        echo -n "."
+        sleep 10
+    done
+}
+
 
 
 
@@ -290,10 +323,9 @@ create_context () {
 
 ### Install Sealed Secrets
 install_sealed_secrets () {
+    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}" ${ERR_POOL_NOT_FOUND}
     requires_poolname
     log "Installing sealed secrets to ${POOL_NAME}"
-    
-    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}" ${ERR_POOL_NOT_FOUND}
     helm repo add sealed-secrets https://bitnami-labs.github.io/sealed-secrets
     helm repo update
     helm install sealed-secrets sealed-secrets/sealed-secrets -n kube-system
@@ -325,7 +357,7 @@ install_metallb () {
     requires_argocd
 
     log "Installing MetalLB to ${POOL_NAME}"
-    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}"
+    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}" ${ERR_POOL_NOT_FOUND}
     
     # ArgoCD Variables
     ARGOCD_APPNAME="metallb"
@@ -348,7 +380,7 @@ install_metallb () {
 install_px_operator () {
 
     log "Installing PX Operator to ${POOL_NAME}"
-    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}"
+    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}" ${ERR_POOL_NOT_FOUND}
 
     requires_poolname
     requires_argocd
@@ -372,7 +404,7 @@ install_px_operator () {
 install_px_ent () {
 
     log "Installing PX Enteprise to ${POOL_NAME}"
-    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}"
+    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}" ${ERR_POOL_NOT_FOUND}
 
     requires_poolname
     requires_argocd
@@ -396,7 +428,7 @@ install_px_ent () {
 install_lpp () {
 
     log "Installing Localpath Provisioner to ${POOL_NAME}"
-    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}"
+    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}" ${ERR_POOL_NOT_FOUND}
 
     requires_poolname
     requires_argocd
@@ -420,12 +452,10 @@ install_lpp () {
 install_pxbbq () {
 
     log "Installing PXBBQ to ${POOL_NAME}"
-    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}"
+    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}" ${ERR_POOL_NOT_FOUND}
 
     requires_poolname
     requires_argocd
-    requires_minio
-    requires_mc
    
     # ArgoCD Variables
     ARGOCD_APPNAME="pxbbq"
@@ -441,8 +471,19 @@ install_pxbbq () {
     ARGOAPP="${ARGOAPP//${ARGOCD_REPO_PATH_PLACEHOLDER}/${ARGOCD_PATH}}"
     kubectl apply -f <(echo "${ARGOAPP}")
 
-    # We need to install a custom secret that will use info from env
-    env
+
+}
+install_pxbbq_taster () {
+
+    log "Installing PXBBQ taster to ${POOL_NAME}"
+    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}" ${ERR_POOL_NOT_FOUND}
+
+    requires_poolname
+    requires_argocd
+    requires_minio
+    requires_mc
+   
+       env
 
     cat <<EOF | kubectl apply -f -
 apiVersion: v1
@@ -464,13 +505,25 @@ EOF
 
     mc mb ${POOL_NAME}/${POOL_NAME}-bbq-taster
     mc mb ${POOL_NAME}/${POOL_NAME}-bbq-taster-results
+    # ArgoCD Variables
+    ARGOCD_APPNAME="pxbbq-taster"
+    ARGOCD_NAMESPACE="pxbbq"
+    ARGOCD_PATH="${ARGOCD_PATH_ROOT}/pxbbq/bbq-taster"
+    ARGOCD_REPO_URL="${ARGOCD_REPO_URL}"
+
+    # Apply Application
+    ARGOAPP=$(< ${ARGOCD_APP_TEMPLATE})
+    ARGOAPP="${ARGOAPP//${ARGOCD_NAMESPACE_PLACEHOLDER}/${ARGOCD_NAMESPACE}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_APP_NAME_PLACEHOLDER}/${ARGOCD_APPNAME}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_REPO_URL_PLACEHOLDER}/${ARGOCD_REPO_URL}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_REPO_PATH_PLACEHOLDER}/${ARGOCD_PATH}}"
+    kubectl apply -f <(echo "${ARGOAPP}")
 
 }
-
 install_minio () {
 
     log "Installing minio to ${POOL_NAME}"
-    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}"
+    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}" ${ERR_POOL_NOT_FOUND}
 
     requires_poolname
     requires_argocd
@@ -506,11 +559,8 @@ install_minio () {
 install_etcd () {
 
     log "Installing etcd to ${POOL_NAME}"
-    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}"
-
-    requires_poolname
-    requires_argocd
-    requires_lpp
+    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}" ${ERR_POOL_NOT_FOUND}
+=$(pxctl status | sed -n -E 's/Cluster UUID: (\w+)/\1/p')
 
     # ArgoCD Variables
     ARGOCD_APPNAME="etcd"
@@ -539,45 +589,159 @@ install_etcd () {
     kubectl create namespace etcd
     kubectl apply -f <(echo "${ARGOAPP}")
 }
+install_grafana () {
+    #Check to make sure Grafana is running
+    if [[ `kubectl -n portworx get pods -l app=grafana | grep Running | grep 1/1 | wc -l` -eq 1 ]]; then
+            sleep 1
+    else
 
+
+    kubectl -n portworx create configmap grafana-dashboard-config --from-file=grafana-dashboard-config.yaml
+    sleep 10
+
+    kubectl -n portworx create configmap grafana-source-config --from-file=grafana-datasource.yaml
+    sleep 10
+
+    curl "https://docs.portworx.com/samples/k8s/pxc/portworx-cluster-dashboard.json" -o portworx-cluster-dashboard.json && \
+    curl "https://docs.portworx.com/samples/k8s/pxc/portworx-node-dashboard.json" -o portworx-node-dashboard.json && \
+    curl "https://docs.portworx.com/samples/k8s/pxc/portworx-volume-dashboard.json" -o portworx-volume-dashboard.json && \
+    curl "https://docs.portworx.com/samples/k8s/pxc/portworx-performance-dashboard.json" -o portworx-performance-dashboard.json && \
+    curl "https://docs.portworx.com/samples/k8s/pxc/portworx-etcd-dashboard.json" -o portworx-etcd-dashboard.json && \
+
+    kubectl -n portworx create configmap grafana-dashboards --from-file=portworx-cluster-dashboard.json --from-file=portworx-performance-dashboard.json --from-file=portworx-node-dashboard.json --from-file=portworx-volume-dashboard.json --from-file=portworx-etcd-dashboard.json
+
+    sleep 10
+
+    kubectl apply -f grafana.yaml
+    sleep 5
+
+    #Check to make sure Grafana is running
+    until [[ `kubectl -n portworx get pods -l app=grafana | grep Running | grep 1/1 | wc -l` -eq 1 ]]; do
+            echo "Waiting for Grafana to be ready...."
+            sleep 10
+    done
+
+    #rm grafana-dashboard-config.yaml
+    #rm grafana-datasource.yaml
+    rm portworx-cluster-dashboard.json
+    rm portworx-node-dashboard.json
+    rm portworx-volume-dashboard.json
+    rm portworx-performance-dashboard.json
+    rm portworx-etcd-dashboard.json
+    #rm grafana.yaml
+
+fi
+
+}
 install_pxbackup () {
 
     log "Installing pxbackup to ${POOL_NAME}"
-    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}"
+    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}" ${ERR_POOL_NOT_FOUND}
 
     requires_poolname
-    requires_argocd
+    # NOTICE: We are going to try a manual helm command instead of using ArgoCD
+    # requires_argocd
 
-    # ArgoCD Variables
-    ARGOCD_APPNAME="pxbackup"
-    ARGOCD_NAMESPACE="central"
+    # # ArgoCD Variables
+    # ARGOCD_APPNAME="pxbackup"
+    # ARGOCD_NAMESPACE="central"
 
-    # Must point to a values file
-    ARGOCD_VALUE_FILES="\$values/${ARGOCD_HELM_VALUES_ROOT}/pxbackup/${POOL_NAME}/values.yaml"
-    ARGOCD_REPO_URL="${ARGOCD_REPO_URL}"
+    # # Must point to a values file
+    # ARGOCD_VALUE_FILES="\$values/${ARGOCD_HELM_VALUES_ROOT}/pxbackup/${POOL_NAME}/values.yaml"
+    # ARGOCD_REPO_URL="${ARGOCD_REPO_URL}"
 
-    # Helm specific options
-    ARGOCD_HELM_REPO="http://charts.portworx.io/"
-    ARGOCD_HELM_CHART_VERSION="2.6.0"
-    ARGOCD_HELM_CHART="px-central"
+    # # Helm specific options
+    # ARGOCD_HELM_REPO="http://charts.portworx.io/"
+    # ARGOCD_HELM_CHART_VERSION="2.6.0"
+    # ARGOCD_HELM_CHART="px-central"
 
-    # Apply Application
-    ARGOAPP=$(< ${ARGOCD_HELM_APP_TEMPLATE})
-    ARGOAPP="${ARGOAPP//${ARGOCD_NAMESPACE_PLACEHOLDER}/${ARGOCD_NAMESPACE}}"
-    ARGOAPP="${ARGOAPP//${ARGOCD_APP_NAME_PLACEHOLDER}/${ARGOCD_APPNAME}}"
-    ARGOAPP="${ARGOAPP//${ARGOCD_REPO_URL_PLACEHOLDER}/${ARGOCD_REPO_URL}}"
-    ARGOAPP="${ARGOAPP//${ARGOCD_HELM_VALUE_FILES_PLACEHOLDER}/${ARGOCD_VALUE_FILES}}"
-    ARGOAPP="${ARGOAPP//${ARGOCD_HELM_REPO_URL_PLACEHOLDER}/${ARGOCD_HELM_REPO}}"
-    ARGOAPP="${ARGOAPP//${ARGOCD_HELM_CHART_PLACEHOLDER}/${ARGOCD_HELM_CHART}}"
-    ARGOAPP="${ARGOAPP//${ARGOCD_HELM_TARGET_PLACEHOLDER}/${ARGOCD_HELM_CHART_VERSION}}"
+    # # Apply Application
+    # ARGOAPP=$(< ${ARGOCD_HELM_APP_TEMPLATE})
+    # ARGOAPP="${ARGOAPP//${ARGOCD_NAMESPACE_PLACEHOLDER}/${ARGOCD_NAMESPACE}}"
+    # ARGOAPP="${ARGOAPP//${ARGOCD_APP_NAME_PLACEHOLDER}/${ARGOCD_APPNAME}}"
+    # ARGOAPP="${ARGOAPP//${ARGOCD_REPO_URL_PLACEHOLDER}/${ARGOCD_REPO_URL}}"
+    # ARGOAPP="${ARGOAPP//${ARGOCD_HELM_VALUE_FILES_PLACEHOLDER}/${ARGOCD_VALUE_FILES}}"
+    # ARGOAPP="${ARGOAPP//${ARGOCD_HELM_REPO_URL_PLACEHOLDER}/${ARGOCD_HELM_REPO}}"
+    # ARGOAPP="${ARGOAPP//${ARGOCD_HELM_CHART_PLACEHOLDER}/${ARGOCD_HELM_CHART}}"
+    # ARGOAPP="${ARGOAPP//${ARGOCD_HELM_TARGET_PLACEHOLDER}/${ARGOCD_HELM_CHART_VERSION}}"
 
-    # Create the minio namespace
-    kubectl create namespace pxbackup
-    kubectl apply -f <(echo "${ARGOAPP}")
+    # Create the central namespace
+    # kubectl create namespace central
+    # kubectl apply -f <(echo "${ARGOAPP}")
+
+    # This is the failback install command:
+    helm install px-central portworx/px-central --namespace central --create-namespace --version 2.6.0 --set persistentStorage.enabled=true,persistentStorage.storageClassName="px-csi-db",pxbackup.enabled=true,oidc.centralOIDC.updateAdminProfile=false
+
+}
+configure_pxbackup() {
+    log "Configuring PXBackup"
+    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}" ${ERR_POOL_NOT_FOUND}
+
+    requires_pxbackup
+    requires_miniofor node in ${nodes[@]}x-backup 10002:10002 &
+    PORT_FORWARD_PID=$!
+    # This is a hack
+    LB_SERVER_IP="localhost"
+
+
+    log "Logging in to pxbackup"
+    until [[ $return_value == 0 ]]; do
+        pxbackupctl login -s http://$LB_UI_IP -u admin -p admin
+        return_value=$?
+        echo "Waiting for successful login"
+        sleep 5
+    done
+    log "Creating cloud credentials"
+    pxbackupctl create cloudcredential --name s3-account -p aws -e $LB_SERVER_IP:10002 --aws-access-key $MINIO_ACCESS_KEY --aws-secret-key $MINIO_SECRET_KEY
+    cloud_credential_uid=$(pxbackupctl get cloudcredential -e $LB_SERVER_IP:10002 --orgID default -o json | jq -cr '.[0].metadata.uid') 
+
+    log "Create backup locations"
+    pxbackupctl create backuplocation -e $LB_SERVER_IP:10002 --cloud-credential-Uid $cloud_credential_uid --name backup-location-1 -p s3 --cloud-credential-name s3-account --path $MINIO_BUCKET --s3-endpoint ${MINIO_ENDPOINT} --s3-region ${S3_REGION} --s3-disable-pathstyle=true --s3-disable-ssl=true
+    pxbackupctl create backuplocation -e $LB_SERVER_IP:10002 --cloud-credential-Uid $cloud_credential_uid --name obj-lock-backup-location-1 -p s3 --cloud-credential-name s3-account --path ${MINIO_BUCKET_OBJECTLOCK} --s3-endpoint ${MINIO_ENDPOINT} --s3-region ${S3_REGION} --s3-disable-pathstyle=true --s3-disable-ssl=true
+
+    log "Create backup schedules"
+    pxbackupctl create schedulepolicy --interval-minutes 15 -e $LB_SERVER_IP:10002 --name 15-min
+    pxbackupctl create schedulepolicy --interval-minutes 15 -e $LB_SERVER_IP:10002 --name 15-min-object --forObjectLock    
+
+
+cat << EOF > ${TEMP_DIR}/mongo-pre-rule.yaml
+    rules:
+    - actions:
+      - value: 'mongosh -u porxie -p porxie --eval "db.adminCommand( { fsync: 1 }
+          )"'
+      podSelector:
+          app.kubernetes.io/name: mongo
+EOF
+cat << EOF > ${TEMP_DIR}/mongo-post-rule.yaml
+    rules:
+    - actions:
+        - value: mongodump -u porxie -p porxie
+      podSelector:
+          app.kubernetes.io/name: mongo
+EOF
+    pxbackupctl create rule -e $LB_SERVER_IP:10002 -f ${TEMP_DIR}/mongo-pre-rule.yaml --name mongo-pre
+    pxbackupctl create rule -e $LB_SERVER_IP:10002 -f ${TEMP_DIR}/mongo-post-rule.yaml --name mongo-post
+    unlink ${TEMP_DIR}/mongo-pre-rule.yaml
+    unlink ${TEMP_DIR}/mongo-post-rule.yaml
+
+    log "Stopping port forward"
+    kill $PORT_FORWARD_PID
+
+}
+reboot_cluster () {
+    log "Rebooting the cluster"
+    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}" ${ERR_POOL_NOT_FOUND}
+    requires_poolname
+    nodes=$(kubectl get nodes -o jsonpath='{.items[*].metadata.name}')
+    for node in ${nodes[@]}; do
+        ssh -o StrictHostKeyChecking=no  ubuntu@$node "sudo update-grub"
+        ssh -o StrictHostKeyChecking=no  ubuntu@$node "sudo reboot"
+    done
+
 }
 configure_minio () {
     log "Configuring Minio"
-    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}"
+    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}" ${ERR_POOL_NOT_FOUND}
 
     requires_mc
     requires_minio
@@ -595,7 +759,7 @@ configure_minio () {
 
 # Install binary utilities locally
 install_utilities () {
-    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}"
+    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}" ${ERR_POOL_NOT_FOUND}
 
     requires_portworx
 
@@ -610,12 +774,23 @@ install_utilities () {
     wget -q -O ${BINARY_DIR}/mc https://dl.minio.io/client/mc/release/linux-amd64/mc
     chmod +x ${BINARY_DIR}/mc
 
+    log "Installing pxctl to ${BINARY_DIR}"
+    BACKUP_POD_NAME=$(kubectl get pods -n central -l app=px-backup -o jsonpath='{.items[0].metadata.name}')
+    kubectl cp -n central $BACKUP_POD_NAME:pxbackupctl/linux/pxbackupctl ${BINARY_DIR}/pxbackupctl --retries=10
+    chmod +x ${BINARY_DIR}/pxbackupctl
+
+    log "Installing kubestr to ${BINARY_DIR}"
+    wget https://github.com/kastenhq/kubestr/releases/download/v0.4.36/kubestr_0.4.36_Linux_amd64.tar.gz
+    sleep 5
+    tar -xvf kubestr_0.4.36_Linux_amd64.tar.gz
+    unlink kubestr_0.4.36_Linux_amd64.tar.gz
+    mv kubestr ${BINARY_DIR}/kubestr
 }
 
 
 ### Output Variables for environment
 env () {
-    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}"
+    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}" ${ERR_POOL_NOT_FOUND}
     log "Exporting environment variables"
 
     requires_poolname
@@ -625,6 +800,12 @@ env () {
         MINIO_ENDPOINT=http://$(kubectl get svc -n minio minio -o jsonpath='{.status.loadBalancer.ingress[].ip}'):9000
         MINIO_BUCKET=${BUCKET_NAME}
         MINIO_BUCKET_OBJECTLOCK=${BUCKET_NAME}-objectlock
+        CLUSTER_UUID=$(kubectl exec $(kubectl get pods -l name=portworx -n portworx -o jsonpath='{.items[0].metadata.name}') -n portworx -- /opt/pwx/bin/pxctl status| sed -n -E 's/\s+Cluster UUID: ([a-zA-Z0-9]+)/\1/p')
+
+        LB_UI_IP=$(kubectl get svc -n central px-backup-ui -o jsonpath='{.status.loadBalancer.ingress[].ip}')
+        # This doesnat actually work because argo keep squashing the loadbalancer change
+        #LB_SERVER_IP=$(kubectl get svc -n central px-backup -o jsonpath='{.status.loadBalancer.ingress[].ip}')
+        client_secret=$(kubectl get secret --namespace central pxc-backup-secret -o jsonpath={.data.OIDC_CLIENT_SECRET} | base64 --decode)
         
         if [[ ${VIEWENV} == 1 ]]; then
             echo ""
@@ -636,6 +817,8 @@ env () {
             echo "export MINIO_SECRET_KEY=${MINIO_SECRET_KEY}"
             echo "export MINIO_BUCKET=${MINIO_BUCKET}"
             echo "export MINIO_BUCKET_OBJECTLOCK=${MINIO_BUCKET_OBJECTLOCK}"
+            echo "export LB_UI_IP=${LB_UI_IP}"
+            echo "export LB_SERVER_IP=${LB_SERVER_IP}"
         else
             log "missing -v flag, not printing variables"
         fi
@@ -644,6 +827,7 @@ env () {
         PORTWORX_API=$(kubectl -n portworx get svc portworx-api -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
         if [[ ${VIEWENV} == 1 ]]; then
             echo "export PORTWORX_API=${PORTWORX_API}"
+            echo "export CLUSTER_UUID=${CLUSTER_UUID}"
         fi
     else
         POOL1=${POOL_NAME}
@@ -651,18 +835,25 @@ env () {
         
         POOL1_PORTWORX_API="$(kubectl --context ${POOL1} -n portworx get svc portworx-api -o jsonpath='{.status.loadBalancer.ingress[0].ip}'):9001"
         POOL2_PORTWORX_API="$(kubectl --context ${POOL2} -n portworx get svc portworx-api -o jsonpath='{.status.loadBalancer.ingress[0].ip}'):9001"
+        kubectl config use-context ${POOL2}
+        POOL2_CLUSTER_UUID=$(kubectl exec $(kubectl get pods -l name=portworx -n portworx -o jsonpath='{.items[0].metadata.name}') -n portworx -- /opt/pwx/bin/pxctl status| sed -n -E 's/\s+Cluster UUID: (\w+)/\1/p')
+        kubectl config use-context ${POOL1}
+        POOL1_CLUSTER_UUID=$(kubectl exec $(kubectl get pods -l name=portworx -n portworx -o jsonpath='{.items[0].metadata.name}') -n portworx -- /opt/pwx/bin/pxctl status| sed -n -E 's/\s+Cluster UUID: (\w+)/\1/p')
         
         if [[ ${VIEWENV} == 1 ]]; then
             echo "export POOL1_PORTWORX_API=${POOL1_PORTWORX_API}"
             echo "export POOL2_PORTWORX_API=${POOL2_PORTWORX_API}"
+            echo "export POOL1_CLUSTER_UUID=${POOL1_CLUSTER_UUID}"
+            echo "export POOL2_CLUSTER_UUID=${POOL2_CLUSTER_UUID}"
         fi
     fi
-    echo ""
-    echo "###############################################"
+    echo ""kubectl get secret -n minio minio -o jsonpath="{.data.rootUser}" | base64 --decode
+
 }
 
-### Meta Commands
-# These commands will call other commands for workflows
+
+# ###############################################
+# ###### META Functions for the script ##########
 
 install_portworx () {
     install_px_operator
@@ -670,6 +861,31 @@ install_portworx () {
 }
 
 install_demo () {
+    kubectl config use-context ${KUBECTL_CONTEXT} || terminate "Could not switch to ${KUBECTL_CONTEXT}" 
+    requires_poolname
+
+    log "Creating cluster"
+    create_rancher_cluster
+    wait_ready_racher_cluster
+    create_context
+    install_sealed_secrets
+    install_argocd
+    sleep 10
+    install_metallb
+    install_portworx
+    wait_ready_portworx
+    install_minio
+    wait_ready_minio
+    configure_minio
+    install_pxbackup
+    wait_ready_pxbackup
+    configure_pxbackup
+    install_pxbbq
+
+
+}
+
+install_demo_async () {
     # we are going to use the pool1 and pool2 params for the demo
     kubectl config use-context ${KUBECTL_CONTEXT} || terminate "Could not switch to ${KUBECTL_CONTEXT}" 
     requires_poolname
@@ -684,7 +900,7 @@ install_demo () {
     create_context
 
     log "Switching to ${POOL_NAME}"
-    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}" 
+    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}" ${ERR_POOL_NOT_FOUND}
 
     install_sealed_secrets
     install_argocd
@@ -693,7 +909,7 @@ install_demo () {
     install_portworx
     wait_ready_portworx
     install_minio
-    # need to add a wait_ready_minio function
+    wait_ready_minio
 
     # We will test for the existence of a second pool and reset the variable below.
     if [[ ! -n ${DR_POOL_NAME} ]]; then
@@ -711,13 +927,14 @@ install_demo () {
     create_context
 
     log "Switching to ${POOL_NAME}"
-    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}"     
+    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}" ${ERR_POOL_NOT_FOUND}
     install_sealed_secrets
     install_argocd
     sleep 10
     install_metallb
     install_portworx
     wait_ready_portworx
+    install_pxbbq
 
 
     # fixing pools
@@ -764,6 +981,24 @@ px_clusterpair () {
     unlink $BASE_DIR/${POOL2}_config.yaml
 }
 
+install_cluster () {
+    kubectl config use-context ${KUBECTL_CONTEXT} || terminate "Could not switch to ${KUBECTL_CONTEXT}" 
+    requires_poolname
+    log "Creating first cluster"
+    create_rancher_cluster
+    wait_ready_racher_cluster
+    create_context
+
+    log "Switching to ${POOL_NAME}"
+    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}" ${ERR_POOL_NOT_FOUND}
+
+    install_sealed_secrets
+    install_argocd
+    sleep 10
+    install_metallb
+    install_lpp
+
+}
 
 ###### Script Run Section
 #set -x
@@ -819,8 +1054,14 @@ while [[ ${1} != "" ]]; do
         install_minio)
             COMMAND="install_minio"
         ;;
+        install_grafana)
+            COMMAND="install_grafana"
+        ;;
         configure_minio)
             COMMAND="configure_minio"
+        ;;
+        configure_pxbackup)
+            COMMAND="configure_pxbackup"
         ;;
         install_portworx)
             COMMAND="install_portworx"
@@ -837,6 +1078,9 @@ while [[ ${1} != "" ]]; do
         install_pxbbq)
             COMMAND="install_pxbbq"
         ;;
+        install_pxbbq_taster)
+            COMMAND="install_pxbbq_taster"
+        ;;
         install_utilities)
             COMMAND="install_utilities"
         ;;
@@ -845,6 +1089,12 @@ while [[ ${1} != "" ]]; do
         ;;
         install_demo)
             COMMAND="install_demo"
+        ;;
+        install_cluster)
+            COMMAND="install_cluster"
+        ;;
+        reboot_cluster)
+            COMMAND="reboot_cluster"
         ;;
         --disable-logs)
             DISABLE_LOGS=1

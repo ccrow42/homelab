@@ -1,0 +1,1931 @@
+{
+  "status": "STATUS_OK",
+  "cluster": {
+    "Status": 2,
+    "Id": "px-cluster",
+    "NodeId": "614b8e69-f68d-4300-9038-b1c75d394928",
+    "Nodes": [
+      {
+        "Id": "614b8e69-f68d-4300-9038-b1c75d394928",
+        "SchedulerNodeName": "demo1-pool2-8589fdf3-wgnjv",
+        "Cpu": 2.386934673366834,
+        "CpuCores": 4,
+        "MemTotal": 12475432960,
+        "MemUsed": 2373193728,
+        "MemFree": 10102239232,
+        "Avgload": 0,
+        "Status": 2,
+        "GenNumber": 1714763747708991200,
+        "Disks": {
+          "/dev/sdb": {
+            "id": "1",
+            "path": "/dev/sdb",
+            "online": true,
+            "seq_write": 986485000,
+            "size": 42949672960,
+            "used": 4320133120,
+            "last_scan": {
+              "seconds": 1714763749,
+              "nanos": 924963924
+            },
+            "cloud_drive_type": "thin"
+          }
+        },
+        "Pools": [
+          {
+            "Cos": 3,
+            "RaidLevel": "raid0",
+            "TotalSize": 42949672960,
+            "Used": 4668096512,
+            "labels": {
+              "beta.kubernetes.io/arch": "amd64",
+              "beta.kubernetes.io/instance-type": "rke2",
+              "beta.kubernetes.io/os": "linux",
+              "iopriority": "HIGH",
+              "kubernetes.io/arch": "amd64",
+              "kubernetes.io/hostname": "demo1-pool2-8589fdf3-wgnjv",
+              "kubernetes.io/os": "linux",
+              "medium": "STORAGE_MEDIUM_MAGNETIC",
+              "node-role.kubernetes.io/worker": "true",
+              "node.kubernetes.io/instance-type": "rke2",
+              "plan.upgrade.cattle.io/system-agent-upgrader": "3105232f9f97257eab6953bb20cb94f8860b5054a3a0342d6db99638",
+              "rke.cattle.io/machine": "13d3bd05-ccd9-44e1-82a7-0841c432b6fd",
+              "topology.portworx.io/datacenter": "Tac",
+              "topology.portworx.io/hypervisor": "HostSystem-host-14",
+              "topology.portworx.io/node": "423c3226-8651-4d71-99d5-5e232d831faf"
+            },
+            "uuid": "065e7909-4605-4a86-bc70-a5f3a2321deb"
+          }
+        ],
+        "MgmtIp": "10.0.1.139",
+        "DataIp": "10.0.1.139",
+        "Timestamp": "2024-05-18T18:11:21.345018513Z",
+        "StartTime": "2024-05-03T19:15:47.708991478Z",
+        "Hostname": "demo1-pool2-8589fdf3-wgnjv",
+        "NodeData": {
+          "KvdbState": {
+            "KvdbPreviousLowestWatchIndex": 85833,
+            "KvdbWatchIndex": 85845,
+            "NodeKvdbState": 1
+          },
+          "STORAGE-INFO": {
+            "Cache": {
+              "AutoTune": false,
+              "CacheChunkSize": 0,
+              "CacheDemotion": 0,
+              "CacheDirtyBlocks": 0,
+              "CacheIOMBps": 0,
+              "CachePolicy": "",
+              "CachePromotion": 0,
+              "CacheReadHits": 0,
+              "CacheReadMisses": 0,
+              "CacheSettings": "",
+              "CacheTotalBlocks": 0,
+              "CacheUsedBlocks": 0,
+              "CacheWriteHits": 0,
+              "CacheWriteMisses": 0,
+              "Cachemode": "",
+              "DirtyState": 0,
+              "Enabled": false,
+              "MaxDirtyUtilPercent": 0,
+              "Members": [],
+              "MinDirtyUtilPercent": 0,
+              "Pool": 0,
+              "Recovery": {
+                "Config": {
+                  "CacheChunkSize": 0,
+                  "CachePolicy": "",
+                  "CacheSettings": "",
+                  "Cachemode": "",
+                  "PoolID": 0
+                },
+                "ExplicitDetach": false
+              }
+            },
+            "LastError": "",
+            "MaxPoolSize": 0,
+            "PoolSize": 42949672960,
+            "Random4KIops": 0,
+            "ReadThroughput": 0,
+            "ResourceJournal": {},
+            "ResourceJournalUUID": "",
+            "ResourceSystemMetadata": {},
+            "ResourceSystemMetadataUUID": "",
+            "ResourceUUID": "",
+            "Resources": {
+              "0:1": {
+                "cloud_drive_type": "thin",
+                "id": "1",
+                "last_scan": {
+                  "nanos": 883213584,
+                  "seconds": 1714763749
+                },
+                "online": true,
+                "path": "/dev/sdb",
+                "seq_write": 986485000,
+                "size": 42949672960,
+                "used": 4320133120
+              }
+            },
+            "ResourcesCount": 1,
+            "ResourcesLastScan": "Resources Scan OK",
+            "Status": "Up",
+            "TotalSize": 42949672960,
+            "Used": 0,
+            "WriteThroughput": 0
+          },
+          "STORAGE-RUNTIME": {
+            "MID": "614b8e69-f68d-4300-9038-b1c75d394928",
+            "PoolUsage": {
+              "0": {
+                "Cache": {
+                  "AutoTune": false,
+                  "CacheChunkSize": 0,
+                  "CacheDemotion": 0,
+                  "CacheDirtyBlocks": 0,
+                  "CacheIOMBps": 0,
+                  "CachePolicy": "",
+                  "CachePromotion": 0,
+                  "CacheReadHits": 0,
+                  "CacheReadMisses": 0,
+                  "CacheSettings": "",
+                  "CacheTotalBlocks": 0,
+                  "CacheUsedBlocks": 0,
+                  "CacheWriteHits": 0,
+                  "CacheWriteMisses": 0,
+                  "Cachemode": "",
+                  "DirtyState": 0,
+                  "Enabled": false,
+                  "MaxDirtyUtilPercent": 0,
+                  "Members": [],
+                  "MinDirtyUtilPercent": 0,
+                  "Pool": 0,
+                  "Recovery": {
+                    "Config": {
+                      "CacheChunkSize": 0,
+                      "CachePolicy": "",
+                      "CacheSettings": "",
+                      "Cachemode": "",
+                      "PoolID": 0
+                    },
+                    "ExplicitDetach": false
+                  }
+                },
+                "TotalAllocated": 4668096512
+              }
+            },
+            "Usage": {
+              "Cache": {
+                "AutoTune": false,
+                "CacheChunkSize": 0,
+                "CacheDemotion": 0,
+                "CacheDirtyBlocks": 0,
+                "CacheIOMBps": 0,
+                "CachePolicy": "",
+                "CachePromotion": 0,
+                "CacheReadHits": 0,
+                "CacheReadMisses": 0,
+                "CacheSettings": "",
+                "CacheTotalBlocks": 0,
+                "CacheUsedBlocks": 0,
+                "CacheWriteHits": 0,
+                "CacheWriteMisses": 0,
+                "Cachemode": "",
+                "DirtyState": 0,
+                "Enabled": false,
+                "MaxDirtyUtilPercent": 0,
+                "Members": [],
+                "MinDirtyUtilPercent": 0,
+                "Pool": 0,
+                "Recovery": {
+                  "Config": {
+                    "CacheChunkSize": 0,
+                    "CachePolicy": "",
+                    "CacheSettings": "",
+                    "Cachemode": "",
+                    "PoolID": 0
+                  },
+                  "ExplicitDetach": false
+                }
+              },
+              "TotalAllocated": 4668096512
+            }
+          },
+          "storage_stats": {
+            "Cpu": 4.556962025316456,
+            "DiskAvail": 38281547776,
+            "DiskTotal": 42949672960,
+            "DiskUtil": 4668125184,
+            "Memory": 19,
+            "PendingIo": 0
+          }
+        },
+        "NodeLabels": {
+          "City": "Tacoma",
+          "Country": "United States",
+          "Data IP": "10.0.1.139",
+          "ISP": "City of Tacoma",
+          "ISP IP": "131.191.29.18",
+          "Kernel Version": "5.15.0-78-generic",
+          "LAT": "4.7285E+01",
+          "LNG": "-1.225036E+02",
+          "Management IP": "10.0.1.139",
+          "OS": "Ubuntu 22.04.2 LTS",
+          "PX Version": "3.1.1.0-519c78f",
+          "Region": "WA",
+          "Timezone": "America/Los_Angeles",
+          "Zip": "98407"
+        },
+        "GossipPort": "9002",
+        "HWType": 1,
+        "SecurityStatus": 1,
+        "SchedulerTopology": {
+          "labels": {
+            "topology.portworx.io/datacenter": "Tac",
+            "topology.portworx.io/hypervisor": "HostSystem-host-14",
+            "topology.portworx.io/node": "423c3226-8651-4d71-99d5-5e232d831faf"
+          }
+        },
+        "NonQuorumMember": false,
+        "DomainID": ""
+      },
+      {
+        "Id": "8ff9f531-f6b5-4023-a7ef-b216da8278fa",
+        "SchedulerNodeName": "demo1-pool2-8589fdf3-5bz26",
+        "Cpu": 2.0151133501259446,
+        "CpuCores": 4,
+        "MemTotal": 12475432960,
+        "MemUsed": 2449481728,
+        "MemFree": 10025951232,
+        "Avgload": 0,
+        "Status": 2,
+        "GenNumber": 1714763748396922400,
+        "Disks": {
+          "/dev/sdb": {
+            "id": "1",
+            "path": "/dev/sdb",
+            "online": true,
+            "seq_write": 893801000,
+            "size": 42949672960,
+            "used": 4320133120,
+            "last_scan": {
+              "seconds": 1714763750,
+              "nanos": 600849431
+            },
+            "cloud_drive_type": "thin"
+          }
+        },
+        "Pools": [
+          {
+            "Cos": 3,
+            "RaidLevel": "raid0",
+            "TotalSize": 42949672960,
+            "Used": 4642942976,
+            "labels": {
+              "beta.kubernetes.io/arch": "amd64",
+              "beta.kubernetes.io/instance-type": "rke2",
+              "beta.kubernetes.io/os": "linux",
+              "iopriority": "HIGH",
+              "kubernetes.io/arch": "amd64",
+              "kubernetes.io/hostname": "demo1-pool2-8589fdf3-5bz26",
+              "kubernetes.io/os": "linux",
+              "medium": "STORAGE_MEDIUM_MAGNETIC",
+              "node-role.kubernetes.io/worker": "true",
+              "node.kubernetes.io/instance-type": "rke2",
+              "plan.upgrade.cattle.io/system-agent-upgrader": "3105232f9f97257eab6953bb20cb94f8860b5054a3a0342d6db99638",
+              "rke.cattle.io/machine": "e7926d18-9312-40d2-b261-f4386fb29e14",
+              "topology.portworx.io/datacenter": "Tac",
+              "topology.portworx.io/hypervisor": "HostSystem-host-14",
+              "topology.portworx.io/node": "423ce6cd-0d87-c5f5-0b15-f5977ebd3486"
+            },
+            "uuid": "fa2dbdb5-5be0-462e-9155-04259dfa451c"
+          }
+        ],
+        "MgmtIp": "10.0.1.141",
+        "DataIp": "10.0.1.141",
+        "Timestamp": "2024-05-18T18:11:18.380753117Z",
+        "StartTime": "2024-05-03T19:15:48.396922748Z",
+        "Hostname": "demo1-pool2-8589fdf3-5bz26",
+        "NodeData": {
+          "KvdbState": {
+            "KvdbPreviousLowestWatchIndex": 85833,
+            "KvdbWatchIndex": 85845,
+            "NodeKvdbState": 1
+          },
+          "STORAGE-INFO": {
+            "Cache": {
+              "AutoTune": false,
+              "CacheChunkSize": 0,
+              "CacheDemotion": 0,
+              "CacheDirtyBlocks": 0,
+              "CacheIOMBps": 0,
+              "CachePolicy": "",
+              "CachePromotion": 0,
+              "CacheReadHits": 0,
+              "CacheReadMisses": 0,
+              "CacheSettings": "",
+              "CacheTotalBlocks": 0,
+              "CacheUsedBlocks": 0,
+              "CacheWriteHits": 0,
+              "CacheWriteMisses": 0,
+              "Cachemode": "",
+              "DirtyState": 0,
+              "Enabled": false,
+              "MaxDirtyUtilPercent": 0,
+              "Members": null,
+              "MinDirtyUtilPercent": 0,
+              "Pool": 0,
+              "Recovery": {
+                "Config": {
+                  "CacheChunkSize": 0,
+                  "CachePolicy": "",
+                  "CacheSettings": "",
+                  "Cachemode": "",
+                  "PoolID": 0
+                },
+                "ExplicitDetach": false
+              }
+            },
+            "LastError": "",
+            "MaxPoolSize": 0,
+            "PoolSize": 42949672960,
+            "Random4KIops": 0,
+            "ReadThroughput": 0,
+            "ResourceJournal": {},
+            "ResourceJournalUUID": "",
+            "ResourceSystemMetadata": {},
+            "ResourceSystemMetadataUUID": "",
+            "ResourceUUID": "",
+            "Resources": {
+              "0:1": {
+                "cloud_drive_type": "thin",
+                "id": "1",
+                "last_scan": {
+                  "nanos": 558998491,
+                  "seconds": 1714763750
+                },
+                "online": true,
+                "path": "/dev/sdb",
+                "seq_write": 893801000,
+                "size": 42949672960,
+                "used": 4320133120
+              }
+            },
+            "ResourcesCount": 1,
+            "ResourcesLastScan": "Resources Scan OK",
+            "Status": "Up",
+            "TotalSize": 42949672960,
+            "Used": 0,
+            "WriteThroughput": 0
+          },
+          "STORAGE-RUNTIME": {
+            "MID": "8ff9f531-f6b5-4023-a7ef-b216da8278fa",
+            "PoolUsage": {
+              "0": {
+                "Cache": {
+                  "AutoTune": false,
+                  "CacheChunkSize": 0,
+                  "CacheDemotion": 0,
+                  "CacheDirtyBlocks": 0,
+                  "CacheIOMBps": 0,
+                  "CachePolicy": "",
+                  "CachePromotion": 0,
+                  "CacheReadHits": 0,
+                  "CacheReadMisses": 0,
+                  "CacheSettings": "",
+                  "CacheTotalBlocks": 0,
+                  "CacheUsedBlocks": 0,
+                  "CacheWriteHits": 0,
+                  "CacheWriteMisses": 0,
+                  "Cachemode": "",
+                  "DirtyState": 0,
+                  "Enabled": false,
+                  "MaxDirtyUtilPercent": 0,
+                  "Members": null,
+                  "MinDirtyUtilPercent": 0,
+                  "Pool": 0,
+                  "Recovery": {
+                    "Config": {
+                      "CacheChunkSize": 0,
+                      "CachePolicy": "",
+                      "CacheSettings": "",
+                      "Cachemode": "",
+                      "PoolID": 0
+                    },
+                    "ExplicitDetach": false
+                  }
+                },
+                "TotalAllocated": 4642942976
+              }
+            },
+            "Usage": {
+              "Cache": {
+                "AutoTune": false,
+                "CacheChunkSize": 0,
+                "CacheDemotion": 0,
+                "CacheDirtyBlocks": 0,
+                "CacheIOMBps": 0,
+                "CachePolicy": "",
+                "CachePromotion": 0,
+                "CacheReadHits": 0,
+                "CacheReadMisses": 0,
+                "CacheSettings": "",
+                "CacheTotalBlocks": 0,
+                "CacheUsedBlocks": 0,
+                "CacheWriteHits": 0,
+                "CacheWriteMisses": 0,
+                "Cachemode": "",
+                "DirtyState": 0,
+                "Enabled": false,
+                "MaxDirtyUtilPercent": 0,
+                "Members": null,
+                "MinDirtyUtilPercent": 0,
+                "Pool": 0,
+                "Recovery": {
+                  "Config": {
+                    "CacheChunkSize": 0,
+                    "CachePolicy": "",
+                    "CacheSettings": "",
+                    "Cachemode": "",
+                    "PoolID": 0
+                  },
+                  "ExplicitDetach": false
+                }
+              },
+              "TotalAllocated": 4642942976
+            }
+          },
+          "storage_stats": {
+            "Cpu": 2.01765447667087,
+            "DiskAvail": 38306729984,
+            "DiskTotal": 42949672960,
+            "DiskUtil": 4642942976,
+            "Memory": 19,
+            "PendingIo": 0
+          }
+        },
+        "NodeLabels": {
+          "City": "Tacoma",
+          "Country": "United States",
+          "Data IP": "10.0.1.141",
+          "ISP": "City of Tacoma",
+          "ISP IP": "131.191.29.18",
+          "Kernel Version": "5.15.0-78-generic",
+          "LAT": "4.7285E+01",
+          "LNG": "-1.225036E+02",
+          "Management IP": "10.0.1.141",
+          "OS": "Ubuntu 22.04.2 LTS",
+          "PX Version": "3.1.1.0-519c78f",
+          "Region": "WA",
+          "Timezone": "America/Los_Angeles",
+          "Zip": "98407"
+        },
+        "GossipPort": "9002",
+        "HWType": 1,
+        "SecurityStatus": 1,
+        "SchedulerTopology": {
+          "labels": {
+            "topology.portworx.io/datacenter": "Tac",
+            "topology.portworx.io/hypervisor": "HostSystem-host-14",
+            "topology.portworx.io/node": "423ce6cd-0d87-c5f5-0b15-f5977ebd3486"
+          }
+        },
+        "NonQuorumMember": false,
+        "DomainID": ""
+      },
+      {
+        "Id": "ff9be64f-3dfe-4c0d-ba01-b2d54ff96e8b",
+        "SchedulerNodeName": "demo1-pool2-8589fdf3-s4gbq",
+        "Cpu": 2.7672955974842766,
+        "CpuCores": 4,
+        "MemTotal": 12475432960,
+        "MemUsed": 1989742592,
+        "MemFree": 10485690368,
+        "Avgload": 0,
+        "Status": 2,
+        "GenNumber": 1714763747390517000,
+        "Disks": {
+          "/dev/sdb": {
+            "id": "1",
+            "path": "/dev/sdb",
+            "online": true,
+            "seq_write": 994773000,
+            "size": 42949672960,
+            "used": 4320133120,
+            "last_scan": {
+              "seconds": 1714763749,
+              "nanos": 614774842
+            },
+            "cloud_drive_type": "thin"
+          }
+        },
+        "Pools": [
+          {
+            "Cos": 3,
+            "RaidLevel": "raid0",
+            "TotalSize": 42949672960,
+            "Used": 4642967552,
+            "labels": {
+              "beta.kubernetes.io/arch": "amd64",
+              "beta.kubernetes.io/instance-type": "rke2",
+              "beta.kubernetes.io/os": "linux",
+              "iopriority": "HIGH",
+              "kubernetes.io/arch": "amd64",
+              "kubernetes.io/hostname": "demo1-pool2-8589fdf3-s4gbq",
+              "kubernetes.io/os": "linux",
+              "medium": "STORAGE_MEDIUM_MAGNETIC",
+              "node-role.kubernetes.io/worker": "true",
+              "node.kubernetes.io/instance-type": "rke2",
+              "plan.upgrade.cattle.io/system-agent-upgrader": "3105232f9f97257eab6953bb20cb94f8860b5054a3a0342d6db99638",
+              "rke.cattle.io/machine": "5bec246a-46a6-4596-a57b-122a123ec0c0",
+              "topology.portworx.io/datacenter": "Tac",
+              "topology.portworx.io/hypervisor": "HostSystem-host-14",
+              "topology.portworx.io/node": "423c034c-0b34-d699-978b-2cd33d62990d"
+            },
+            "uuid": "a31ded63-d059-46cd-bee4-a845cacf253b"
+          }
+        ],
+        "MgmtIp": "10.0.1.133",
+        "DataIp": "10.0.1.133",
+        "Timestamp": "2024-05-18T18:11:16.848244936Z",
+        "StartTime": "2024-05-03T19:15:47.390517171Z",
+        "Hostname": "demo1-pool2-8589fdf3-s4gbq",
+        "NodeData": {
+          "KvdbState": {
+            "KvdbPreviousLowestWatchIndex": 85833,
+            "KvdbWatchIndex": 85845,
+            "NodeKvdbState": 1
+          },
+          "STORAGE-INFO": {
+            "Cache": {
+              "AutoTune": false,
+              "CacheChunkSize": 0,
+              "CacheDemotion": 0,
+              "CacheDirtyBlocks": 0,
+              "CacheIOMBps": 0,
+              "CachePolicy": "",
+              "CachePromotion": 0,
+              "CacheReadHits": 0,
+              "CacheReadMisses": 0,
+              "CacheSettings": "",
+              "CacheTotalBlocks": 0,
+              "CacheUsedBlocks": 0,
+              "CacheWriteHits": 0,
+              "CacheWriteMisses": 0,
+              "Cachemode": "",
+              "DirtyState": 0,
+              "Enabled": false,
+              "MaxDirtyUtilPercent": 0,
+              "Members": null,
+              "MinDirtyUtilPercent": 0,
+              "Pool": 0,
+              "Recovery": {
+                "Config": {
+                  "CacheChunkSize": 0,
+                  "CachePolicy": "",
+                  "CacheSettings": "",
+                  "Cachemode": "",
+                  "PoolID": 0
+                },
+                "ExplicitDetach": false
+              }
+            },
+            "LastError": "",
+            "MaxPoolSize": 0,
+            "PoolSize": 42949672960,
+            "Random4KIops": 0,
+            "ReadThroughput": 0,
+            "ResourceJournal": {},
+            "ResourceJournalUUID": "",
+            "ResourceSystemMetadata": {},
+            "ResourceSystemMetadataUUID": "",
+            "ResourceUUID": "",
+            "Resources": {
+              "0:1": {
+                "cloud_drive_type": "thin",
+                "id": "1",
+                "last_scan": {
+                  "nanos": 577510872,
+                  "seconds": 1714763749
+                },
+                "online": true,
+                "path": "/dev/sdb",
+                "seq_write": 994773000,
+                "size": 42949672960,
+                "used": 4320133120
+              }
+            },
+            "ResourcesCount": 1,
+            "ResourcesLastScan": "Resources Scan OK",
+            "Status": "Up",
+            "TotalSize": 42949672960,
+            "Used": 0,
+            "WriteThroughput": 0
+          },
+          "STORAGE-RUNTIME": {
+            "MID": "ff9be64f-3dfe-4c0d-ba01-b2d54ff96e8b",
+            "PoolUsage": {
+              "0": {
+                "Cache": {
+                  "AutoTune": false,
+                  "CacheChunkSize": 0,
+                  "CacheDemotion": 0,
+                  "CacheDirtyBlocks": 0,
+                  "CacheIOMBps": 0,
+                  "CachePolicy": "",
+                  "CachePromotion": 0,
+                  "CacheReadHits": 0,
+                  "CacheReadMisses": 0,
+                  "CacheSettings": "",
+                  "CacheTotalBlocks": 0,
+                  "CacheUsedBlocks": 0,
+                  "CacheWriteHits": 0,
+                  "CacheWriteMisses": 0,
+                  "Cachemode": "",
+                  "DirtyState": 0,
+                  "Enabled": false,
+                  "MaxDirtyUtilPercent": 0,
+                  "Members": null,
+                  "MinDirtyUtilPercent": 0,
+                  "Pool": 0,
+                  "Recovery": {
+                    "Config": {
+                      "CacheChunkSize": 0,
+                      "CachePolicy": "",
+                      "CacheSettings": "",
+                      "Cachemode": "",
+                      "PoolID": 0
+                    },
+                    "ExplicitDetach": false
+                  }
+                },
+                "TotalAllocated": 4642967552
+              }
+            },
+            "Usage": {
+              "Cache": {
+                "AutoTune": false,
+                "CacheChunkSize": 0,
+                "CacheDemotion": 0,
+                "CacheDirtyBlocks": 0,
+                "CacheIOMBps": 0,
+                "CachePolicy": "",
+                "CachePromotion": 0,
+                "CacheReadHits": 0,
+                "CacheReadMisses": 0,
+                "CacheSettings": "",
+                "CacheTotalBlocks": 0,
+                "CacheUsedBlocks": 0,
+                "CacheWriteHits": 0,
+                "CacheWriteMisses": 0,
+                "Cachemode": "",
+                "DirtyState": 0,
+                "Enabled": false,
+                "MaxDirtyUtilPercent": 0,
+                "Members": null,
+                "MinDirtyUtilPercent": 0,
+                "Pool": 0,
+                "Recovery": {
+                  "Config": {
+                    "CacheChunkSize": 0,
+                    "CachePolicy": "",
+                    "CacheSettings": "",
+                    "Cachemode": "",
+                    "PoolID": 0
+                  },
+                  "ExplicitDetach": false
+                }
+              },
+              "TotalAllocated": 4642967552
+            }
+          },
+          "storage_stats": {
+            "Cpu": 2.6548672566371683,
+            "DiskAvail": 38306729984,
+            "DiskTotal": 42949672960,
+            "DiskUtil": 4642942976,
+            "Memory": 15,
+            "PendingIo": 0
+          }
+        },
+        "NodeLabels": {
+          "City": "Tacoma",
+          "Country": "United States",
+          "Data IP": "10.0.1.133",
+          "ISP": "City of Tacoma",
+          "ISP IP": "131.191.29.18",
+          "Kernel Version": "5.15.0-78-generic",
+          "LAT": "4.7285E+01",
+          "LNG": "-1.225036E+02",
+          "Management IP": "10.0.1.133",
+          "OS": "Ubuntu 22.04.2 LTS",
+          "PX Version": "3.1.1.0-519c78f",
+          "Region": "WA",
+          "Timezone": "America/Los_Angeles",
+          "Zip": "98407"
+        },
+        "GossipPort": "9002",
+        "HWType": 1,
+        "SecurityStatus": 1,
+        "SchedulerTopology": {
+          "labels": {
+            "topology.portworx.io/datacenter": "Tac",
+            "topology.portworx.io/hypervisor": "HostSystem-host-14",
+            "topology.portworx.io/node": "423c034c-0b34-d699-978b-2cd33d62990d"
+          }
+        },
+        "NonQuorumMember": false,
+        "DomainID": ""
+      }
+    ],
+    "ManagementURL": "",
+    "FluentDConfig": {
+      "ip": "",
+      "port": ""
+    }
+  },
+  "daemoninfo": {
+    "Version": "3.1.1.0-519c78f",
+    "SchedulerInfo": {
+      "Version": "",
+      "LastError": "",
+      "IsSelinuxEnabled": false
+    },
+    "StorageSpec": {
+      "DriverName": "kernel",
+      "SwVersion": "3.1.1.0-519c78f",
+      "BlockDriver": 0,
+      "TargetDsType": 0,
+      "Version": "1",
+      "NID": 2,
+      "MID": "614b8e69-f68d-4300-9038-b1c75d394928",
+      "PeerAddr": "tcp://10.0.1.139:9003",
+      "ClientAddr": "http://10.0.1.139:9001",
+      "StorageVol": "/var/.px",
+      "StorageVolMd": "/var/.px/0",
+      "JournalDev": "",
+      "SystemMetadataDev": "",
+      "Info": {
+        "Resources": {
+          "0:1": {
+            "id": "1",
+            "path": "/dev/sdb",
+            "online": true,
+            "seq_write": 986485000,
+            "size": 42949672960,
+            "used": 4320133120,
+            "last_scan": {
+              "seconds": 1714763749,
+              "nanos": 883213584
+            },
+            "cloud_drive_type": "thin"
+          }
+        },
+        "ResourcesLastScan": "Resources Scan OK",
+        "ResourcesCount": 1,
+        "ResourceUUID": "",
+        "ResourceJournal": {},
+        "ResourceJournalUUID": "",
+        "ResourceSystemMetadata": {},
+        "ResourceSystemMetadataUUID": "",
+        "ReadThroughput": 0,
+        "WriteThroughput": 0,
+        "Random4KIops": 0,
+        "Status": "Up",
+        "PoolSize": 42949672960,
+        "TotalSize": 42949672960,
+        "Used": 0,
+        "LastError": "",
+        "Cache": {
+          "Pool": 0,
+          "Members": [],
+          "Enabled": false,
+          "CacheTotalBlocks": 0,
+          "CacheUsedBlocks": 0,
+          "CacheDirtyBlocks": 0,
+          "CacheReadHits": 0,
+          "CacheReadMisses": 0,
+          "CacheWriteHits": 0,
+          "CacheWriteMisses": 0,
+          "CacheChunkSize": 0,
+          "Cachemode": "",
+          "CachePolicy": "",
+          "CacheSettings": "",
+          "CacheDemotion": 0,
+          "CachePromotion": 0,
+          "CacheIOMBps": 0,
+          "DirtyState": 0,
+          "AutoTune": false,
+          "MinDirtyUtilPercent": 0,
+          "MaxDirtyUtilPercent": 0,
+          "Recovery": {
+            "Config": {
+              "PoolID": 0,
+              "Cachemode": "",
+              "CacheChunkSize": 0,
+              "CachePolicy": "",
+              "CacheSettings": ""
+            },
+            "ExplicitDetach": false
+          }
+        },
+        "MaxPoolSize": 0
+      },
+      "MdInfo": {
+        "Resources": {},
+        "ResourcesLastScan": "",
+        "ResourcesCount": 0,
+        "ResourceUUID": "",
+        "ResourceJournal": {},
+        "ResourceJournalUUID": "",
+        "ResourceSystemMetadata": {},
+        "ResourceSystemMetadataUUID": "",
+        "ReadThroughput": 0,
+        "WriteThroughput": 0,
+        "Random4KIops": 0,
+        "Status": "",
+        "PoolSize": 0,
+        "TotalSize": 0,
+        "Used": 0,
+        "LastError": "",
+        "Cache": {
+          "Pool": 0,
+          "Members": [],
+          "Enabled": false,
+          "CacheTotalBlocks": 0,
+          "CacheUsedBlocks": 0,
+          "CacheDirtyBlocks": 0,
+          "CacheReadHits": 0,
+          "CacheReadMisses": 0,
+          "CacheWriteHits": 0,
+          "CacheWriteMisses": 0,
+          "CacheChunkSize": 0,
+          "Cachemode": "",
+          "CachePolicy": "",
+          "CacheSettings": "",
+          "CacheDemotion": 0,
+          "CachePromotion": 0,
+          "CacheIOMBps": 0,
+          "DirtyState": 0,
+          "AutoTune": false,
+          "MinDirtyUtilPercent": 0,
+          "MaxDirtyUtilPercent": 0,
+          "Recovery": {
+            "Config": {
+              "PoolID": 0,
+              "Cachemode": "",
+              "CacheChunkSize": 0,
+              "CachePolicy": "",
+              "CacheSettings": ""
+            },
+            "ExplicitDetach": false
+          }
+        },
+        "MaxPoolSize": 0
+      },
+      "Geo": {
+        "Provider": "vsphere",
+        "Region": "default",
+        "Zone": "default",
+        "Datacenter": "Tac",
+        "Row": "default",
+        "Rack": "default",
+        "Chassis": "default",
+        "Hypervisor": "HostSystem-host-14",
+        "Node": "423c3226-8651-4d71-99d5-5e232d831faf",
+        "InstanceGroup": null
+      },
+      "DebugLevel": "",
+      "Labels": {
+        "beta.kubernetes.io/arch": "amd64",
+        "beta.kubernetes.io/instance-type": "rke2",
+        "beta.kubernetes.io/os": "linux",
+        "kubernetes.io/arch": "amd64",
+        "kubernetes.io/hostname": "demo1-pool2-8589fdf3-wgnjv",
+        "kubernetes.io/os": "linux",
+        "node-role.kubernetes.io/worker": "true",
+        "node.kubernetes.io/instance-type": "rke2",
+        "plan.upgrade.cattle.io/system-agent-upgrader": "3105232f9f97257eab6953bb20cb94f8860b5054a3a0342d6db99638",
+        "rke.cattle.io/machine": "13d3bd05-ccd9-44e1-82a7-0841c432b6fd",
+        "topology.portworx.io/datacenter": "Tac",
+        "topology.portworx.io/hypervisor": "HostSystem-host-14",
+        "topology.portworx.io/node": "423c3226-8651-4d71-99d5-5e232d831faf"
+      },
+      "OpStatus": "Up",
+      "ErrStatus": 0,
+      "HAOpStatus": 0,
+      "Decommissioned": false,
+      "DataPools": [
+        {
+          "Cos": 3,
+          "RaidLevel": "raid0",
+          "labels": {
+            "beta.kubernetes.io/arch": "amd64",
+            "beta.kubernetes.io/instance-type": "rke2",
+            "beta.kubernetes.io/os": "linux",
+            "iopriority": "HIGH",
+            "kubernetes.io/arch": "amd64",
+            "kubernetes.io/hostname": "demo1-pool2-8589fdf3-wgnjv",
+            "kubernetes.io/os": "linux",
+            "medium": "STORAGE_MEDIUM_MAGNETIC",
+            "node-role.kubernetes.io/worker": "true",
+            "node.kubernetes.io/instance-type": "rke2",
+            "plan.upgrade.cattle.io/system-agent-upgrader": "3105232f9f97257eab6953bb20cb94f8860b5054a3a0342d6db99638",
+            "rke.cattle.io/machine": "13d3bd05-ccd9-44e1-82a7-0841c432b6fd",
+            "topology.portworx.io/datacenter": "Tac",
+            "topology.portworx.io/hypervisor": "HostSystem-host-14",
+            "topology.portworx.io/node": "423c3226-8651-4d71-99d5-5e232d831faf"
+          },
+          "uuid": "065e7909-4605-4a86-bc70-a5f3a2321deb",
+          "CosAdmin": 0,
+          "Info": {
+            "Resources": {
+              "1": {
+                "id": "1",
+                "path": "/dev/sdb",
+                "online": true,
+                "seq_write": 986485000,
+                "size": 42949672960,
+                "used": 4320133120,
+                "last_scan": {
+                  "seconds": 1714763749,
+                  "nanos": 924963924
+                },
+                "cloud_drive_type": "thin"
+              }
+            },
+            "ResourcesLastScan": "Resources Scan OK",
+            "ResourcesCount": 1,
+            "ResourceUUID": "a7cd30f4-de0e-477d-adb0-03eb6f36ce11",
+            "ResourceJournal": {},
+            "ResourceJournalUUID": "",
+            "ResourceSystemMetadata": {},
+            "ResourceSystemMetadataUUID": "",
+            "ReadThroughput": 0,
+            "WriteThroughput": 986485000,
+            "Random4KIops": 0,
+            "Status": "Up",
+            "PoolSize": 42949672960,
+            "TotalSize": 42949672960,
+            "Used": 4320133120,
+            "LastError": "",
+            "Cache": {
+              "Pool": 0,
+              "Members": [],
+              "Enabled": false,
+              "CacheTotalBlocks": 0,
+              "CacheUsedBlocks": 0,
+              "CacheDirtyBlocks": 0,
+              "CacheReadHits": 0,
+              "CacheReadMisses": 0,
+              "CacheWriteHits": 0,
+              "CacheWriteMisses": 0,
+              "CacheChunkSize": 0,
+              "Cachemode": "",
+              "CachePolicy": "",
+              "CacheSettings": "",
+              "CacheDemotion": 0,
+              "CachePromotion": 0,
+              "CacheIOMBps": 0,
+              "DirtyState": 0,
+              "AutoTune": false,
+              "MinDirtyUtilPercent": 0,
+              "MaxDirtyUtilPercent": 0,
+              "Recovery": {
+                "Config": {
+                  "PoolID": 0,
+                  "Cachemode": "",
+                  "CacheChunkSize": 0,
+                  "CachePolicy": "",
+                  "CacheSettings": ""
+                },
+                "ExplicitDetach": false
+              }
+            },
+            "MaxPoolSize": 18446744073709552000
+          },
+          "Status": "Up",
+          "ReserveFactor": 0,
+          "SnapReserveFactor": 0
+        }
+      ],
+      "DataPoolType": 0,
+      "MdPoolID": 0,
+      "RaidLevel": "",
+      "ScanSchedule": "",
+      "AsyncIO": false,
+      "NumThreads": 0,
+      "CacheDevices": [],
+      "DedicatedCache": true,
+      "DomainId": "",
+      "FpSpec": {
+        "enable": true,
+        "secure": true,
+        "protocol": 3
+      },
+      "Cpu": 4,
+      "Memory": 12475432960,
+      "CacheBlksize": 0,
+      "DisableAttachments": {
+        "All": false,
+        "Issuer": ""
+      },
+      "EnableIntegrity": false,
+      "ThinPoolZero": false,
+      "PoolMetadataDev": [],
+      "KvdbDev": "",
+      "MarkDownInitiator": {
+        "NID": 0,
+        "MID": "",
+        "Reason": ""
+      },
+      "MaxThinPoolSize": 16492674416640
+    },
+    "StorageSpecs": {
+      "614b8e69-f68d-4300-9038-b1c75d394928": {
+        "DriverName": "kernel",
+        "SwVersion": "3.1.1.0-519c78f",
+        "BlockDriver": 0,
+        "TargetDsType": 0,
+        "Version": "1",
+        "NID": 2,
+        "MID": "614b8e69-f68d-4300-9038-b1c75d394928",
+        "PeerAddr": "tcp://10.0.1.139:9003",
+        "ClientAddr": "http://10.0.1.139:9001",
+        "StorageVol": "/var/.px",
+        "StorageVolMd": "/var/.px/0",
+        "JournalDev": "",
+        "SystemMetadataDev": "",
+        "Info": {
+          "Resources": {
+            "0:1": {
+              "id": "1",
+              "path": "/dev/sdb",
+              "online": true,
+              "seq_write": 986485000,
+              "size": 42949672960,
+              "used": 4320133120,
+              "last_scan": {
+                "seconds": 1714763749,
+                "nanos": 883213584
+              },
+              "cloud_drive_type": "thin"
+            }
+          },
+          "ResourcesLastScan": "Resources Scan OK",
+          "ResourcesCount": 1,
+          "ResourceUUID": "",
+          "ResourceJournal": {},
+          "ResourceJournalUUID": "",
+          "ResourceSystemMetadata": {},
+          "ResourceSystemMetadataUUID": "",
+          "ReadThroughput": 0,
+          "WriteThroughput": 0,
+          "Random4KIops": 0,
+          "Status": "Up",
+          "PoolSize": 42949672960,
+          "TotalSize": 42949672960,
+          "Used": 0,
+          "LastError": "",
+          "Cache": {
+            "Pool": 0,
+            "Members": [],
+            "Enabled": false,
+            "CacheTotalBlocks": 0,
+            "CacheUsedBlocks": 0,
+            "CacheDirtyBlocks": 0,
+            "CacheReadHits": 0,
+            "CacheReadMisses": 0,
+            "CacheWriteHits": 0,
+            "CacheWriteMisses": 0,
+            "CacheChunkSize": 0,
+            "Cachemode": "",
+            "CachePolicy": "",
+            "CacheSettings": "",
+            "CacheDemotion": 0,
+            "CachePromotion": 0,
+            "CacheIOMBps": 0,
+            "DirtyState": 0,
+            "AutoTune": false,
+            "MinDirtyUtilPercent": 0,
+            "MaxDirtyUtilPercent": 0,
+            "Recovery": {
+              "Config": {
+                "PoolID": 0,
+                "Cachemode": "",
+                "CacheChunkSize": 0,
+                "CachePolicy": "",
+                "CacheSettings": ""
+              },
+              "ExplicitDetach": false
+            }
+          },
+          "MaxPoolSize": 0
+        },
+        "MdInfo": {
+          "Resources": {},
+          "ResourcesLastScan": "",
+          "ResourcesCount": 0,
+          "ResourceUUID": "",
+          "ResourceJournal": {},
+          "ResourceJournalUUID": "",
+          "ResourceSystemMetadata": {},
+          "ResourceSystemMetadataUUID": "",
+          "ReadThroughput": 0,
+          "WriteThroughput": 0,
+          "Random4KIops": 0,
+          "Status": "",
+          "PoolSize": 0,
+          "TotalSize": 0,
+          "Used": 0,
+          "LastError": "",
+          "Cache": {
+            "Pool": 0,
+            "Members": [],
+            "Enabled": false,
+            "CacheTotalBlocks": 0,
+            "CacheUsedBlocks": 0,
+            "CacheDirtyBlocks": 0,
+            "CacheReadHits": 0,
+            "CacheReadMisses": 0,
+            "CacheWriteHits": 0,
+            "CacheWriteMisses": 0,
+            "CacheChunkSize": 0,
+            "Cachemode": "",
+            "CachePolicy": "",
+            "CacheSettings": "",
+            "CacheDemotion": 0,
+            "CachePromotion": 0,
+            "CacheIOMBps": 0,
+            "DirtyState": 0,
+            "AutoTune": false,
+            "MinDirtyUtilPercent": 0,
+            "MaxDirtyUtilPercent": 0,
+            "Recovery": {
+              "Config": {
+                "PoolID": 0,
+                "Cachemode": "",
+                "CacheChunkSize": 0,
+                "CachePolicy": "",
+                "CacheSettings": ""
+              },
+              "ExplicitDetach": false
+            }
+          },
+          "MaxPoolSize": 0
+        },
+        "Geo": {
+          "Provider": "vsphere",
+          "Region": "default",
+          "Zone": "default",
+          "Datacenter": "Tac",
+          "Row": "default",
+          "Rack": "default",
+          "Chassis": "default",
+          "Hypervisor": "HostSystem-host-14",
+          "Node": "423c3226-8651-4d71-99d5-5e232d831faf",
+          "InstanceGroup": null
+        },
+        "DebugLevel": "",
+        "Labels": {
+          "beta.kubernetes.io/arch": "amd64",
+          "beta.kubernetes.io/instance-type": "rke2",
+          "beta.kubernetes.io/os": "linux",
+          "kubernetes.io/arch": "amd64",
+          "kubernetes.io/hostname": "demo1-pool2-8589fdf3-wgnjv",
+          "kubernetes.io/os": "linux",
+          "node-role.kubernetes.io/worker": "true",
+          "node.kubernetes.io/instance-type": "rke2",
+          "plan.upgrade.cattle.io/system-agent-upgrader": "3105232f9f97257eab6953bb20cb94f8860b5054a3a0342d6db99638",
+          "rke.cattle.io/machine": "13d3bd05-ccd9-44e1-82a7-0841c432b6fd",
+          "topology.portworx.io/datacenter": "Tac",
+          "topology.portworx.io/hypervisor": "HostSystem-host-14",
+          "topology.portworx.io/node": "423c3226-8651-4d71-99d5-5e232d831faf"
+        },
+        "OpStatus": "Up",
+        "ErrStatus": 0,
+        "HAOpStatus": 0,
+        "Decommissioned": false,
+        "DataPools": [
+          {
+            "Cos": 3,
+            "RaidLevel": "raid0",
+            "labels": {
+              "beta.kubernetes.io/arch": "amd64",
+              "beta.kubernetes.io/instance-type": "rke2",
+              "beta.kubernetes.io/os": "linux",
+              "iopriority": "HIGH",
+              "kubernetes.io/arch": "amd64",
+              "kubernetes.io/hostname": "demo1-pool2-8589fdf3-wgnjv",
+              "kubernetes.io/os": "linux",
+              "medium": "STORAGE_MEDIUM_MAGNETIC",
+              "node-role.kubernetes.io/worker": "true",
+              "node.kubernetes.io/instance-type": "rke2",
+              "plan.upgrade.cattle.io/system-agent-upgrader": "3105232f9f97257eab6953bb20cb94f8860b5054a3a0342d6db99638",
+              "rke.cattle.io/machine": "13d3bd05-ccd9-44e1-82a7-0841c432b6fd",
+              "topology.portworx.io/datacenter": "Tac",
+              "topology.portworx.io/hypervisor": "HostSystem-host-14",
+              "topology.portworx.io/node": "423c3226-8651-4d71-99d5-5e232d831faf"
+            },
+            "uuid": "065e7909-4605-4a86-bc70-a5f3a2321deb",
+            "CosAdmin": 0,
+            "Info": {
+              "Resources": {
+                "1": {
+                  "id": "1",
+                  "path": "/dev/sdb",
+                  "online": true,
+                  "seq_write": 986485000,
+                  "size": 42949672960,
+                  "used": 4320133120,
+                  "last_scan": {
+                    "seconds": 1714763749,
+                    "nanos": 924963924
+                  },
+                  "cloud_drive_type": "thin"
+                }
+              },
+              "ResourcesLastScan": "Resources Scan OK",
+              "ResourcesCount": 1,
+              "ResourceUUID": "a7cd30f4-de0e-477d-adb0-03eb6f36ce11",
+              "ResourceJournal": {},
+              "ResourceJournalUUID": "",
+              "ResourceSystemMetadata": {},
+              "ResourceSystemMetadataUUID": "",
+              "ReadThroughput": 0,
+              "WriteThroughput": 986485000,
+              "Random4KIops": 0,
+              "Status": "Up",
+              "PoolSize": 42949672960,
+              "TotalSize": 42949672960,
+              "Used": 4320133120,
+              "LastError": "",
+              "Cache": {
+                "Pool": 0,
+                "Members": [],
+                "Enabled": false,
+                "CacheTotalBlocks": 0,
+                "CacheUsedBlocks": 0,
+                "CacheDirtyBlocks": 0,
+                "CacheReadHits": 0,
+                "CacheReadMisses": 0,
+                "CacheWriteHits": 0,
+                "CacheWriteMisses": 0,
+                "CacheChunkSize": 0,
+                "Cachemode": "",
+                "CachePolicy": "",
+                "CacheSettings": "",
+                "CacheDemotion": 0,
+                "CachePromotion": 0,
+                "CacheIOMBps": 0,
+                "DirtyState": 0,
+                "AutoTune": false,
+                "MinDirtyUtilPercent": 0,
+                "MaxDirtyUtilPercent": 0,
+                "Recovery": {
+                  "Config": {
+                    "PoolID": 0,
+                    "Cachemode": "",
+                    "CacheChunkSize": 0,
+                    "CachePolicy": "",
+                    "CacheSettings": ""
+                  },
+                  "ExplicitDetach": false
+                }
+              },
+              "MaxPoolSize": 18446744073709552000
+            },
+            "Status": "Up",
+            "ReserveFactor": 0,
+            "SnapReserveFactor": 0
+          }
+        ],
+        "DataPoolType": 0,
+        "MdPoolID": 0,
+        "RaidLevel": "",
+        "ScanSchedule": "",
+        "AsyncIO": false,
+        "NumThreads": 0,
+        "CacheDevices": [],
+        "DedicatedCache": true,
+        "DomainId": "",
+        "FpSpec": {
+          "enable": true,
+          "secure": true,
+          "protocol": 3
+        },
+        "Cpu": 4,
+        "Memory": 12475432960,
+        "CacheBlksize": 0,
+        "DisableAttachments": {
+          "All": false,
+          "Issuer": ""
+        },
+        "EnableIntegrity": false,
+        "ThinPoolZero": false,
+        "PoolMetadataDev": [],
+        "KvdbDev": "",
+        "MarkDownInitiator": {
+          "NID": 0,
+          "MID": "",
+          "Reason": ""
+        },
+        "MaxThinPoolSize": 16492674416640
+      },
+      "8ff9f531-f6b5-4023-a7ef-b216da8278fa": {
+        "DriverName": "kernel",
+        "SwVersion": "3.1.1.0-519c78f",
+        "BlockDriver": 0,
+        "TargetDsType": 0,
+        "Version": "1",
+        "NID": 0,
+        "MID": "8ff9f531-f6b5-4023-a7ef-b216da8278fa",
+        "PeerAddr": "tcp://10.0.1.141:9003",
+        "ClientAddr": "http://10.0.1.141:9001",
+        "StorageVol": "/var/.px",
+        "StorageVolMd": "/var/.px/0",
+        "JournalDev": "",
+        "SystemMetadataDev": "",
+        "Info": {
+          "Resources": {
+            "0:1": {
+              "id": "1",
+              "path": "/dev/sdb",
+              "online": true,
+              "seq_write": 893801000,
+              "size": 42949672960,
+              "used": 4320133120,
+              "last_scan": {
+                "seconds": 1714763750,
+                "nanos": 558998491
+              },
+              "cloud_drive_type": "thin"
+            }
+          },
+          "ResourcesLastScan": "Resources Scan OK",
+          "ResourcesCount": 1,
+          "ResourceUUID": "",
+          "ResourceJournal": {},
+          "ResourceJournalUUID": "",
+          "ResourceSystemMetadata": {},
+          "ResourceSystemMetadataUUID": "",
+          "ReadThroughput": 0,
+          "WriteThroughput": 0,
+          "Random4KIops": 0,
+          "Status": "Up",
+          "PoolSize": 42949672960,
+          "TotalSize": 42949672960,
+          "Used": 0,
+          "LastError": "",
+          "Cache": {
+            "Pool": 0,
+            "Members": [],
+            "Enabled": false,
+            "CacheTotalBlocks": 0,
+            "CacheUsedBlocks": 0,
+            "CacheDirtyBlocks": 0,
+            "CacheReadHits": 0,
+            "CacheReadMisses": 0,
+            "CacheWriteHits": 0,
+            "CacheWriteMisses": 0,
+            "CacheChunkSize": 0,
+            "Cachemode": "",
+            "CachePolicy": "",
+            "CacheSettings": "",
+            "CacheDemotion": 0,
+            "CachePromotion": 0,
+            "CacheIOMBps": 0,
+            "DirtyState": 0,
+            "AutoTune": false,
+            "MinDirtyUtilPercent": 0,
+            "MaxDirtyUtilPercent": 0,
+            "Recovery": {
+              "Config": {
+                "PoolID": 0,
+                "Cachemode": "",
+                "CacheChunkSize": 0,
+                "CachePolicy": "",
+                "CacheSettings": ""
+              },
+              "ExplicitDetach": false
+            }
+          },
+          "MaxPoolSize": 0
+        },
+        "MdInfo": {
+          "Resources": {},
+          "ResourcesLastScan": "",
+          "ResourcesCount": 0,
+          "ResourceUUID": "",
+          "ResourceJournal": {},
+          "ResourceJournalUUID": "",
+          "ResourceSystemMetadata": {},
+          "ResourceSystemMetadataUUID": "",
+          "ReadThroughput": 0,
+          "WriteThroughput": 0,
+          "Random4KIops": 0,
+          "Status": "",
+          "PoolSize": 0,
+          "TotalSize": 0,
+          "Used": 0,
+          "LastError": "",
+          "Cache": {
+            "Pool": 0,
+            "Members": [],
+            "Enabled": false,
+            "CacheTotalBlocks": 0,
+            "CacheUsedBlocks": 0,
+            "CacheDirtyBlocks": 0,
+            "CacheReadHits": 0,
+            "CacheReadMisses": 0,
+            "CacheWriteHits": 0,
+            "CacheWriteMisses": 0,
+            "CacheChunkSize": 0,
+            "Cachemode": "",
+            "CachePolicy": "",
+            "CacheSettings": "",
+            "CacheDemotion": 0,
+            "CachePromotion": 0,
+            "CacheIOMBps": 0,
+            "DirtyState": 0,
+            "AutoTune": false,
+            "MinDirtyUtilPercent": 0,
+            "MaxDirtyUtilPercent": 0,
+            "Recovery": {
+              "Config": {
+                "PoolID": 0,
+                "Cachemode": "",
+                "CacheChunkSize": 0,
+                "CachePolicy": "",
+                "CacheSettings": ""
+              },
+              "ExplicitDetach": false
+            }
+          },
+          "MaxPoolSize": 0
+        },
+        "Geo": {
+          "Provider": "vsphere",
+          "Region": "default",
+          "Zone": "default",
+          "Datacenter": "Tac",
+          "Row": "default",
+          "Rack": "default",
+          "Chassis": "default",
+          "Hypervisor": "HostSystem-host-14",
+          "Node": "423ce6cd-0d87-c5f5-0b15-f5977ebd3486",
+          "InstanceGroup": null
+        },
+        "DebugLevel": "",
+        "Labels": {
+          "beta.kubernetes.io/arch": "amd64",
+          "beta.kubernetes.io/instance-type": "rke2",
+          "beta.kubernetes.io/os": "linux",
+          "kubernetes.io/arch": "amd64",
+          "kubernetes.io/hostname": "demo1-pool2-8589fdf3-5bz26",
+          "kubernetes.io/os": "linux",
+          "node-role.kubernetes.io/worker": "true",
+          "node.kubernetes.io/instance-type": "rke2",
+          "plan.upgrade.cattle.io/system-agent-upgrader": "3105232f9f97257eab6953bb20cb94f8860b5054a3a0342d6db99638",
+          "rke.cattle.io/machine": "e7926d18-9312-40d2-b261-f4386fb29e14",
+          "topology.portworx.io/datacenter": "Tac",
+          "topology.portworx.io/hypervisor": "HostSystem-host-14",
+          "topology.portworx.io/node": "423ce6cd-0d87-c5f5-0b15-f5977ebd3486"
+        },
+        "OpStatus": "Up",
+        "ErrStatus": 0,
+        "HAOpStatus": 0,
+        "Decommissioned": false,
+        "DataPools": [
+          {
+            "Cos": 3,
+            "RaidLevel": "raid0",
+            "labels": {
+              "beta.kubernetes.io/arch": "amd64",
+              "beta.kubernetes.io/instance-type": "rke2",
+              "beta.kubernetes.io/os": "linux",
+              "iopriority": "HIGH",
+              "kubernetes.io/arch": "amd64",
+              "kubernetes.io/hostname": "demo1-pool2-8589fdf3-5bz26",
+              "kubernetes.io/os": "linux",
+              "medium": "STORAGE_MEDIUM_MAGNETIC",
+              "node-role.kubernetes.io/worker": "true",
+              "node.kubernetes.io/instance-type": "rke2",
+              "plan.upgrade.cattle.io/system-agent-upgrader": "3105232f9f97257eab6953bb20cb94f8860b5054a3a0342d6db99638",
+              "rke.cattle.io/machine": "e7926d18-9312-40d2-b261-f4386fb29e14",
+              "topology.portworx.io/datacenter": "Tac",
+              "topology.portworx.io/hypervisor": "HostSystem-host-14",
+              "topology.portworx.io/node": "423ce6cd-0d87-c5f5-0b15-f5977ebd3486"
+            },
+            "uuid": "fa2dbdb5-5be0-462e-9155-04259dfa451c",
+            "CosAdmin": 0,
+            "Info": {
+              "Resources": {
+                "1": {
+                  "id": "1",
+                  "path": "/dev/sdb",
+                  "online": true,
+                  "seq_write": 893801000,
+                  "size": 42949672960,
+                  "used": 4320133120,
+                  "last_scan": {
+                    "seconds": 1714763750,
+                    "nanos": 600849431
+                  },
+                  "cloud_drive_type": "thin"
+                }
+              },
+              "ResourcesLastScan": "Resources Scan OK",
+              "ResourcesCount": 1,
+              "ResourceUUID": "cc9424a2-1d6a-4d76-b98b-6ff35d1d3d7b",
+              "ResourceJournal": {},
+              "ResourceJournalUUID": "",
+              "ResourceSystemMetadata": {},
+              "ResourceSystemMetadataUUID": "",
+              "ReadThroughput": 0,
+              "WriteThroughput": 893801000,
+              "Random4KIops": 0,
+              "Status": "Up",
+              "PoolSize": 42949672960,
+              "TotalSize": 42949672960,
+              "Used": 4320133120,
+              "LastError": "",
+              "Cache": {
+                "Pool": 0,
+                "Members": [],
+                "Enabled": false,
+                "CacheTotalBlocks": 0,
+                "CacheUsedBlocks": 0,
+                "CacheDirtyBlocks": 0,
+                "CacheReadHits": 0,
+                "CacheReadMisses": 0,
+                "CacheWriteHits": 0,
+                "CacheWriteMisses": 0,
+                "CacheChunkSize": 0,
+                "Cachemode": "",
+                "CachePolicy": "",
+                "CacheSettings": "",
+                "CacheDemotion": 0,
+                "CachePromotion": 0,
+                "CacheIOMBps": 0,
+                "DirtyState": 0,
+                "AutoTune": false,
+                "MinDirtyUtilPercent": 0,
+                "MaxDirtyUtilPercent": 0,
+                "Recovery": {
+                  "Config": {
+                    "PoolID": 0,
+                    "Cachemode": "",
+                    "CacheChunkSize": 0,
+                    "CachePolicy": "",
+                    "CacheSettings": ""
+                  },
+                  "ExplicitDetach": false
+                }
+              },
+              "MaxPoolSize": 18446744073709552000
+            },
+            "Status": "Up",
+            "ReserveFactor": 0,
+            "SnapReserveFactor": 0
+          }
+        ],
+        "DataPoolType": 0,
+        "MdPoolID": 0,
+        "RaidLevel": "",
+        "ScanSchedule": "",
+        "AsyncIO": false,
+        "NumThreads": 0,
+        "CacheDevices": [],
+        "DedicatedCache": true,
+        "DomainId": "",
+        "FpSpec": {
+          "enable": true,
+          "secure": true,
+          "protocol": 3
+        },
+        "Cpu": 4,
+        "Memory": 12475432960,
+        "CacheBlksize": 0,
+        "DisableAttachments": {
+          "All": false,
+          "Issuer": ""
+        },
+        "EnableIntegrity": false,
+        "ThinPoolZero": false,
+        "PoolMetadataDev": [],
+        "KvdbDev": "",
+        "MarkDownInitiator": {
+          "NID": 0,
+          "MID": "",
+          "Reason": ""
+        },
+        "MaxThinPoolSize": 16492674416640
+      },
+      "ff9be64f-3dfe-4c0d-ba01-b2d54ff96e8b": {
+        "DriverName": "kernel",
+        "SwVersion": "3.1.1.0-519c78f",
+        "BlockDriver": 0,
+        "TargetDsType": 0,
+        "Version": "1",
+        "NID": 1,
+        "MID": "ff9be64f-3dfe-4c0d-ba01-b2d54ff96e8b",
+        "PeerAddr": "tcp://10.0.1.133:9003",
+        "ClientAddr": "http://10.0.1.133:9001",
+        "StorageVol": "/var/.px",
+        "StorageVolMd": "/var/.px/0",
+        "JournalDev": "",
+        "SystemMetadataDev": "",
+        "Info": {
+          "Resources": {
+            "0:1": {
+              "id": "1",
+              "path": "/dev/sdb",
+              "online": true,
+              "seq_write": 994773000,
+              "size": 42949672960,
+              "used": 4320133120,
+              "last_scan": {
+                "seconds": 1714763749,
+                "nanos": 577510872
+              },
+              "cloud_drive_type": "thin"
+            }
+          },
+          "ResourcesLastScan": "Resources Scan OK",
+          "ResourcesCount": 1,
+          "ResourceUUID": "",
+          "ResourceJournal": {},
+          "ResourceJournalUUID": "",
+          "ResourceSystemMetadata": {},
+          "ResourceSystemMetadataUUID": "",
+          "ReadThroughput": 0,
+          "WriteThroughput": 0,
+          "Random4KIops": 0,
+          "Status": "Up",
+          "PoolSize": 42949672960,
+          "TotalSize": 42949672960,
+          "Used": 0,
+          "LastError": "",
+          "Cache": {
+            "Pool": 0,
+            "Members": [],
+            "Enabled": false,
+            "CacheTotalBlocks": 0,
+            "CacheUsedBlocks": 0,
+            "CacheDirtyBlocks": 0,
+            "CacheReadHits": 0,
+            "CacheReadMisses": 0,
+            "CacheWriteHits": 0,
+            "CacheWriteMisses": 0,
+            "CacheChunkSize": 0,
+            "Cachemode": "",
+            "CachePolicy": "",
+            "CacheSettings": "",
+            "CacheDemotion": 0,
+            "CachePromotion": 0,
+            "CacheIOMBps": 0,
+            "DirtyState": 0,
+            "AutoTune": false,
+            "MinDirtyUtilPercent": 0,
+            "MaxDirtyUtilPercent": 0,
+            "Recovery": {
+              "Config": {
+                "PoolID": 0,
+                "Cachemode": "",
+                "CacheChunkSize": 0,
+                "CachePolicy": "",
+                "CacheSettings": ""
+              },
+              "ExplicitDetach": false
+            }
+          },
+          "MaxPoolSize": 0
+        },
+        "MdInfo": {
+          "Resources": {},
+          "ResourcesLastScan": "",
+          "ResourcesCount": 0,
+          "ResourceUUID": "",
+          "ResourceJournal": {},
+          "ResourceJournalUUID": "",
+          "ResourceSystemMetadata": {},
+          "ResourceSystemMetadataUUID": "",
+          "ReadThroughput": 0,
+          "WriteThroughput": 0,
+          "Random4KIops": 0,
+          "Status": "",
+          "PoolSize": 0,
+          "TotalSize": 0,
+          "Used": 0,
+          "LastError": "",
+          "Cache": {
+            "Pool": 0,
+            "Members": [],
+            "Enabled": false,
+            "CacheTotalBlocks": 0,
+            "CacheUsedBlocks": 0,
+            "CacheDirtyBlocks": 0,
+            "CacheReadHits": 0,
+            "CacheReadMisses": 0,
+            "CacheWriteHits": 0,
+            "CacheWriteMisses": 0,
+            "CacheChunkSize": 0,
+            "Cachemode": "",
+            "CachePolicy": "",
+            "CacheSettings": "",
+            "CacheDemotion": 0,
+            "CachePromotion": 0,
+            "CacheIOMBps": 0,
+            "DirtyState": 0,
+            "AutoTune": false,
+            "MinDirtyUtilPercent": 0,
+            "MaxDirtyUtilPercent": 0,
+            "Recovery": {
+              "Config": {
+                "PoolID": 0,
+                "Cachemode": "",
+                "CacheChunkSize": 0,
+                "CachePolicy": "",
+                "CacheSettings": ""
+              },
+              "ExplicitDetach": false
+            }
+          },
+          "MaxPoolSize": 0
+        },
+        "Geo": {
+          "Provider": "vsphere",
+          "Region": "default",
+          "Zone": "default",
+          "Datacenter": "Tac",
+          "Row": "default",
+          "Rack": "default",
+          "Chassis": "default",
+          "Hypervisor": "HostSystem-host-14",
+          "Node": "423c034c-0b34-d699-978b-2cd33d62990d",
+          "InstanceGroup": null
+        },
+        "DebugLevel": "",
+        "Labels": {
+          "beta.kubernetes.io/arch": "amd64",
+          "beta.kubernetes.io/instance-type": "rke2",
+          "beta.kubernetes.io/os": "linux",
+          "kubernetes.io/arch": "amd64",
+          "kubernetes.io/hostname": "demo1-pool2-8589fdf3-s4gbq",
+          "kubernetes.io/os": "linux",
+          "node-role.kubernetes.io/worker": "true",
+          "node.kubernetes.io/instance-type": "rke2",
+          "plan.upgrade.cattle.io/system-agent-upgrader": "3105232f9f97257eab6953bb20cb94f8860b5054a3a0342d6db99638",
+          "rke.cattle.io/machine": "5bec246a-46a6-4596-a57b-122a123ec0c0",
+          "topology.portworx.io/datacenter": "Tac",
+          "topology.portworx.io/hypervisor": "HostSystem-host-14",
+          "topology.portworx.io/node": "423c034c-0b34-d699-978b-2cd33d62990d"
+        },
+        "OpStatus": "Up",
+        "ErrStatus": 0,
+        "HAOpStatus": 0,
+        "Decommissioned": false,
+        "DataPools": [
+          {
+            "Cos": 3,
+            "RaidLevel": "raid0",
+            "labels": {
+              "beta.kubernetes.io/arch": "amd64",
+              "beta.kubernetes.io/instance-type": "rke2",
+              "beta.kubernetes.io/os": "linux",
+              "iopriority": "HIGH",
+              "kubernetes.io/arch": "amd64",
+              "kubernetes.io/hostname": "demo1-pool2-8589fdf3-s4gbq",
+              "kubernetes.io/os": "linux",
+              "medium": "STORAGE_MEDIUM_MAGNETIC",
+              "node-role.kubernetes.io/worker": "true",
+              "node.kubernetes.io/instance-type": "rke2",
+              "plan.upgrade.cattle.io/system-agent-upgrader": "3105232f9f97257eab6953bb20cb94f8860b5054a3a0342d6db99638",
+              "rke.cattle.io/machine": "5bec246a-46a6-4596-a57b-122a123ec0c0",
+              "topology.portworx.io/datacenter": "Tac",
+              "topology.portworx.io/hypervisor": "HostSystem-host-14",
+              "topology.portworx.io/node": "423c034c-0b34-d699-978b-2cd33d62990d"
+            },
+            "uuid": "a31ded63-d059-46cd-bee4-a845cacf253b",
+            "CosAdmin": 0,
+            "Info": {
+              "Resources": {
+                "1": {
+                  "id": "1",
+                  "path": "/dev/sdb",
+                  "online": true,
+                  "seq_write": 994773000,
+                  "size": 42949672960,
+                  "used": 4320133120,
+                  "last_scan": {
+                    "seconds": 1714763749,
+                    "nanos": 614774842
+                  },
+                  "cloud_drive_type": "thin"
+                }
+              },
+              "ResourcesLastScan": "Resources Scan OK",
+              "ResourcesCount": 1,
+              "ResourceUUID": "0a6d0762-0964-4c71-9170-489af1753983",
+              "ResourceJournal": {},
+              "ResourceJournalUUID": "",
+              "ResourceSystemMetadata": {},
+              "ResourceSystemMetadataUUID": "",
+              "ReadThroughput": 0,
+              "WriteThroughput": 994773000,
+              "Random4KIops": 0,
+              "Status": "Up",
+              "PoolSize": 42949672960,
+              "TotalSize": 42949672960,
+              "Used": 4320133120,
+              "LastError": "",
+              "Cache": {
+                "Pool": 0,
+                "Members": [],
+                "Enabled": false,
+                "CacheTotalBlocks": 0,
+                "CacheUsedBlocks": 0,
+                "CacheDirtyBlocks": 0,
+                "CacheReadHits": 0,
+                "CacheReadMisses": 0,
+                "CacheWriteHits": 0,
+                "CacheWriteMisses": 0,
+                "CacheChunkSize": 0,
+                "Cachemode": "",
+                "CachePolicy": "",
+                "CacheSettings": "",
+                "CacheDemotion": 0,
+                "CachePromotion": 0,
+                "CacheIOMBps": 0,
+                "DirtyState": 0,
+                "AutoTune": false,
+                "MinDirtyUtilPercent": 0,
+                "MaxDirtyUtilPercent": 0,
+                "Recovery": {
+                  "Config": {
+                    "PoolID": 0,
+                    "Cachemode": "",
+                    "CacheChunkSize": 0,
+                    "CachePolicy": "",
+                    "CacheSettings": ""
+                  },
+                  "ExplicitDetach": false
+                }
+              },
+              "MaxPoolSize": 18446744073709552000
+            },
+            "Status": "Up",
+            "ReserveFactor": 0,
+            "SnapReserveFactor": 0
+          }
+        ],
+        "DataPoolType": 0,
+        "MdPoolID": 0,
+        "RaidLevel": "",
+        "ScanSchedule": "",
+        "AsyncIO": false,
+        "NumThreads": 0,
+        "CacheDevices": [],
+        "DedicatedCache": true,
+        "DomainId": "",
+        "FpSpec": {
+          "enable": true,
+          "secure": true,
+          "protocol": 3
+        },
+        "Cpu": 4,
+        "Memory": 12475432960,
+        "CacheBlksize": 0,
+        "DisableAttachments": {
+          "All": false,
+          "Issuer": ""
+        },
+        "EnableIntegrity": false,
+        "ThinPoolZero": false,
+        "PoolMetadataDev": [],
+        "KvdbDev": "",
+        "MarkDownInitiator": {
+          "NID": 0,
+          "MID": "",
+          "Reason": ""
+        },
+        "MaxThinPoolSize": 16492674416640
+      }
+    },
+    "QuorumMap": {
+      "614b8e69-f68d-4300-9038-b1c75d394928": true,
+      "8ff9f531-f6b5-4023-a7ef-b216da8278fa": true,
+      "ff9be64f-3dfe-4c0d-ba01-b2d54ff96e8b": true
+    }
+  },
+  "license": "Trial (expires in 16 days)",
+  "telemetrystatus": {
+    "connection_status": {
+      "error_code": 15
+    }
+  },
+  "meteringstatus": {
+    "status": {}
+  }
+}

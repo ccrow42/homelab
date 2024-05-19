@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 
-# BEARER_TOKEN is the token that will be used to authenticate to the Rancher API
-# SEALED_SECRET_TLS_CERT and SEALED_SECRET_TLS_KEY are used for bitnomi's sealed secrets
+# !!!! IMPORTANT !!!!
+# You need to set some env vars manually for some script functions to work!
+# BEARER_TOKEN is used 
+# SEALED_SECRET_TLS_CERT and SEALED_SECRET_TLS_KEY are used for bitnomi's sealed secrets installation. 
+# Should be populated with the hashed value 
 
 
 # Environment variables to set other fuctions
@@ -17,6 +20,8 @@ readonly ERR_ARGOCD_NOT_INSTALLED=164
 readonly ERR_PORTWORX_NOT_INSTALLED=165
 readonly ERR_UTILITY_NOT_INSTALLED=166
 readonly ERR_MINIO_NOT_INSTALLED=167
+readonly ERR_LPP_NOT_INSTALLED=168
+readonly ERR_PXBACKUP_NOT_INSTALLED=169
 
 ### Placeholders
 # These placeholders appear in the TEMPLATE* files and should probably not be changed
@@ -42,6 +47,8 @@ CONFIG_FILE="${BASE_DIR}/rancher_conf.sh"
 # Used to store binary utilies
 BINARY_DIR="/home/ccrow/bin"
 
+TEMP_DIR=${BASE_DIR}
+
 ### Templates we use
 RANCHER_SERVER_URL="https://rancher.lan.ccrow.org"
 CONTROL_POOL_TEMPLATE="${BASE_DIR}/TEMPLATE-controlpool.yaml"
@@ -52,6 +59,8 @@ ARGOCD_APP_TEMPLATE="${BASE_DIR}/TEMPLATE-argocdapp.yaml"
 ARGOCD_HELM_APP_TEMPLATE="${BASE_DIR}/TEMPLATE-argocdapp-helm.yaml"
 
 ### ArgoCD URLs
+# Example paths: ${ARGOCD_REPO_URL}/${ARGOCD_PATH_ROOT}/ovarlays/${POOL_NAME}
+# ${ARGOCD_REPO_URL}/${ARGOCD_HELM_VALUES_ROOT}/${POOL_NAME}/values.yaml
 ARGOCD_REPO_URL="https://github.com/ccrow42/homelab"
 ARGOCD_PATH_ROOT="manifests"
 ARGOCD_HELM_VALUES_ROOT="manifests"

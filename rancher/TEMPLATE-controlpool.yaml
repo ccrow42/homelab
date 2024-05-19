@@ -5,7 +5,6 @@ cfgparam:
 cloneFrom: /Tac/vm/templates/jammy-server-cloudimg-amd64
 cloudConfig: |+
   #cloud-config
-
 cloudinit: ""
 common:
   labels: null

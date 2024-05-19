@@ -1,0 +1,46 @@
+apiVersion: rke-machine-config.cattle.io/v1
+boot2dockerUrl: ""
+cfgparam:
+- disk.enableUUID=TRUE
+cloneFrom: /Tac/vm/templates/jammy-server-cloudimg-amd64
+cloudConfig: |
+  #cloud-config
+  autoinstall:
+    late-commands:
+      - |
+        cat <<'EOF' > /target/etc/default/grub.d/40my.cfg
+        GRUB_CMDLINE_LINUX_DEFAULT="${GRUB_CMDLINE_LINUX_DEFAULT} cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory systemd.unified_cgroup_hierarchy=0"
+        EOF
+        curtin in-target --target=/target -- update-grub
+cloudinit: ""
+contentLibrary: templates
+cpuCount: "2"
+creationType: template
+datacenter: /Tac
+datastore: /Tac/datastore/esx2-local3
+datastoreCluster: ""
+diskSize: "100000"
+folder: ""
+gracefulShutdownTimeout: "0"
+hostsystem: ""
+kind: VmwarevsphereConfig
+memorySize: "8192"
+metadata:
+  annotations:
+    field.cattle.io/creatorId: user-lvdpc
+    ownerBindingsCreated: "true"
+  name: nc-undefined-pool1-xcdf9
+  namespace: fleet-default
+os: linux
+password: ""
+pool: /Tac/host/Cluster1/Resources
+sshPassword: tcuser
+sshPort: "22"
+sshUser: docker
+sshUserGroup: staff
+username: ""
+vappIpallocationpolicy: ""
+vappIpprotocol: ""
+vappTransport: ""
+vcenter: ""
+vcenterPort: "443"
