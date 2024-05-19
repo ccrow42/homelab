@@ -11,6 +11,7 @@ DEMO_PROMPT="${GREEN}➜ ${CYAN}Rancher IO Control Demo ${COLOR_RESET}"
 # ra install_demo
 # ra install_grafana
 # ra reboot_cluster # this will set the cgroup to v1
+# Have grafana up
 
 PROMPT_TIMEOUT=0
 

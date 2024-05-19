@@ -34,7 +34,7 @@ pe "# Notice the node that mongo-0 is running on"
 
 pe "# We will now halt it #"
 pei "node=\$(kubectl -n pxbbq get pods mongo-0 -o wide --no-headers | awk '{print \$7}')"
-pei "ssh ubuntu@\$node sudo halt"
+pei "ssh -o StrictHostKeyChecking=no ubuntu@\$node sudo halt"
 
 pe "# It may take some time for the cluster to notice the node is down"
 pei "watch kubectl -n pxbbq get pods,pvc -o wide"

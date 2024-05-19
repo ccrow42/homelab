@@ -227,6 +227,15 @@ wait_ready_minio () {
         sleep 10
     done
 }
+wait_ready_argocd () {
+    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}" ${ERR_POOL_NOT_FOUND}
+    log "Waiting for ArgoCD to be ready, this may take a few minutes."
+    until [[ $(kubectl -n argocd get deployments.apps argocd-server -o jsonpath={'.status.readyReplicas'}) -ge 1 ]]; do
+        echo -n "."
+        sleep 10
+    done
+
+}
 
 
 
@@ -319,6 +328,7 @@ create_context () {
     CONTEXT_URL="$(kubectl --context ${KUBECTL_CONTEXT} config view --flatten --minify | yq .clusters[0].cluster.server)/k8s/clusters/$(kubectl --context ${KUBECTL_CONTEXT} -n fleet-default get clusters.provisioning.cattle.io ${POOL_NAME} -o yaml | yq .status.clusterName)"
     kubectl config set-cluster ${POOL_NAME} --server=${CONTEXT_URL}
     kubectl config set-context ${POOL_NAME} --cluster=${POOL_NAME} --user=${KUBECTL_CONTEXT}
+    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}" ${ERR_POOL_NOT_FOUND}
 }
 
 ### Install Sealed Secrets
@@ -870,7 +880,7 @@ install_demo () {
     create_context
     install_sealed_secrets
     install_argocd
-    sleep 10
+    wait_ready_argocd
     install_metallb
     install_portworx
     wait_ready_portworx
@@ -889,6 +899,7 @@ install_demo_async () {
     # we are going to use the pool1 and pool2 params for the demo
     kubectl config use-context ${KUBECTL_CONTEXT} || terminate "Could not switch to ${KUBECTL_CONTEXT}" 
     requires_poolname
+    requires_drpoolname
     POOL1=${POOL_NAME}
     POOL2=${DR_POOL_NAME}
 
@@ -898,24 +909,15 @@ install_demo_async () {
     create_rancher_cluster
     wait_ready_racher_cluster
     create_context
-
-    log "Switching to ${POOL_NAME}"
-    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}" ${ERR_POOL_NOT_FOUND}
-
     install_sealed_secrets
     install_argocd
-    sleep 10
+    wait_ready_argocd
     install_metallb
     install_portworx
     wait_ready_portworx
     install_minio
     wait_ready_minio
-
-    # We will test for the existence of a second pool and reset the variable below.
-    if [[ ! -n ${DR_POOL_NAME} ]]; then
-        log "DR Pool not set, skipping second cluster"
-        return
-    fi
+    install_pxbbq
 
     POOL_NAME=${DR_POOL_NAME}
     kubectl config use-context ${KUBECTL_CONTEXT} || terminate "Could not switch to ${KUBECTL_CONTEXT}" 
@@ -930,11 +932,10 @@ install_demo_async () {
     kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}" ${ERR_POOL_NOT_FOUND}
     install_sealed_secrets
     install_argocd
-    sleep 10
+    wait_ready_argocd
     install_metallb
     install_portworx
     wait_ready_portworx
-    install_pxbbq
 
 
     # fixing pools
@@ -1089,6 +1090,9 @@ while [[ ${1} != "" ]]; do
         ;;
         install_demo)
             COMMAND="install_demo"
+        ;;
+        install_demo_async)
+            COMMAND="install_demo_async"
         ;;
         install_cluster)
             COMMAND="install_cluster"
