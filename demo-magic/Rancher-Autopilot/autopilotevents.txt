@@ -1,9 +1,9 @@
 
 ##############################
 We will see a few events:
-- Initializing - We found a rule we need to initialize
+- Initializing - we found a volume we need to monitor
 - Normal - Standard operating state
-- Triggered - Our rule has met the criteria for our autogrow
-- ActiveActionsPending - Our rule is in the queue to be executed
-- ActiveActionsInProgress - Our rule is in the action queue
-- ActiveActionsTaken - We have successfully triggered our rule.
+- Triggered - Our volume has met the criteria for our autogrow
+- ActiveActionsPending - Our grow action is in the queue to be executed
+- ActiveActionsInProgress - Our grow action is being executed
+- ActiveActionsTaken - We have successfully grown the volume

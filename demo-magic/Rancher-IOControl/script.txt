@@ -1,0 +1,11 @@
+Hello,
+
+In this demo I'm going to show you a feature of Portworx Enterprise called IO Control.
+
+IO Control allows us to put limits on IOs and Bandwidth of our volumes by configuring paramaters on a storageclass, or by 
+setting a limit on existing volumes.
+
+This ensures that volumes cannot cause cluster wide performance problems by over-utilizing IO, which is sometimes called
+a "Noisy Neighbor"
+
+Let's get started

@@ -9,6 +9,7 @@ DEMO_PROMPT="${WHITE}➜ ${GREEN}Source Cluster> ${COLOR_RESET}"
 ### Environment Requirements:
 # We need to run the following:
 # ra install_demo_async
+# license dr
 # Have the connection to pxbbq up
 SRCPOOL="demo3"
 DSTPOOL="demo4"
@@ -82,7 +83,5 @@ pei "echo \$DSTIP"
 wait
 
 pe "# We can see that our order is still there! #"
-
-# Reset the environment:
 
 pei ""

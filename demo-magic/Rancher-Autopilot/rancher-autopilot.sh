@@ -11,7 +11,7 @@ DEMO_PROMPT="${GREEN}➜ ${CYAN}Rancher Autopilot Demo ${COLOR_RESET}"
 # ra install_demo
 
 
-PROMPT_TIMEOUT=3
+PROMPT_TIMEOUT=0
 
 source ~/.bashrc
 
@@ -24,6 +24,9 @@ pxctl () {
 clear
 
 wait
+
+pei "# I have a Rancher RKE2 cluster ready to go #"
+pe "kubectl get nodes"
 
 pei "# First, let's create a namespace for our demo #"
 
@@ -55,6 +58,9 @@ pe "kubectl create -f disk-filler-pvc.yaml -n autopilot"
 pei "# Now let's check the size of our pvc #"
 pe "kubectl get pvc -n autopilot"
 
+echo "https://rancher.lan.ccrow.org/dashboard/c/c-m-8ptqhmgb/explorer/persistentvolumeclaim"
+wait
+
 pei "# Now let's start filling the disk #"
 pe "kubectl create -f disk-filler.yaml -n autopilot"
 
@@ -64,4 +70,10 @@ pe "watch 'kubectl get events --field-selector involvedObject.kind=AutopilotRule
 pei "# Let's look at the size of our pvc #"
 pe "kubectl get pvc -n autopilot"
 
+
+pe "# We can see that our volume has grown #"
+echo "https://rancher.lan.ccrow.org/dashboard/c/c-m-8ptqhmgb/explorer/persistentvolumeclaim"
 wait
+
+kubectl delete ns autopilot&
+kubectl delete -f autopilotrule.yaml 

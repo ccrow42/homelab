@@ -42,6 +42,7 @@ readonly ARGOCD_HELM_VALUE_FILES_PLACEHOLDER="ARGOCD_HELM_VALUE_FILES_PLACEHOLDE
 
 ### Environment Variables
 BASE_DIR=/home/ccrow/personal/homelab/rancher
+MANIFEST_LOCAL_DIR=/home/ccrow/personal/homelab/manifests
 CONFIG_FILE="${BASE_DIR}/rancher_conf.sh"
 
 # Used to store binary utilies

@@ -1,0 +1,15 @@
+hello,
+
+Today I will be demoing Autopilot.
+
+Autopilot is a Portworx feature that provides automatic capacity managment for persistent volumes.
+
+Autopilot uses rules to detect when a persistent volume reaches a capacity threshold, and performs an action, such as automaticaly
+growing the volume.
+
+Autopilot can also manage portworx storage pools to automatically increase back-end capacity.
+
+This allows administrators to save money by right sizing persistent volumes, as well as right sizing storage pools, all while providing 
+peace of mind that when a volume runs low on space, it will be remediated without any intervention on the part of the administrator.
+
+Let's get started.

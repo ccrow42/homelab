@@ -112,6 +112,7 @@ Commands:
     px_clusterpair          Create a cluster pair between two clusters. Requires --pool and --dr-pool
     install_demo_async      Install two clusters with Portworx, PXBBQ, minio
     install_demo            Install 1 cluster with Portworx, PXBBQ, minio, pxbackup
+    install_mvp             Install 1 cluster with Argo, Sealed Secrets, LPP, and portworx
     install_cluster         Build a cluster with ArgoCD, MetalLB, LPP, and sealed secrets
     reboot_cluster          Reboot the cluster
 
@@ -363,26 +364,35 @@ install_argocd () {
 ### Install Metallb
 install_metallb () {
 
-    requires_poolname
-    requires_argocd
+
 
     log "Installing MetalLB to ${POOL_NAME}"
     kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}" ${ERR_POOL_NOT_FOUND}
+
+    requires_poolname
+    #requires_argocd
     
-    # ArgoCD Variables
-    ARGOCD_APPNAME="metallb"
-    ARGOCD_NAMESPACE="metallb-system"
-    ARGOCD_PATH="${ARGOCD_PATH_ROOT}/metallb/overlays/${POOL_NAME}"
-    ARGOCD_REPO_URL="${ARGOCD_REPO_URL}"
+    # # ArgoCD Variables
+    # ARGOCD_APPNAME="metallb"
+    # ARGOCD_NAMESPACE="metallb-system"
+    # ARGOCD_PATH="${ARGOCD_PATH_ROOT}/metallb/overlays/${POOL_NAME}"
+    # ARGOCD_REPO_URL="${ARGOCD_REPO_URL}"
 
-    # Apply Application
-    ARGOAPP=$(< ${ARGOCD_APP_TEMPLATE})
-    ARGOAPP="${ARGOAPP//${ARGOCD_NAMESPACE_PLACEHOLDER}/${ARGOCD_NAMESPACE}}"
-    ARGOAPP="${ARGOAPP//${ARGOCD_APP_NAME_PLACEHOLDER}/${ARGOCD_APPNAME}}"
-    ARGOAPP="${ARGOAPP//${ARGOCD_REPO_URL_PLACEHOLDER}/${ARGOCD_REPO_URL}}"
-    ARGOAPP="${ARGOAPP//${ARGOCD_REPO_PATH_PLACEHOLDER}/${ARGOCD_PATH}}"
-    kubectl apply -f <(echo "${ARGOAPP}")
+    # # Apply Application
+    # ARGOAPP=$(< ${ARGOCD_APP_TEMPLATE})
+    # ARGOAPP="${ARGOAPP//${ARGOCD_NAMESPACE_PLACEHOLDER}/${ARGOCD_NAMESPACE}}"
+    # ARGOAPP="${ARGOAPP//${ARGOCD_APP_NAME_PLACEHOLDER}/${ARGOCD_APPNAME}}"
+    # ARGOAPP="${ARGOAPP//${ARGOCD_REPO_URL_PLACEHOLDER}/${ARGOCD_REPO_URL}}"
+    # ARGOAPP="${ARGOAPP//${ARGOCD_REPO_PATH_PLACEHOLDER}/${ARGOCD_PATH}}"
+    # kubectl apply -f <(echo "${ARGOAPP}")
 
+    # Fallback option
+    kubectl apply -k ${MANIFEST_LOCAL_DIR}/metallb/overlays/${POOL_NAME}
+    until [[ $(kubectl -n metallb-system get pods --no-headers | grep 1/1 | wc -l ) == 4 ]]; do
+        kubectl apply -k ${MANIFEST_LOCAL_DIR}/metallb/overlays/${POOL_NAME}
+        sleep 10
+        echo -n "."
+    done
 
 }
 
@@ -393,21 +403,23 @@ install_px_operator () {
     kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}" ${ERR_POOL_NOT_FOUND}
 
     requires_poolname
-    requires_argocd
+    #requires_argocd
 
-    # ArgoCD Variables
-    ARGOCD_APPNAME="px-operator"
-    ARGOCD_NAMESPACE="portworx"
-    ARGOCD_PATH="${ARGOCD_PATH_ROOT}/px-operator/overlays/${POOL_NAME}"
-    ARGOCD_REPO_URL="${ARGOCD_REPO_URL}"
+    # # ArgoCD Variables
+    # ARGOCD_APPNAME="px-operator"
+    # ARGOCD_NAMESPACE="portworx"
+    # ARGOCD_PATH="${ARGOCD_PATH_ROOT}/px-operator/overlays/${POOL_NAME}"
+    # ARGOCD_REPO_URL="${ARGOCD_REPO_URL}"
 
-    # Apply Application
-    ARGOAPP=$(< ${ARGOCD_APP_TEMPLATE})
-    ARGOAPP="${ARGOAPP//${ARGOCD_NAMESPACE_PLACEHOLDER}/${ARGOCD_NAMESPACE}}"
-    ARGOAPP="${ARGOAPP//${ARGOCD_APP_NAME_PLACEHOLDER}/${ARGOCD_APPNAME}}"
-    ARGOAPP="${ARGOAPP//${ARGOCD_REPO_URL_PLACEHOLDER}/${ARGOCD_REPO_URL}}"
-    ARGOAPP="${ARGOAPP//${ARGOCD_REPO_PATH_PLACEHOLDER}/${ARGOCD_PATH}}"
-    kubectl apply -f <(echo "${ARGOAPP}")
+    # # Apply Application
+    # ARGOAPP=$(< ${ARGOCD_APP_TEMPLATE})
+    # ARGOAPP="${ARGOAPP//${ARGOCD_NAMESPACE_PLACEHOLDER}/${ARGOCD_NAMESPACE}}"
+    # ARGOAPP="${ARGOAPP//${ARGOCD_APP_NAME_PLACEHOLDER}/${ARGOCD_APPNAME}}"
+    # ARGOAPP="${ARGOAPP//${ARGOCD_REPO_URL_PLACEHOLDER}/${ARGOCD_REPO_URL}}"
+    # ARGOAPP="${ARGOAPP//${ARGOCD_REPO_PATH_PLACEHOLDER}/${ARGOCD_PATH}}"
+    # kubectl apply -f <(echo "${ARGOAPP}")
+
+    kubectl apply -k ${MANIFEST_LOCAL_DIR}/px-operator/overlays/${POOL_NAME}
 }
 
 ### Install PX Enterprise
@@ -417,21 +429,23 @@ install_px_ent () {
     kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}" ${ERR_POOL_NOT_FOUND}
 
     requires_poolname
-    requires_argocd
+    #requires_argocd
     
-    # ArgoCD Variables
-    ARGOCD_APPNAME="portworx"
-    ARGOCD_NAMESPACE="portworx"
-    ARGOCD_PATH="${ARGOCD_PATH_ROOT}/portworx/overlays/${POOL_NAME}"
-    ARGOCD_REPO_URL="${ARGOCD_REPO_URL}"
+    # # ArgoCD Variables
+    # ARGOCD_APPNAME="portworx"
+    # ARGOCD_NAMESPACE="portworx"
+    # ARGOCD_PATH="${ARGOCD_PATH_ROOT}/portworx/overlays/${POOL_NAME}"
+    # ARGOCD_REPO_URL="${ARGOCD_REPO_URL}"
 
-    # Apply Application
-    ARGOAPP=$(< ${ARGOCD_APP_TEMPLATE})
-    ARGOAPP="${ARGOAPP//${ARGOCD_NAMESPACE_PLACEHOLDER}/${ARGOCD_NAMESPACE}}"
-    ARGOAPP="${ARGOAPP//${ARGOCD_APP_NAME_PLACEHOLDER}/${ARGOCD_APPNAME}}"
-    ARGOAPP="${ARGOAPP//${ARGOCD_REPO_URL_PLACEHOLDER}/${ARGOCD_REPO_URL}}"
-    ARGOAPP="${ARGOAPP//${ARGOCD_REPO_PATH_PLACEHOLDER}/${ARGOCD_PATH}}"
-    kubectl apply -f <(echo "${ARGOAPP}")
+    # # Apply Application
+    # ARGOAPP=$(< ${ARGOCD_APP_TEMPLATE})
+    # ARGOAPP="${ARGOAPP//${ARGOCD_NAMESPACE_PLACEHOLDER}/${ARGOCD_NAMESPACE}}"
+    # ARGOAPP="${ARGOAPP//${ARGOCD_APP_NAME_PLACEHOLDER}/${ARGOCD_APPNAME}}"
+    # ARGOAPP="${ARGOAPP//${ARGOCD_REPO_URL_PLACEHOLDER}/${ARGOCD_REPO_URL}}"
+    # ARGOAPP="${ARGOAPP//${ARGOCD_REPO_PATH_PLACEHOLDER}/${ARGOCD_PATH}}"
+    # kubectl apply -f <(echo "${ARGOAPP}")
+
+    kubectl apply -k ${MANIFEST_LOCAL_DIR}/portworx/overlays/${POOL_NAME}
 }
 
 ### Install Local Path Provisioner
@@ -443,19 +457,21 @@ install_lpp () {
     requires_poolname
     requires_argocd
     
-    # ArgoCD Variables
-    ARGOCD_APPNAME="localpath"
-    ARGOCD_NAMESPACE="local-path-storage"
-    ARGOCD_PATH="${ARGOCD_PATH_ROOT}/local-path-provisioner/overlays/${POOL_NAME}"
-    ARGOCD_REPO_URL="${ARGOCD_REPO_URL}"
+    # # ArgoCD Variables
+    # ARGOCD_APPNAME="localpath"
+    # ARGOCD_NAMESPACE="local-path-storage"
+    # ARGOCD_PATH="${ARGOCD_PATH_ROOT}/local-path-provisioner/overlays/${POOL_NAME}"
+    # ARGOCD_REPO_URL="${ARGOCD_REPO_URL}"
 
-    # Apply Application
-    ARGOAPP=$(< ${ARGOCD_APP_TEMPLATE})
-    ARGOAPP="${ARGOAPP//${ARGOCD_NAMESPACE_PLACEHOLDER}/${ARGOCD_NAMESPACE}}"
-    ARGOAPP="${ARGOAPP//${ARGOCD_APP_NAME_PLACEHOLDER}/${ARGOCD_APPNAME}}"
-    ARGOAPP="${ARGOAPP//${ARGOCD_REPO_URL_PLACEHOLDER}/${ARGOCD_REPO_URL}}"
-    ARGOAPP="${ARGOAPP//${ARGOCD_REPO_PATH_PLACEHOLDER}/${ARGOCD_PATH}}"
-    kubectl apply -f <(echo "${ARGOAPP}")
+    # # Apply Application
+    # ARGOAPP=$(< ${ARGOCD_APP_TEMPLATE})
+    # ARGOAPP="${ARGOAPP//${ARGOCD_NAMESPACE_PLACEHOLDER}/${ARGOCD_NAMESPACE}}"
+    # ARGOAPP="${ARGOAPP//${ARGOCD_APP_NAME_PLACEHOLDER}/${ARGOCD_APPNAME}}"
+    # ARGOAPP="${ARGOAPP//${ARGOCD_REPO_URL_PLACEHOLDER}/${ARGOCD_REPO_URL}}"
+    # ARGOAPP="${ARGOAPP//${ARGOCD_REPO_PATH_PLACEHOLDER}/${ARGOCD_PATH}}"
+    # kubectl apply -f <(echo "${ARGOAPP}")
+
+    kubectl apply -k ${MANIFEST_LOCAL_DIR}/local-path-provisioner/overlays/${POOL_NAME}
 }
 
 ### Install PXBBQ
@@ -465,21 +481,23 @@ install_pxbbq () {
     kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}" ${ERR_POOL_NOT_FOUND}
 
     requires_poolname
-    requires_argocd
+    # requires_argocd
    
-    # ArgoCD Variables
-    ARGOCD_APPNAME="pxbbq"
-    ARGOCD_NAMESPACE="pxbbq"
-    ARGOCD_PATH="${ARGOCD_PATH_ROOT}/pxbbq/overlays/${POOL_NAME}"
-    ARGOCD_REPO_URL="${ARGOCD_REPO_URL}"
+    # # ArgoCD Variables
+    # ARGOCD_APPNAME="pxbbq"
+    # ARGOCD_NAMESPACE="pxbbq"
+    # ARGOCD_PATH="${ARGOCD_PATH_ROOT}/pxbbq/overlays/${POOL_NAME}"
+    # ARGOCD_REPO_URL="${ARGOCD_REPO_URL}"
 
-    # Apply Application
-    ARGOAPP=$(< ${ARGOCD_APP_TEMPLATE})
-    ARGOAPP="${ARGOAPP//${ARGOCD_NAMESPACE_PLACEHOLDER}/${ARGOCD_NAMESPACE}}"
-    ARGOAPP="${ARGOAPP//${ARGOCD_APP_NAME_PLACEHOLDER}/${ARGOCD_APPNAME}}"
-    ARGOAPP="${ARGOAPP//${ARGOCD_REPO_URL_PLACEHOLDER}/${ARGOCD_REPO_URL}}"
-    ARGOAPP="${ARGOAPP//${ARGOCD_REPO_PATH_PLACEHOLDER}/${ARGOCD_PATH}}"
-    kubectl apply -f <(echo "${ARGOAPP}")
+    # # Apply Application
+    # ARGOAPP=$(< ${ARGOCD_APP_TEMPLATE})
+    # ARGOAPP="${ARGOAPP//${ARGOCD_NAMESPACE_PLACEHOLDER}/${ARGOCD_NAMESPACE}}"
+    # ARGOAPP="${ARGOAPP//${ARGOCD_APP_NAME_PLACEHOLDER}/${ARGOCD_APPNAME}}"
+    # ARGOAPP="${ARGOAPP//${ARGOCD_REPO_URL_PLACEHOLDER}/${ARGOCD_REPO_URL}}"
+    # ARGOAPP="${ARGOAPP//${ARGOCD_REPO_PATH_PLACEHOLDER}/${ARGOCD_PATH}}"
+    # kubectl apply -f <(echo "${ARGOAPP}")
+
+    kubectl apply -k ${MANIFEST_LOCAL_DIR}/pxbbq/overlays/${POOL_NAME}
 
 
 }
@@ -538,32 +556,46 @@ install_minio () {
     requires_poolname
     requires_argocd
 
-    # ArgoCD Variables
-    ARGOCD_APPNAME="minio"
-    ARGOCD_NAMESPACE="minio"
+    # # ArgoCD Variables
+    # ARGOCD_APPNAME="minio"
+    # ARGOCD_NAMESPACE="minio"
 
-    # Must point to a values file
-    ARGOCD_VALUE_FILES="\$values/${ARGOCD_HELM_VALUES_ROOT}/minio/${POOL_NAME}/values.yaml"
-    ARGOCD_REPO_URL="${ARGOCD_REPO_URL}"
+    # # Must point to a values file
+    # ARGOCD_VALUE_FILES="\$values/${ARGOCD_HELM_VALUES_ROOT}/minio/${POOL_NAME}/values.yaml"
+    # ARGOCD_REPO_URL="${ARGOCD_REPO_URL}"
 
-    # Helm specific options
-    ARGOCD_HELM_REPO="https://charts.min.io/"
-    ARGOCD_HELM_CHART_VERSION="5.2.0"
-    ARGOCD_HELM_CHART="minio"
+    # # Helm specific options
+    # ARGOCD_HELM_REPO="https://charts.min.io/"
+    # ARGOCD_HELM_CHART_VERSION="5.2.0"
+    # ARGOCD_HELM_CHART="minio"
 
-    # Apply Application
-    ARGOAPP=$(< ${ARGOCD_HELM_APP_TEMPLATE})
-    ARGOAPP="${ARGOAPP//${ARGOCD_NAMESPACE_PLACEHOLDER}/${ARGOCD_NAMESPACE}}"
-    ARGOAPP="${ARGOAPP//${ARGOCD_APP_NAME_PLACEHOLDER}/${ARGOCD_APPNAME}}"
-    ARGOAPP="${ARGOAPP//${ARGOCD_REPO_URL_PLACEHOLDER}/${ARGOCD_REPO_URL}}"
-    ARGOAPP="${ARGOAPP//${ARGOCD_HELM_VALUE_FILES_PLACEHOLDER}/${ARGOCD_VALUE_FILES}}"
-    ARGOAPP="${ARGOAPP//${ARGOCD_HELM_REPO_URL_PLACEHOLDER}/${ARGOCD_HELM_REPO}}"
-    ARGOAPP="${ARGOAPP//${ARGOCD_HELM_CHART_PLACEHOLDER}/${ARGOCD_HELM_CHART}}"
-    ARGOAPP="${ARGOAPP//${ARGOCD_HELM_TARGET_PLACEHOLDER}/${ARGOCD_HELM_CHART_VERSION}}"
+    # # Apply Application
+    # ARGOAPP=$(< ${ARGOCD_HELM_APP_TEMPLATE})
+    # ARGOAPP="${ARGOAPP//${ARGOCD_NAMESPACE_PLACEHOLDER}/${ARGOCD_NAMESPACE}}"
+    # ARGOAPP="${ARGOAPP//${ARGOCD_APP_NAME_PLACEHOLDER}/${ARGOCD_APPNAME}}"
+    # ARGOAPP="${ARGOAPP//${ARGOCD_REPO_URL_PLACEHOLDER}/${ARGOCD_REPO_URL}}"
+    # ARGOAPP="${ARGOAPP//${ARGOCD_HELM_VALUE_FILES_PLACEHOLDER}/${ARGOCD_VALUE_FILES}}"
+    # ARGOAPP="${ARGOAPP//${ARGOCD_HELM_REPO_URL_PLACEHOLDER}/${ARGOCD_HELM_REPO}}"
+    # ARGOAPP="${ARGOAPP//${ARGOCD_HELM_CHART_PLACEHOLDER}/${ARGOCD_HELM_CHART}}"
+    # ARGOAPP="${ARGOAPP//${ARGOCD_HELM_TARGET_PLACEHOLDER}/${ARGOCD_HELM_CHART_VERSION}}"
 
-    # Create the minio namespace
-    kubectl create namespace minio
-    kubectl apply -f <(echo "${ARGOAPP}")
+    # # Create the minio namespace
+    # kubectl create namespace minio
+    # kubectl apply -f <(echo "${ARGOAPP}")
+
+    #fallback to manual install
+    helm install minio \
+    --set mode=standalone \
+    --set persistence.storageClass=px-csi-db \
+    --set persistence.accessMode=ReadWriteMany \
+    --set persistence.size=10Gi \
+    --set resources.requests.memory=1Gi \
+    --set service.type=LoadBalancer \
+    --namespace minio \
+    --create-namespace \
+    minio/minio
+
+
 }
 
 install_etcd () {
@@ -606,23 +638,23 @@ install_grafana () {
     else
 
 
-    kubectl -n portworx create configmap grafana-dashboard-config --from-file=grafana-dashboard-config.yaml
+    kubectl -n portworx create configmap grafana-dashboard-config --from-file=${BASE_DIR}/grafana-dashboard-config.yaml
     sleep 10
 
-    kubectl -n portworx create configmap grafana-source-config --from-file=grafana-datasource.yaml
+    kubectl -n portworx create configmap grafana-source-config --from-file=${BASE_DIR}/grafana-datasource.yaml
     sleep 10
 
-    curl "https://docs.portworx.com/samples/k8s/pxc/portworx-cluster-dashboard.json" -o portworx-cluster-dashboard.json && \
-    curl "https://docs.portworx.com/samples/k8s/pxc/portworx-node-dashboard.json" -o portworx-node-dashboard.json && \
-    curl "https://docs.portworx.com/samples/k8s/pxc/portworx-volume-dashboard.json" -o portworx-volume-dashboard.json && \
-    curl "https://docs.portworx.com/samples/k8s/pxc/portworx-performance-dashboard.json" -o portworx-performance-dashboard.json && \
-    curl "https://docs.portworx.com/samples/k8s/pxc/portworx-etcd-dashboard.json" -o portworx-etcd-dashboard.json && \
+    curl "https://docs.portworx.com/samples/k8s/pxc/portworx-cluster-dashboard.json" -o ${BASE_DIR}/portworx-cluster-dashboard.json && \
+    curl "https://docs.portworx.com/samples/k8s/pxc/portworx-node-dashboard.json" -o ${BASE_DIR}/portworx-node-dashboard.json && \
+    curl "https://docs.portworx.com/samples/k8s/pxc/portworx-volume-dashboard.json" -o ${BASE_DIR}/portworx-volume-dashboard.json && \
+    curl "https://docs.portworx.com/samples/k8s/pxc/portworx-performance-dashboard.json" -o ${BASE_DIR}/portworx-performance-dashboard.json && \
+    curl "https://docs.portworx.com/samples/k8s/pxc/portworx-etcd-dashboard.json" -o ${BASE_DIR}/portworx-etcd-dashboard.json && \
 
-    kubectl -n portworx create configmap grafana-dashboards --from-file=portworx-cluster-dashboard.json --from-file=portworx-performance-dashboard.json --from-file=portworx-node-dashboard.json --from-file=portworx-volume-dashboard.json --from-file=portworx-etcd-dashboard.json
+    kubectl -n portworx create configmap grafana-dashboards --from-file=${BASE_DIR}/portworx-cluster-dashboard.json --from-file=${BASE_DIR}/portworx-performance-dashboard.json --from-file=${BASE_DIR}/portworx-node-dashboard.json --from-file=${BASE_DIR}/portworx-volume-dashboard.json --from-file=${BASE_DIR}/portworx-etcd-dashboard.json
 
     sleep 10
 
-    kubectl apply -f grafana.yaml
+    kubectl apply -f ${BASE_DIR}/grafana.yaml
     sleep 5
 
     #Check to make sure Grafana is running
@@ -633,11 +665,11 @@ install_grafana () {
 
     #rm grafana-dashboard-config.yaml
     #rm grafana-datasource.yaml
-    rm portworx-cluster-dashboard.json
-    rm portworx-node-dashboard.json
-    rm portworx-volume-dashboard.json
-    rm portworx-performance-dashboard.json
-    rm portworx-etcd-dashboard.json
+    rm ${BASE_DIR}/portworx-cluster-dashboard.json
+    rm ${BASE_DIR}/portworx-node-dashboard.json
+    rm ${BASE_DIR}/portworx-volume-dashboard.json
+    rm ${BASE_DIR}/portworx-performance-dashboard.json
+    rm ${BASE_DIR}/portworx-etcd-dashboard.json
     #rm grafana.yaml
 
 fi
@@ -680,7 +712,7 @@ install_pxbackup () {
     # kubectl apply -f <(echo "${ARGOAPP}")
 
     # This is the failback install command:
-    helm install px-central portworx/px-central --namespace central --create-namespace --version 2.6.0 --set persistentStorage.enabled=true,persistentStorage.storageClassName="px-csi-db",pxbackup.enabled=true,oidc.centralOIDC.updateAdminProfile=false
+    helm install px-central portworx/px-central --namespace central --create-namespace --version 2.7.0 --set persistentStorage.enabled=true,persistentStorage.storageClassName="px-csi-db",pxbackup.enabled=true,oidc.centralOIDC.updateAdminProfile=false
 
 }
 configure_pxbackup() {
@@ -688,7 +720,10 @@ configure_pxbackup() {
     kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}" ${ERR_POOL_NOT_FOUND}
 
     requires_pxbackup
-    requires_miniofor node in ${nodes[@]}x-backup 10002:10002 &
+    requires_minio
+    env
+
+    kubectl port-forward -n central svc/px-backup 10002:10002 &
     PORT_FORWARD_PID=$!
     # This is a hack
     LB_SERVER_IP="localhost"
@@ -857,7 +892,7 @@ env () {
             echo "export POOL2_CLUSTER_UUID=${POOL2_CLUSTER_UUID}"
         fi
     fi
-    echo ""kubectl get secret -n minio minio -o jsonpath="{.data.rootUser}" | base64 --decode
+
 
 }
 
@@ -867,6 +902,7 @@ env () {
 
 install_portworx () {
     install_px_operator
+    sleep 30
     install_px_ent
 }
 
@@ -891,9 +927,31 @@ install_demo () {
     wait_ready_pxbackup
     configure_pxbackup
     install_pxbbq
-
-
 }
+
+install_mvp () {
+    kubectl config use-context ${KUBECTL_CONTEXT} || terminate "Could not switch to ${KUBECTL_CONTEXT}" 
+    requires_poolname
+
+    log "Creating cluster"
+    create_rancher_cluster
+    wait_ready_racher_cluster
+    create_context
+    install_sealed_secrets
+    install_argocd
+    #wait_ready_argocd
+    install_metallb
+    install_portworx
+    wait_ready_portworx
+    #install_minio
+    #wait_ready_minio
+    #configure_minio
+    #install_pxbackup
+    #wait_ready_pxbackup
+    #configure_pxbackup
+    #install_pxbbq
+}
+
 
 install_demo_async () {
     # we are going to use the pool1 and pool2 params for the demo
@@ -1090,6 +1148,9 @@ while [[ ${1} != "" ]]; do
         ;;
         install_demo)
             COMMAND="install_demo"
+        ;;
+        install_mvp)
+            COMMAND="install_mvp"
         ;;
         install_demo_async)
             COMMAND="install_demo_async"

@@ -1,0 +1,5 @@
+    rules:
+    - actions:
+        - value: mongodump -u porxie -p porxie
+      podSelector:
+          app.kubernetes.io/name: mongo

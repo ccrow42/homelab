@@ -4,7 +4,7 @@
 TYPE_SPEED=20
 # see http://www.tldp.org/HOWTO/Bash-Prompt-HOWTO/bash-prompt-escape-sequences.html for escape sequences
 #
-DEMO_PROMPT="${GREEN}➜ ${CYAN}Rancher IO Control Demo ${COLOR_RESET}"
+DEMO_PROMPT="${GREEN}➜ ${CYAN}Rancher IO Control Demo> ${COLOR_RESET}"
 
 ### Environment Requirements:
 # We need to run the following:
@@ -25,6 +25,10 @@ clear
 
 wait
 
+pei "# I have a Rancher RKE2 cluster ready to go #"
+pe "kubectl get nodes"
+
+
 pei "### We will start by generating some I/O using kubestr"
 
 pe "kubestr fio -z 30G -s px-csi-db -f rand-write.fio -o json -e rand-RW-WL.json >& /dev/null &"
@@ -36,6 +40,9 @@ pei "export VolName=\$(pxctl volume list | grep \"28 GiB\" | awk '{ print \$2}' 
 pei "pxctl volume inspect \$VolName"
 
 pei "### Lets check on the amount of I/O being generated in Grafana"
+
+#pei "$ENDPOINT=http://\$(kubectl -n portworx get svc grafana-svc -o jsonpath='{.status.loadBalancer.ingress[0].ip}'):3000"
+#pei "echo $ENDPOINT"
 
 wait
 
