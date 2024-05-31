@@ -1,0 +1,38 @@
+Hello,
+
+Today I am going to demo Async DR using two rancher clusters. 
+
+Async DR uses an object store to transfer data between to clusters. 
+It will ensure that all of our PVCs and manifests are present on the destination cluster 
+  so that we can activate our application by simply scaling the destination cluster resources
+
+Let's get started.
+
+I have two rancher clusters that have already been paired and are ready for DR.
+
+Let's take a few moments to talk about the cluster pair object.
+
+The clusterpair object (named demo in this case) contains connection information about the destination cluster. 
+such as:
+- portworx endpoint
+- cluster control plane
+- authentication information
+
+
+next, let's take a look at the migrationSchedule manifest. 
+
+This manifest contains information about what we want to replicate and the schedule interval.
+Keep in mind that we can apply more granular selectors by using labels, although we haven't done that here.
+
+We are now going to watch for the next scheduled migration. I will speed up the video.
+
+pause - get destination PX BBQ ready in the background.
+
+Now we will simulate a DR event by halting the nodes in the source cluster. 
+
+Switching to our destination cluster, I'm going to activate the pxbbq application. 
+We don't need storkctl to do this, we can also just scale the deployments and stateful sets
+
+With our failover complete, let's make sure our application still has our order.
+
+

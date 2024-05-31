@@ -5,5 +5,3 @@ resources:
 - namespace.yaml
 - mongodb.yaml
 - pxbbq.yaml
-#- bbq-taster.yaml
-#- bbq-taster-secret.yaml removed as we are using automation now

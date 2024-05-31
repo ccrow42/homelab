@@ -1,15 +1,15 @@
 apiVersion: stork.libopenstorage.org/v1alpha1
 kind: MigrationSchedule
 metadata:
-  name: schedule
+  name: asyncdr-schedule
   namespace: portworx
   annotations:
 spec:
   template:
     spec:
-      clusterPair: stage
+      clusterPair: demo
       includeResources: true
-      startApplications: true
+      startApplications: false
       includeVolumes: true
       namespaces:
       - pxbbq

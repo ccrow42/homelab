@@ -1,11 +1,36 @@
 Hello,
 
-In this demo I'm going to show you a feature of Portworx Enterprise called IO Control.
+In this demo I'm going to show you a feature of Portworx Enterprise called Application IO Control.
 
-IO Control allows us to put limits on IOs and Bandwidth of our volumes by configuring paramaters on a storageclass, or by 
+Application IO Control allows us to put limits on IOs and Bandwidth of our volumes by configuring paramaters on a storageclass, or by 
 setting a limit on existing volumes.
 
 This ensures that volumes cannot cause cluster wide performance problems by over-utilizing IO, which is sometimes called
 a "Noisy Neighbor"
 
 Let's get started
+
+
+
+---
+
+I will be running this demo on a rancher RKE 2 cluster in my lab, and using grafana to meter the load.
+
+To generate IO load, I will be using kubstr, which is a container that runs a synthentic workload using fio inside a container
+
+While we wait for that to spool up, let's look at an example storage class. Application IO control can throttle IOPS and Bandwidth, but not both for the same operation.
+For example, I cannot limit the IOPS and Bandwidth of read operations.
+
+Switching to our Portworx provided grafana dashboard, we can see that our IOPS are very high.
+
+of course a storageClass is a great place to apply IO controls by policy, but sometimes we just want to limit the IO of a particular application after it has been provisioned
+
+I'm going to do that to our kubestr pvc now by setting a limit on read and write IOPS to 750.
+
+And after checking grafana, we can indeed see that our IO has been reduced drastically.
+
+Thanks for watching.
+
+
+
+

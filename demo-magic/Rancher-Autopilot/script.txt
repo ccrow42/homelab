@@ -13,3 +13,31 @@ This allows administrators to save money by right sizing persistent volumes, as 
 peace of mind that when a volume runs low on space, it will be remediated without any intervention on the part of the administrator.
 
 Let's get started.
+
+
+I will be running this demo on Rancher RKE2.
+
+Autopilot, as a rules engine, selects PVCs to grow based on labels. In our example, we will only be applying the label to PVCs within any namespace 
+with the label type=db, and then only to PVCs that carry the label app=disk-filler.
+
+This allows granular control of what rules apply to which volumes.
+
+We can also control when the rule triggers - after the volume grows to 30% capacity,
+as well as by how much, and to what maximum.
+
+-> rancher window
+
+We will be using a 10gb volume to to start, with a rule to grow it to a 20gb volume if it is triggered.
+
+-> trigger monitor
+
+It is easiest to monitor autopilot as events. This can take a couple of minutes, so I have sped up the video.
+
+There are a few events that autopilot will go through.
+Normal is the standard state of a rule, and denotes that we have detected that are PVC met the selection criteria and is being monitored
+When the volume meets our 30% threshold, it will be triggered. We will then rapidly transition to growing the volume.
+
+Let's check on the size of our volume. 
+
+Although this demo only dealt with an autopilot rule that expands a pvc, autopilot can also grow the backend storage pool on supported back-ends, 
+which include: AWS, Azure, Pure storage, and vmware vSphere

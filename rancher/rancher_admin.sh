@@ -114,7 +114,7 @@ Commands:
     install_demo            Install 1 cluster with Portworx, PXBBQ, minio, pxbackup
     install_mvp             Install 1 cluster with Argo, Sealed Secrets, LPP, and portworx
     install_cluster         Build a cluster with ArgoCD, MetalLB, LPP, and sealed secrets
-    reboot_cluster          Reboot the cluster
+    reboot_cluster          Reboot the cluster. This also updates grub.
 
 Options:
     -h, --help              Display this help message
@@ -212,6 +212,11 @@ wait_ready_portworx () {
         sleep 10
     done
 }
+
+# while ! kubectl get stc -A -n portworx | grep -q 'Running\|Online'; do
+#    echo "Waiting for StorageCluster status online"
+#    sleep 3
+# done
 wait_ready_pxbackup () {
     kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}" ${ERR_POOL_NOT_FOUND}
     log "Waiting for PXBackup to be ready, this may take a few minutes."
@@ -370,29 +375,29 @@ install_metallb () {
     kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}" ${ERR_POOL_NOT_FOUND}
 
     requires_poolname
-    #requires_argocd
+    requires_argocd
     
-    # # ArgoCD Variables
-    # ARGOCD_APPNAME="metallb"
-    # ARGOCD_NAMESPACE="metallb-system"
-    # ARGOCD_PATH="${ARGOCD_PATH_ROOT}/metallb/overlays/${POOL_NAME}"
-    # ARGOCD_REPO_URL="${ARGOCD_REPO_URL}"
+    # ArgoCD Variables
+    ARGOCD_APPNAME="metallb"
+    ARGOCD_NAMESPACE="metallb-system"
+    ARGOCD_PATH="${ARGOCD_PATH_ROOT}/metallb/overlays/${POOL_NAME}"
+    ARGOCD_REPO_URL="${ARGOCD_REPO_URL}"
 
-    # # Apply Application
-    # ARGOAPP=$(< ${ARGOCD_APP_TEMPLATE})
-    # ARGOAPP="${ARGOAPP//${ARGOCD_NAMESPACE_PLACEHOLDER}/${ARGOCD_NAMESPACE}}"
-    # ARGOAPP="${ARGOAPP//${ARGOCD_APP_NAME_PLACEHOLDER}/${ARGOCD_APPNAME}}"
-    # ARGOAPP="${ARGOAPP//${ARGOCD_REPO_URL_PLACEHOLDER}/${ARGOCD_REPO_URL}}"
-    # ARGOAPP="${ARGOAPP//${ARGOCD_REPO_PATH_PLACEHOLDER}/${ARGOCD_PATH}}"
-    # kubectl apply -f <(echo "${ARGOAPP}")
+    # Apply Application
+    ARGOAPP=$(< ${ARGOCD_APP_TEMPLATE})
+    ARGOAPP="${ARGOAPP//${ARGOCD_NAMESPACE_PLACEHOLDER}/${ARGOCD_NAMESPACE}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_APP_NAME_PLACEHOLDER}/${ARGOCD_APPNAME}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_REPO_URL_PLACEHOLDER}/${ARGOCD_REPO_URL}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_REPO_PATH_PLACEHOLDER}/${ARGOCD_PATH}}"
+    kubectl apply -f <(echo "${ARGOAPP}")
 
     # Fallback option
-    kubectl apply -k ${MANIFEST_LOCAL_DIR}/metallb/overlays/${POOL_NAME}
-    until [[ $(kubectl -n metallb-system get pods --no-headers | grep 1/1 | wc -l ) == 4 ]]; do
-        kubectl apply -k ${MANIFEST_LOCAL_DIR}/metallb/overlays/${POOL_NAME}
-        sleep 10
-        echo -n "."
-    done
+    # kubectl apply -k ${MANIFEST_LOCAL_DIR}/metallb/overlays/${POOL_NAME}
+    # until [[ $(kubectl -n metallb-system get pods --no-headers | grep 1/1 | wc -l ) == 4 ]]; do
+    #     kubectl apply -k ${MANIFEST_LOCAL_DIR}/metallb/overlays/${POOL_NAME}
+    #     sleep 10
+    #     echo -n "."
+    # done
 
 }
 
@@ -405,21 +410,21 @@ install_px_operator () {
     requires_poolname
     #requires_argocd
 
-    # # ArgoCD Variables
-    # ARGOCD_APPNAME="px-operator"
-    # ARGOCD_NAMESPACE="portworx"
-    # ARGOCD_PATH="${ARGOCD_PATH_ROOT}/px-operator/overlays/${POOL_NAME}"
-    # ARGOCD_REPO_URL="${ARGOCD_REPO_URL}"
+    # ArgoCD Variables
+    ARGOCD_APPNAME="px-operator"
+    ARGOCD_NAMESPACE="portworx"
+    ARGOCD_PATH="${ARGOCD_PATH_ROOT}/px-operator/overlays/${POOL_NAME}"
+    ARGOCD_REPO_URL="${ARGOCD_REPO_URL}"
 
-    # # Apply Application
-    # ARGOAPP=$(< ${ARGOCD_APP_TEMPLATE})
-    # ARGOAPP="${ARGOAPP//${ARGOCD_NAMESPACE_PLACEHOLDER}/${ARGOCD_NAMESPACE}}"
-    # ARGOAPP="${ARGOAPP//${ARGOCD_APP_NAME_PLACEHOLDER}/${ARGOCD_APPNAME}}"
-    # ARGOAPP="${ARGOAPP//${ARGOCD_REPO_URL_PLACEHOLDER}/${ARGOCD_REPO_URL}}"
-    # ARGOAPP="${ARGOAPP//${ARGOCD_REPO_PATH_PLACEHOLDER}/${ARGOCD_PATH}}"
-    # kubectl apply -f <(echo "${ARGOAPP}")
+    # Apply Application
+    ARGOAPP=$(< ${ARGOCD_APP_TEMPLATE})
+    ARGOAPP="${ARGOAPP//${ARGOCD_NAMESPACE_PLACEHOLDER}/${ARGOCD_NAMESPACE}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_APP_NAME_PLACEHOLDER}/${ARGOCD_APPNAME}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_REPO_URL_PLACEHOLDER}/${ARGOCD_REPO_URL}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_REPO_PATH_PLACEHOLDER}/${ARGOCD_PATH}}"
+    kubectl apply -f <(echo "${ARGOAPP}")
 
-    kubectl apply -k ${MANIFEST_LOCAL_DIR}/px-operator/overlays/${POOL_NAME}
+    #kubectl apply -k ${MANIFEST_LOCAL_DIR}/px-operator/overlays/${POOL_NAME}
 }
 
 ### Install PX Enterprise
@@ -429,23 +434,23 @@ install_px_ent () {
     kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}" ${ERR_POOL_NOT_FOUND}
 
     requires_poolname
-    #requires_argocd
+    requires_argocd
     
-    # # ArgoCD Variables
-    # ARGOCD_APPNAME="portworx"
-    # ARGOCD_NAMESPACE="portworx"
-    # ARGOCD_PATH="${ARGOCD_PATH_ROOT}/portworx/overlays/${POOL_NAME}"
-    # ARGOCD_REPO_URL="${ARGOCD_REPO_URL}"
+    # ArgoCD Variables
+    ARGOCD_APPNAME="portworx"
+    ARGOCD_NAMESPACE="portworx"
+    ARGOCD_PATH="${ARGOCD_PATH_ROOT}/portworx/overlays/${POOL_NAME}"
+    ARGOCD_REPO_URL="${ARGOCD_REPO_URL}"
 
-    # # Apply Application
-    # ARGOAPP=$(< ${ARGOCD_APP_TEMPLATE})
-    # ARGOAPP="${ARGOAPP//${ARGOCD_NAMESPACE_PLACEHOLDER}/${ARGOCD_NAMESPACE}}"
-    # ARGOAPP="${ARGOAPP//${ARGOCD_APP_NAME_PLACEHOLDER}/${ARGOCD_APPNAME}}"
-    # ARGOAPP="${ARGOAPP//${ARGOCD_REPO_URL_PLACEHOLDER}/${ARGOCD_REPO_URL}}"
-    # ARGOAPP="${ARGOAPP//${ARGOCD_REPO_PATH_PLACEHOLDER}/${ARGOCD_PATH}}"
-    # kubectl apply -f <(echo "${ARGOAPP}")
+    # Apply Application
+    ARGOAPP=$(< ${ARGOCD_APP_TEMPLATE})
+    ARGOAPP="${ARGOAPP//${ARGOCD_NAMESPACE_PLACEHOLDER}/${ARGOCD_NAMESPACE}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_APP_NAME_PLACEHOLDER}/${ARGOCD_APPNAME}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_REPO_URL_PLACEHOLDER}/${ARGOCD_REPO_URL}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_REPO_PATH_PLACEHOLDER}/${ARGOCD_PATH}}"
+    kubectl apply -f <(echo "${ARGOAPP}")
 
-    kubectl apply -k ${MANIFEST_LOCAL_DIR}/portworx/overlays/${POOL_NAME}
+    #kubectl apply -k ${MANIFEST_LOCAL_DIR}/portworx/overlays/${POOL_NAME}
 }
 
 ### Install Local Path Provisioner
@@ -457,21 +462,21 @@ install_lpp () {
     requires_poolname
     requires_argocd
     
-    # # ArgoCD Variables
-    # ARGOCD_APPNAME="localpath"
-    # ARGOCD_NAMESPACE="local-path-storage"
-    # ARGOCD_PATH="${ARGOCD_PATH_ROOT}/local-path-provisioner/overlays/${POOL_NAME}"
-    # ARGOCD_REPO_URL="${ARGOCD_REPO_URL}"
+    # ArgoCD Variables
+    ARGOCD_APPNAME="localpath"
+    ARGOCD_NAMESPACE="local-path-storage"
+    ARGOCD_PATH="${ARGOCD_PATH_ROOT}/local-path-provisioner/overlays/${POOL_NAME}"
+    ARGOCD_REPO_URL="${ARGOCD_REPO_URL}"
 
-    # # Apply Application
-    # ARGOAPP=$(< ${ARGOCD_APP_TEMPLATE})
-    # ARGOAPP="${ARGOAPP//${ARGOCD_NAMESPACE_PLACEHOLDER}/${ARGOCD_NAMESPACE}}"
-    # ARGOAPP="${ARGOAPP//${ARGOCD_APP_NAME_PLACEHOLDER}/${ARGOCD_APPNAME}}"
-    # ARGOAPP="${ARGOAPP//${ARGOCD_REPO_URL_PLACEHOLDER}/${ARGOCD_REPO_URL}}"
-    # ARGOAPP="${ARGOAPP//${ARGOCD_REPO_PATH_PLACEHOLDER}/${ARGOCD_PATH}}"
-    # kubectl apply -f <(echo "${ARGOAPP}")
+    # Apply Application
+    ARGOAPP=$(< ${ARGOCD_APP_TEMPLATE})
+    ARGOAPP="${ARGOAPP//${ARGOCD_NAMESPACE_PLACEHOLDER}/${ARGOCD_NAMESPACE}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_APP_NAME_PLACEHOLDER}/${ARGOCD_APPNAME}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_REPO_URL_PLACEHOLDER}/${ARGOCD_REPO_URL}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_REPO_PATH_PLACEHOLDER}/${ARGOCD_PATH}}"
+    kubectl apply -f <(echo "${ARGOAPP}")
 
-    kubectl apply -k ${MANIFEST_LOCAL_DIR}/local-path-provisioner/overlays/${POOL_NAME}
+    #kubectl apply -k ${MANIFEST_LOCAL_DIR}/local-path-provisioner/overlays/${POOL_NAME}
 }
 
 ### Install PXBBQ
@@ -481,23 +486,23 @@ install_pxbbq () {
     kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}" ${ERR_POOL_NOT_FOUND}
 
     requires_poolname
-    # requires_argocd
+    requires_argocd
    
-    # # ArgoCD Variables
-    # ARGOCD_APPNAME="pxbbq"
-    # ARGOCD_NAMESPACE="pxbbq"
-    # ARGOCD_PATH="${ARGOCD_PATH_ROOT}/pxbbq/overlays/${POOL_NAME}"
-    # ARGOCD_REPO_URL="${ARGOCD_REPO_URL}"
+    # ArgoCD Variables
+    ARGOCD_APPNAME="pxbbq"
+    ARGOCD_NAMESPACE="pxbbq"
+    ARGOCD_PATH="${ARGOCD_PATH_ROOT}/pxbbq/overlays/${POOL_NAME}"
+    ARGOCD_REPO_URL="${ARGOCD_REPO_URL}"
 
-    # # Apply Application
-    # ARGOAPP=$(< ${ARGOCD_APP_TEMPLATE})
-    # ARGOAPP="${ARGOAPP//${ARGOCD_NAMESPACE_PLACEHOLDER}/${ARGOCD_NAMESPACE}}"
-    # ARGOAPP="${ARGOAPP//${ARGOCD_APP_NAME_PLACEHOLDER}/${ARGOCD_APPNAME}}"
-    # ARGOAPP="${ARGOAPP//${ARGOCD_REPO_URL_PLACEHOLDER}/${ARGOCD_REPO_URL}}"
-    # ARGOAPP="${ARGOAPP//${ARGOCD_REPO_PATH_PLACEHOLDER}/${ARGOCD_PATH}}"
-    # kubectl apply -f <(echo "${ARGOAPP}")
+    # Apply Application
+    ARGOAPP=$(< ${ARGOCD_APP_TEMPLATE})
+    ARGOAPP="${ARGOAPP//${ARGOCD_NAMESPACE_PLACEHOLDER}/${ARGOCD_NAMESPACE}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_APP_NAME_PLACEHOLDER}/${ARGOCD_APPNAME}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_REPO_URL_PLACEHOLDER}/${ARGOCD_REPO_URL}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_REPO_PATH_PLACEHOLDER}/${ARGOCD_PATH}}"
+    kubectl apply -f <(echo "${ARGOAPP}")
 
-    kubectl apply -k ${MANIFEST_LOCAL_DIR}/pxbbq/overlays/${POOL_NAME}
+    #kubectl apply -k ${MANIFEST_LOCAL_DIR}/pxbbq/overlays/${POOL_NAME}
 
 
 }
@@ -584,6 +589,7 @@ install_minio () {
     # kubectl apply -f <(echo "${ARGOAPP}")
 
     #fallback to manual install
+    log "Installing minio to ${POOL_NAME} using fallback method"
     helm install minio \
     --set mode=standalone \
     --set persistence.storageClass=px-csi-db \

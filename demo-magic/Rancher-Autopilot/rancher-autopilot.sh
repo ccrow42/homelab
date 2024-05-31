@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 . demo-magic.sh
 
-TYPE_SPEED=20
+TYPE_SPEED=35
 # see http://www.tldp.org/HOWTO/Bash-Prompt-HOWTO/bash-prompt-escape-sequences.html for escape sequences
 #
 DEMO_PROMPT="${GREEN}➜ ${CYAN}Rancher Autopilot Demo ${COLOR_RESET}"
@@ -74,6 +74,9 @@ pe "kubectl get pvc -n autopilot"
 pe "# We can see that our volume has grown #"
 echo "https://rancher.lan.ccrow.org/dashboard/c/c-m-8ptqhmgb/explorer/persistentvolumeclaim"
 wait
+
+pe "# Remember, autopilot can also grow the cluster's storage pool automatically"
+pe "pxctl status"
 
 kubectl delete ns autopilot&
 kubectl delete -f autopilotrule.yaml 
