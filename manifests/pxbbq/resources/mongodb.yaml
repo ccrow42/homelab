@@ -59,6 +59,9 @@ spec:
   volumeClaimTemplates:
   - metadata:
       name: mongo-pv
+      labels:
+        app: mongo-db
+        pxmigrate: "true"
     spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
