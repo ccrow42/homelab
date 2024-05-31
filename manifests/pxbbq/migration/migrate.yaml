@@ -4,7 +4,7 @@ metadata:
   name: migrate01
   namespace: portworx
 spec:
-  clusterPair: demo
+  clusterPair: stage
   includeResources: true
   startApplications: true
   namespaces:
