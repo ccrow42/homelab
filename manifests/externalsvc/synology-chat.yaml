@@ -24,7 +24,7 @@ subsets:
 kind: Ingress
 apiVersion: networking.k8s.io/v1
 metadata:
-  name: ingress-synology
+  name: ingress-synology-chat
   namespace: externalsvc
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
