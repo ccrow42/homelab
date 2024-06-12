@@ -5,6 +5,6 @@ resources:
 - namespace.yaml
 - pxbbq-web-svc.yaml
 - pxbbq-web-deployment.yaml
-- mongdb-sts.yaml
-- mongdb-svc.yaml
+- mongodb-sts.yaml
+- mongodb-svc.yaml
 
