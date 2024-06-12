@@ -1,0 +1,12 @@
+apiVersion: apps/v1
+kind: Deployment                 
+metadata:
+  name: pxbbq-web  
+  namespace: pxbbq         
+spec:
+  replicas: 3                    
+  template:                      
+    spec:                        
+      containers:
+      - name: pxbbq-web
+        image: eshanks16/pxbbq:6bf91d4
