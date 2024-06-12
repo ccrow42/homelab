@@ -42,6 +42,9 @@ BASE_DIR=/home/ccrow/personal/homelab/rancher
 CONFIG_FILE="${BASE_DIR}/rancher_conf.sh"
 
 
+
+
+
 # Standard Functions
 
 log () {
@@ -718,7 +721,7 @@ install_pxbackup () {
     # kubectl apply -f <(echo "${ARGOAPP}")
 
     # This is the failback install command:
-    helm install px-central portworx/px-central --namespace central --create-namespace --version 2.7.0 --set persistentStorage.enabled=true,persistentStorage.storageClassName="px-csi-db",pxbackup.enabled=true,oidc.centralOIDC.updateAdminProfile=false
+    helm install px-central portworx/px-central --namespace central --create-namespace --version ${PXBACKUP_VERSION} --set persistentStorage.enabled=true,persistentStorage.storageClassName="px-csi-db",pxbackup.enabled=true,oidc.centralOIDC.updateAdminProfile=false
 
 }
 configure_pxbackup() {

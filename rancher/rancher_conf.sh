@@ -74,3 +74,8 @@ BUCKET_NAME="bucket"
 S3_REGION="us-west-2"
 # should be set to --disable-ssl if you are using http, otherwise NULL
 DISABLE_SSL="--disable-ssl"
+
+### Versions
+PXBACKUP_VERSION=${PXBACKUP_VERSION:-2.7.0}
+# We are using customize here
+#PORTWORX_VERSION=${PORTWORK_VERSION:-3.1}

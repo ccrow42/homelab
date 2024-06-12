@@ -3,5 +3,8 @@ kind: Kustomization
 
 resources:
 - namespace.yaml
-- mongodb.yaml
-- pxbbq.yaml
+- pxbbq-web-svc.yaml
+- pxbbq-web-deployment.yaml
+- mongdb-sts.yaml
+- mongdb-svc.yaml
+
