@@ -1,0 +1,106 @@
+# Create Model Server and pull the model with an init container. 
+# Looks for a node with a label "gpu=true" and will deploy on that node first
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ollama
+  namespace: genai
+spec:
+  serviceName: "ollama"
+  replicas: 1
+  selector:
+    matchLabels:
+      name: ollama
+  template:
+    metadata:
+      labels:
+        name: ollama
+    spec:
+      containers:
+      - name: ollama
+        image: ollama/ollama:0.1.39
+        ports:
+        - name: http
+          containerPort: 11434
+          protocol: TCP
+        resources:
+          limits:
+            nvidia.com/gpu: 1
+        env:
+        - name: PATH
+          value: /usr/local/nvidia/bin:/usr/local/nvidia/lib64:/usr/bin:/usr/sbin:/bin:/sbin
+        - name: LD_LIBRARY_PATH
+          value: /usr/local/nvidia/lib64
+        - name: OLLAMA_MODELS
+          value: /data/ollama
+        volumeMounts:
+            - mountPath: "/root/.ollama"
+              name: ollama-pvc
+            - mountPath: "/data/ollama"
+              name: ollama-data
+      initContainers:
+        - name: ollama-init
+          image: ollama/ollama:latest
+          resources:
+            limits:
+              nvidia.com/gpu: 1
+          env:
+          - name: PATH
+            value: /usr/local/nvidia/bin:/usr/local/nvidia/lib64:/usr/bin:/usr/sbin:/bin:/sbin
+          - name: LD_LIBRARY_PATH
+            value: /usr/local/nvidia/lib64
+          - name: OLLAMA_MODELS
+            value: /data/ollama
+          command: ["sh", "-c", "ollama serve & sleep 20 && ollama pull llama3"]
+          volumeMounts:
+            - mountPath: "/root/.ollama"
+              name: ollama-pvc
+            - mountPath: "/data/ollama"
+              name: ollama-data
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 1
+            preference:
+              matchExpressions:
+              - key: gpu
+                operator: In
+                values:
+                - "true"
+  volumeClaimTemplates:
+    - metadata:
+        name: ollama-pvc
+        namespace: genai
+        labels:
+          app: ollama-pvc
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        storageClassName: px-csi-db
+        resources:
+          requests:
+            storage: 50Gi
+    - metadata:
+        name: ollama-data
+        namespace: genai
+        labels:
+          app: ollama-data
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        storageClassName: px-csi-db
+        resources:
+          requests:
+            storage: 50Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: genai
+  name: ollama
+spec:
+  type: ClusterIP
+  selector:
+    name: ollama
+  ports:
+  - port: 11434
+    protocol: TCP

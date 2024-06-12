@@ -1,0 +1,75 @@
+# Create Neo4J database for RAG data
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: database
+  name: database
+  namespace: genai
+spec:
+  serviceName: "database"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: database
+  template:
+    metadata:
+      labels:
+        app: database
+    spec:
+      containers:
+        - env:
+            - name: NEO4J_AUTH
+              value: neo4j/password
+            - name: NEO4J_PLUGINS
+              value: '["apoc"]'
+            - name: NEO4J_db_tx__log_rotation_retention__policy
+              value: "false"
+          image: neo4j:5.11
+          livenessProbe:
+            exec:
+              command:
+                - wget --no-verbose --tries=1 --spider localhost:7474 || exit 1
+            failureThreshold: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+          name: database
+          ports:
+            - containerPort: 7687
+              protocol: TCP
+            - containerPort: 7474
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /data
+              name: neo4j-data
+      restartPolicy: Always
+  volumeClaimTemplates:
+    - metadata:
+        name: neo4j-data
+        labels:
+          app: neo4j-data
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        storageClassName: px-csi-replicated
+        resources:
+          requests:
+            storage: 100Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: database
+  name: database
+  namespace: genai
+spec:
+  type: ClusterIP
+  ports:
+    - name: "7687"
+      port: 7687
+      targetPort: 7687
+    - name: "7474"
+      port: 7474
+      targetPort: 7474
+  selector:
+    app: database

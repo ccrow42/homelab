@@ -1,0 +1,8 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- 0-genai-ns.yaml
+- 1-database-sts.yaml
+- 2-ollama-sts.yaml
+- 3-pdf-bot-deployment.yaml

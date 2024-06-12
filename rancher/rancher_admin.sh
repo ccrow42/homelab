@@ -38,7 +38,7 @@
 # SEALED_SECRET_TLS_CERT and SEALED_SECRET_TLS_KEY are used for bitnomi's sealed secrets
 
 SCRIPT_NAME=$(basename $0)
-BASE_DIR=/home/ccrow/personal/homelab/rancher
+BASE_DIR=~/personal/homelab/rancher
 CONFIG_FILE="${BASE_DIR}/rancher_conf.sh"
 
 

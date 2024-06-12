@@ -1,0 +1,7 @@
+# Create the genai namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: genai
+  labels:
+    name: genai
