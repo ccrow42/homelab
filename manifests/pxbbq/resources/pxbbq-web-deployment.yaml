@@ -40,7 +40,7 @@ spec:
           value: "bolt://database.genai.svc.cluster.local:7687" #MUST be the internal svc name for the new4j service (CLUSTERIP)
         ############# CI/CD Demo Section ##############
         - name: ARCHIVE_ORDERS
-          value: False #USED FOR CI/CD Database testing demos. Setting this to TRUE Wipes out all previous orders
+          value: "False" #USED FOR CI/CD Database testing demos. Setting this to TRUE Wipes out all previous orders
         imagePullPolicy: Always
         ports:
           - containerPort: 8080
