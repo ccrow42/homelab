@@ -3,3 +3,4 @@ kind: Kustomization
 
 resources:
 - ../../resources
+- ollama-sts.yaml

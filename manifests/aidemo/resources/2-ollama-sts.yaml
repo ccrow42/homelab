@@ -25,8 +25,8 @@ spec:
           containerPort: 11434
           protocol: TCP
         resources:
-          limits:
-            nvidia.com/gpu: 1
+#          limits:
+#            nvidia.com/gpu: 1
         env:
         - name: PATH
           value: /usr/local/nvidia/bin:/usr/local/nvidia/lib64:/usr/bin:/usr/sbin:/bin:/sbin

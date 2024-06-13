@@ -106,6 +106,7 @@ Commands:
     install_lpp             Install local path provisioner
     install_etcd            Install etcd to the cluster
     install_pxbbq           Install PXBBQ to the cluster
+    install_aidemo          Install the PXBBQ AI DEMO to the cluster
     install_minio           Install Minio to the cluster
     install_grafana         Install Grafana to the cluster
     install_pxbbq_taster    Install PXBBQ taster to the cluster
@@ -506,9 +507,34 @@ install_pxbbq () {
     kubectl apply -f <(echo "${ARGOAPP}")
 
     #kubectl apply -k ${MANIFEST_LOCAL_DIR}/pxbbq/overlays/${POOL_NAME}
-
-
 }
+
+### Install aidemo
+install_aidemo () {
+
+    log "Installing PXBBQ to ${POOL_NAME}"
+    kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}" ${ERR_POOL_NOT_FOUND}
+
+    requires_poolname
+    requires_argocd
+   
+    # ArgoCD Variables
+    ARGOCD_APPNAME="aidemo"
+    ARGOCD_NAMESPACE="genai"
+    ARGOCD_PATH="${ARGOCD_PATH_ROOT}/aidemo/overlays/${POOL_NAME}"
+    ARGOCD_REPO_URL="${ARGOCD_REPO_URL}"
+
+    # Apply Application
+    ARGOAPP=$(< ${ARGOCD_APP_TEMPLATE})
+    ARGOAPP="${ARGOAPP//${ARGOCD_NAMESPACE_PLACEHOLDER}/${ARGOCD_NAMESPACE}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_APP_NAME_PLACEHOLDER}/${ARGOCD_APPNAME}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_REPO_URL_PLACEHOLDER}/${ARGOCD_REPO_URL}}"
+    ARGOAPP="${ARGOAPP//${ARGOCD_REPO_PATH_PLACEHOLDER}/${ARGOCD_PATH}}"
+    kubectl apply -f <(echo "${ARGOAPP}")
+
+    #kubectl apply -k ${MANIFEST_LOCAL_DIR}/pxbbq/overlays/${POOL_NAME}
+}
+
 install_pxbbq_taster () {
 
     log "Installing PXBBQ taster to ${POOL_NAME}"
@@ -1145,6 +1171,9 @@ while [[ ${1} != "" ]]; do
         ;;
         install_pxbbq)
             COMMAND="install_pxbbq"
+        ;;
+        install_aidemo)
+            COMMAND="install_aidemo"
         ;;
         install_pxbbq_taster)
             COMMAND="install_pxbbq_taster"
