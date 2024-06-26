@@ -33,7 +33,7 @@ spec:
   tls:
     - hosts:
         - rancher.ccrow.org
-      secretName: rancher-tls
+      secretName: rancher-ext-tls
   rules:
     - host: rancher.ccrow.org
       http:
