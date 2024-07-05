@@ -1,0 +1,45 @@
+{
+  "DiskProvisioning": "thin",
+  "IPAllocationPolicy": "dhcpPolicy",
+  "IPProtocol": "IPv4",
+  "PropertyMapping": [
+    {
+      "Key": "instance-id",
+      "Value": "id-ovf"
+    },
+    {
+      "Key": "hostname",
+      "Value": "k3s-vm5"
+    },
+    {
+      "Key": "seedfrom",
+      "Value": ""
+    },
+    {
+      "Key": "public-keys",
+      "Value": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCvl7fpPqnLJJvZfZ40x65XLBt7uTYinvlaLj0AiARwsuxUMw9uILYK4gNoXg+wMixfUR/GwSqrI7VmFXpofhzqkyGRqr0g9NFrXbDVAZ0KfAAfbqnpGLpn  
+enur1Xtl33a9QCuQ6m/kt3rwWwRM/uPF5PtG59D22hIH1SBxnQhPgLMC+ik+dE25OmAhk/lPmh0xssGbXRnYlKmSNf+zb30lnYXsbzfo3awi/J0Fksch2/k82GEbCEc/poZUcbLjaYJUkGvXQXJ1tbopOskl  
+co+1b3nrqR/pZZSkhibqxns06bMW0NNoZaDCovnpou0HKPlje2miez9VAH//hxcE/gwXOIEkeDCYC6HAve65mdGt/pdet5HGEzwMkfI8fLIlKok1cEpsFljNeX1qDt0vtmkQxeorRiMFSi1vZjOVACmO2Avb  
+t1mXDXDEcW9psIqM4Pc1DeXKRQdDyGj7ASwUZlmOCd7714PqJBiRRKVgwofafuVV/QgKXFtOId8TPMmhnU0= ccrow@ccrow-gentoo"
+    },
+    {
+      "Key": "user-data",
+      "Value": ""
+    },
+    {
+      "Key": "password",
+      "Value": ""
+    }
+  ],
+  "NetworkMapping": [
+    {
+      "Name": "VM Network",
+      "Network": "public-1"
+    }
+  ],
+  "MarkAsTemplate": false,
+  "PowerOn": false,
+  "InjectOvfEnv": false,
+  "WaitForIP": false,
+  "Name": "k3s-vm5"
+}
