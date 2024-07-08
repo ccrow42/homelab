@@ -49,8 +49,9 @@ spec:
             server: 10.0.1.8
             path: /volume1/Movies/Movies
         - name: radarr-movies-norepl
-          hostPath:
-            path: /mnt/plex-norepl/movies
+          nfs:
+            server: 10.0.1.8
+            path: /volume1/Plex-norepl/movies
 ---
 kind: Service
 apiVersion: v1
