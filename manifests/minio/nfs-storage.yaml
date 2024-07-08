@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-volume-3
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 2048Gi
+  accessModes:
+    - ReadWriteOnce
+  nfs:
+    server: 10.0.1.8
+    path: /volume1/k3s/minio
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: minio-nfs
+  namespace: minio
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2048Gi
