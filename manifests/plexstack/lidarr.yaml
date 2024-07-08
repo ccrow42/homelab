@@ -55,11 +55,14 @@ spec:
         persistentVolumeClaim:
           claimName: lidarr-pvc
       - name: lidarr-downloads
-        hostPath:
-          path: /mnt/uberplex/downloads
+        nfs:
+          server: 10.0.1.8
+          path: /volume1/uberplex/downloads
       - name: lidarr-music
-        hostPath:
-          path: /mnt/music
+        nfs:
+          server: 10.0.1.8
+          path: /volume1/Music
+
 ---
 apiVersion: v1
 kind: Service
