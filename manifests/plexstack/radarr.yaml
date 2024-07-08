@@ -45,8 +45,9 @@ spec:
           hostPath:
             path: /mnt/uberplex/downloads
         - name: radarr-movies
-          hostPath:
-            path: /mnt/movies/Movies
+          nfs:
+            server: 10.0.1.8
+            path: /volume1/Movies/Movies
         - name: radarr-movies-norepl
           hostPath:
             path: /mnt/plex-norepl/movies
