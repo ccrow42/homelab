@@ -60,8 +60,9 @@ spec:
         persistentVolumeClaim:
           claimName: qbittorrent-pvc
       - name: qbittorrent-downloads
-        hostPath:
-          path: /mnt/uberplex/downloads
+        nfs:
+          server: 10.0.1.8
+          path: /volume1/uberplex/downloads
 ---
 apiVersion: v1
 kind: Service
