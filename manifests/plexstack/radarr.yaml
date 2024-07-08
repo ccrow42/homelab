@@ -45,13 +45,11 @@ spec:
           hostPath:
             path: /mnt/uberplex/downloads
         - name: radarr-movies
-          nfs:
-            server: 10.0.1.8
-            path: /volume1/movies/Movies
+          hostPath:
+            path: /mnt/movies/Movies
         - name: radarr-movies-norepl
-          nfs:
-            server: 10.0.1.8
-            path: /volume1/plex-norepl/movies
+          hostPath:
+            path: /mnt/plex-norepl/movies
 ---
 kind: Service
 apiVersion: v1
