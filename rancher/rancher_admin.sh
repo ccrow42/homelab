@@ -1035,6 +1035,7 @@ install_demo_async () {
     POOL_NAME=${POOL1}
     DR_POOL_NAME=${POOL2}
     log "Pools reset to ${POOL_NAME} and ${DR_POOL_NAME}"
+    sleep 15
     px_clusterpair
 
 }
