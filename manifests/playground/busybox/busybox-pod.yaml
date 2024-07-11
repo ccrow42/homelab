@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: busybox-pod
+spec:
+  containers:
+  - name: busybox
+    image: busybox
+    command: ['sh', '-c', 'echo Hello Kubernetes! && sleep 3600']
+    volumeMounts:
+    - name: custom-volume
+      mountPath: /mnt
+  volumes:
+  - name: custom-volume
+    persistentVolumeClaim:
+      claimName: vm-pvc-custom
+

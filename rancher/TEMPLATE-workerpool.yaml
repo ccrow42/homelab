@@ -23,7 +23,7 @@ common:
   labels: null
   taints: []
 contentLibrary: templates
-cpuCount: "4"
+cpuCount: "6"
 creationType: template
 customAttribute: []
 datacenter: /Tac
