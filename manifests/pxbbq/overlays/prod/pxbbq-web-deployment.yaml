@@ -17,7 +17,7 @@ spec:
     spec:                        
       containers:
       - name: pxbbq-web
-        image: eshanks16/pxbbq:v4.3
+        image: eshanks16/pxbbq:v4.2
         env:
         - name: MONGO_INIT_USER
           value: "porxie" #Mongo User with permissions to create additional databases and users. Typically "porxie" or "pds"
@@ -42,7 +42,7 @@ spec:
           value: "bolt://database.genai.svc.cluster.local:7687" #MUST be the internal svc name for the new4j service (CLUSTERIP)
         ############# CI/CD Demo Section ##############
         - name: ARCHIVE_ORDERS
-          value: "True"
+          value: "False"
         imagePullPolicy: Always
         ports:
           - containerPort: 8080
