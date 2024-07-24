@@ -42,8 +42,9 @@ spec:
           persistentVolumeClaim:
             claimName: radarr-pvc
         - name: radarr-downloads
-          hostPath:
-            path: /mnt/uberplex/downloads
+          nfs:
+            server: 10.0.1.8
+            path: /volume1/uberplex/downloads
         - name: radarr-movies
           nfs:
             server: 10.0.1.8
