@@ -1,0 +1,229 @@
+Sources:
+https://gist.github.com/superseb/c363247c879e96c982495daea1125276
+https://github.com/rancher/rancher/issues/15477
+https://gist.github.com/superseb/c363247c879e96c982495daea1125276
+
+
+export UTILVM_NAME="util1"
+
+gcloud compute instances create $UTILVM_NAME \
+    --zone=$ZONE1 \
+    --machine-type=e2-standard-2 \
+    --image-family=ubuntu-2204-lts \
+    --image-project=ubuntu-os-cloud \
+    --boot-disk-size=10GB \
+    --boot-disk-type=pd-standard
+
+gcloud compute firewall-rules create allow-http \
+    --allow tcp:80 \
+    --source-ranges=0.0.0.0/0
+
+gcloud compute firewall-rules create allow-https \
+    --allow tcp:443 \
+    --source-ranges=0.0.0.0/0
+
+gcloud compute firewall-rules create allow-ssh \
+    --allow tcp:22 \
+    --source-ranges=0.0.0.0/0
+
+
+EXTERNAL_IP=$(gcloud compute instances describe $UTILVM_NAME --zone=$ZONE1 --format='get(networkInterfaces[0].accessConfigs[0].natIP)')
+
+get password from logs:
+BOOTSTRAP_PASSWORD=$(docker logs compassionate_fermi | grep "Bootstrap Password" | awk '{print $6}')
+
+LOGINRESPONSE=`curl -s 'https://127.0.0.1/v3-public/localProviders/local?action=login' -H 'content-type: application/json' --data-binary '{"username":"admin","password":"$BOOTSTRAP_PASSWORD"}' --insecure`
+
+except grab the password from the logs
+
+LOGINTOKEN=`echo $LOGINRESPONSE | jq -r .token`
+
+curl -s 'https://127.0.0.1/v3/users?action=changepassword' -H 'content-type: application/json' -H "Authorization: Bearer $LOGINTOKEN" --data-binary '{"currentPassword":"admin","$BOOTSTRAP_PASSWORD":"thisisyournewpassword"}' --insecure
+
+
+```
+apiVersion: provisioning.cattle.io/v1
+kind: Cluster
+metadata:
+  annotations:
+    field.cattle.io/creatorId: user-j8tfg
+  creationTimestamp: "2024-07-16T17:13:08Z"
+  finalizers:
+  - wrangler.cattle.io/provisioning-cluster-remove
+  - wrangler.cattle.io/rke-cluster-remove
+  - wrangler.cattle.io/cloud-config-secret-remover
+  generation: 2
+  name: cluster3
+  namespace: fleet-default
+  resourceVersion: "14759"
+  uid: 410f7df5-c4f4-4122-80ae-55773f21a6bd
+spec:
+  kubernetesVersion: v1.28.11+rke2r1
+  localClusterAuthEndpoint: {}
+  rkeConfig:
+    chartValues:
+      rke2-calico: {}
+    dataDirectories: {}
+    etcd:
+      snapshotRetention: 5
+      snapshotScheduleCron: 0 */5 * * *
+    machineGlobalConfig:
+      cni: calico
+      disable-kube-proxy: false
+      etcd-expose-metrics: false
+    machinePoolDefaults: {}
+    machineSelectorConfig:
+    - config:
+        protect-kernel-defaults: false
+    registries: {}
+    upgradeStrategy:
+      controlPlaneConcurrency: "1"
+      controlPlaneDrainOptions:
+        deleteEmptyDirData: true
+        disableEviction: false
+        enabled: false
+        force: false
+        gracePeriod: -1
+        ignoreDaemonSets: true
+        ignoreErrors: false
+        postDrainHooks: null
+        preDrainHooks: null
+        skipWaitForDeleteTimeoutSeconds: 0
+        timeout: 120
+      workerConcurrency: "1"
+      workerDrainOptions:
+        deleteEmptyDirData: true
+        disableEviction: false
+        enabled: false
+        force: false
+        gracePeriod: -1
+        ignoreDaemonSets: true
+        ignoreErrors: false
+        postDrainHooks: null
+        preDrainHooks: null
+        skipWaitForDeleteTimeoutSeconds: 0
+        timeout: 120
+status:
+  clusterName: c-m-jgcpt9qg
+  conditions:
+  - lastUpdateTime: "2024-07-16T17:13:08Z"
+    reason: Reconciling
+    status: "True"
+    type: Reconciling
+  - lastUpdateTime: "2024-07-16T17:13:08Z"
+    status: "False"
+    type: Stalled
+  - lastUpdateTime: "2024-07-16T17:13:18Z"
+    status: "True"
+    type: Created
+  - lastUpdateTime: "2024-07-16T17:13:12Z"
+    status: "True"
+    type: RKECluster
+  - lastUpdateTime: "2024-07-16T17:13:08Z"
+    status: "True"
+    type: BackingNamespaceCreated
+  - lastUpdateTime: "2024-07-16T17:13:08Z"
+    status: "True"
+    type: DefaultProjectCreated
+  - lastUpdateTime: "2024-07-16T17:13:09Z"
+    status: "True"
+    type: SystemProjectCreated
+  - lastUpdateTime: "2024-07-16T17:13:12Z"
+    message: waiting for at least one control plane, etcd, and worker node to be registered
+    reason: Waiting
+    status: Unknown
+    type: Updated
+  - lastUpdateTime: "2024-07-16T17:13:12Z"
+    message: waiting for at least one control plane, etcd, and worker node to be registered
+    reason: Waiting
+    status: Unknown
+    type: Provisioned
+  - lastUpdateTime: "2024-07-16T17:13:12Z"
+    message: waiting for at least one control plane, etcd, and worker node to be registered
+    reason: Waiting
+    status: Unknown
+    type: Ready
+  - lastUpdateTime: "2024-07-16T17:13:09Z"
+    status: "True"
+    type: InitialRolesPopulated
+  - lastUpdateTime: "2024-07-16T17:13:12Z"
+    status: "True"
+    type: CreatorMadeOwner
+  - lastUpdateTime: "2024-07-16T17:13:13Z"
+    status: "True"
+    type: NoDiskPressure
+  - lastUpdateTime: "2024-07-16T17:13:13Z"
+    status: "True"
+    type: NoMemoryPressure
+  - lastUpdateTime: "2024-07-16T17:13:13Z"
+    status: "True"
+    type: SecretsMigrated
+  - lastUpdateTime: "2024-07-16T17:13:13Z"
+    status: "True"
+    type: ServiceAccountSecretsMigrated
+  - lastUpdateTime: "2024-07-16T17:13:13Z"
+    status: "True"
+    type: RKESecretsMigrated
+  - lastUpdateTime: "2024-07-16T17:13:14Z"
+    status: "True"
+    type: ACISecretsMigrated
+  - lastUpdateTime: "2024-07-16T17:13:18Z"
+    status: "False"
+    type: Connected
+  fleetWorkspaceName: fleet-default
+  observedGeneration: 2
+```
+
+
+```
+apiVersion: provisioning.cattle.io/v1
+kind: Cluster
+metadata:
+  name: cluster4
+  namespace: fleet-default
+spec:
+  kubernetesVersion: v1.28.11+rke2r1
+  localClusterAuthEndpoint: {}
+  rkeConfig:
+    chartValues:
+      rke2-calico: {}
+    dataDirectories: {}
+    etcd:
+      snapshotRetention: 5
+      snapshotScheduleCron: 0 */5 * * *
+    machineGlobalConfig:
+      cni: calico
+      disable-kube-proxy: false
+      etcd-expose-metrics: false
+    machinePoolDefaults: {}
+    machineSelectorConfig:
+    - config:
+        protect-kernel-defaults: false
+    registries: {}
+    upgradeStrategy:
+      controlPlaneConcurrency: "1"
+      controlPlaneDrainOptions:
+        deleteEmptyDirData: true
+        disableEviction: false
+        enabled: false
+        force: false
+        gracePeriod: -1
+        ignoreDaemonSets: true
+        ignoreErrors: false
+        postDrainHooks: null
+        preDrainHooks: null
+        skipWaitForDeleteTimeoutSeconds: 0
+        timeout: 120
+      workerConcurrency: "1"
+      workerDrainOptions:
+        deleteEmptyDirData: true
+        disableEviction: false
+        enabled: false
+        force: false
+        gracePeriod: -1
+        ignoreDaemonSets: true
+        ignoreErrors: false
+        postDrainHooks: null
+        preDrainHooks: null
+        skipWaitForDeleteTimeoutSeconds: 0
+        timeout: 120

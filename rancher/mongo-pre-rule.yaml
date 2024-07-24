@@ -1,6 +1,0 @@
-    rules:
-    - actions:
-      - value: 'mongosh -u porxie -p porxie --eval "db.adminCommand( { fsync: 1 }
-          )"'
-      podSelector:
-          app.kubernetes.io/name: mongo
