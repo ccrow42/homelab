@@ -1,0 +1,16 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: k3s-pxbbq
+spec:
+  destination:
+    name: 'in-cluster'
+    namespace: 'pxbbq'
+  source:
+    path: manifests/pxbbq/overlays/prod-demo
+    repoURL: 'https://github.com/ccrow42/homelab'
+    targetRevision: HEAD
+  project: default
+  syncPolicy:
+    automated: {}
+  
