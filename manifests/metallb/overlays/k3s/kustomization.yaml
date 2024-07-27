@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
 - ../../resources
 - ./metallb-k3s.yaml
+- ./metallb-k3s-ingress.yaml
