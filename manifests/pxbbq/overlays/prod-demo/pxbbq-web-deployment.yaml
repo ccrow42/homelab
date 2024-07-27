@@ -1,0 +1,13 @@
+# Deploy the PXBBQ Application
+---
+apiVersion: apps/v1
+kind: Deployment                 
+metadata:
+  name: pxbbq-web  
+  namespace: pxbbq         
+spec:
+  replicas: 2
+  template:
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: amd64

@@ -5,3 +5,5 @@ resources:
 - ./ingress.yaml
 patches:
 - path: pxbbq-web-service.yaml
+- path: mongodb-sts.yaml
+- path: pxbbq-web-deployment.yaml

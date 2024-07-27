@@ -19,7 +19,7 @@ items:
         paths:
         - backend:
             service:
-              name: pxbbq-web
+              name: pxbbq-svc
               port:
                 number: 80
           path: /
