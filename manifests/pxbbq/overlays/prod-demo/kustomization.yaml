@@ -3,6 +3,8 @@ kind: Kustomization
 resources:
 - ../../resources
 - ./ingress.yaml
+- ./networkPolicy-mongo.yaml
+- ./networkPolicy-web.yaml
 patches:
 - path: pxbbq-web-service.yaml
 - path: mongodb-sts.yaml
