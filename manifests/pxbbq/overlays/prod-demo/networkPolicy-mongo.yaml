@@ -1,7 +1,8 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: untitled-policy
+  name: pxbbq-mongo-policy
+  namespace: pxbbq
 spec:
   podSelector:
     matchLabels:
