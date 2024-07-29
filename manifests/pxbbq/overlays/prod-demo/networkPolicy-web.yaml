@@ -9,25 +9,14 @@ spec:
       app: pxbbq-web
   ingress:
     - from:
-        - ipBlock:
-            cidr: 0.0.0.0/0
-      ports:
-        - port: 80
-          protocol: TCP
-    - from:
         - namespaceSelector:
             matchLabels:
               app.kubernetes.io/name: ingress-nginx
-      ports:
-        - port: 80
-          protocol: TCP
-    - from:
         - podSelector:
             matchLabels:
               pxbbq: allow
       ports:
-        - port: 80
-          protocol: TCP
+        - port: 8080
   egress:
     - to:
         - namespaceSelector: {}
