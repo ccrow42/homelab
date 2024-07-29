@@ -61,9 +61,9 @@ spec:
   - port: 1433
     targetPort: 1433
     name: tcpsql
-  clusterIP: None  
   selector:
     app: mssql
+  type: LoadBalancer
 ---
 apiVersion: v1
 kind: ConfigMap
