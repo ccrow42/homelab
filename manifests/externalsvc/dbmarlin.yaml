@@ -36,7 +36,7 @@ spec:
   tls:
     - hosts:
         - dbmarlin.ccrow.org
-      secretName: synology-tls
+      secretName: dbmarlin-tls
   rules:
     - host: dbmarlin.ccrow.org
       http:
