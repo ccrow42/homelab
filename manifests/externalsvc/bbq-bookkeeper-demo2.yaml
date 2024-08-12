@@ -35,10 +35,10 @@ metadata:
 spec:
   tls:
     - hosts:
-        - bbq-bookkeeper-demo2.pxbbq.com
+        - bbq-bookkeeper-stage.pxbbq.com
       secretName: bbq-bookkeeper-demo2-tls
   rules:
-    - host: bbq-bookkeeper-demo2.pxbbq.com
+    - host: bbq-bookkeeper-stage.pxbbq.com
       http:
         paths:
           - path: /
