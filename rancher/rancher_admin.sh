@@ -346,16 +346,21 @@ install_sealed_secrets () {
     kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}" ${ERR_POOL_NOT_FOUND}
     requires_poolname
     log "Installing sealed secrets to ${POOL_NAME}"
-    helm repo add sealed-secrets https://bitnami-labs.github.io/sealed-secrets
-    helm repo update
-    helm install sealed-secrets sealed-secrets/sealed-secrets -n kube-system
-    sleep 10
-    # Sealed secret substitution
+
+
     SEALED_SECRET=$(< ${SEALED_SECRET_TEMPLATE})
     SEALED_SECRET="${SEALED_SECRET//${TLS_CERT_PLACEHOLDER}/${SEALED_SECRET_TLS_CERT}}"
     SEALED_SECRET="${SEALED_SECRET//${TLS_KEY_PLACEHOLDER}/${SEALED_SECRET_TLS_KEY}}"
     kubectl apply -f <(echo "${SEALED_SECRET}")
     kubectl delete pod -n kube-system -l app.kubernetes.io/name=sealed-secrets
+
+
+    helm repo add sealed-secrets https://bitnami-labs.github.io/sealed-secrets
+    helm repo update
+    helm install sealed-secrets sealed-secrets/sealed-secrets -n kube-system --set=keyrenewperiod=0
+    sleep 10
+    # Sealed secret substitution
+
 
 }
 
