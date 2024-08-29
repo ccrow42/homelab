@@ -33,7 +33,7 @@ spec:
           value: "porxie" #Mongo DB Password for User that will be created by using the Init User
           ########## CHATBOT SECTION #############
         - name: CHATBOT_ENABLED #If CHATBOT is set to False, the other variables in this section are not needed.
-          value: "True" #Set to True to enable a LLAMA3 chatbot - Requires the AIDemo to be deployed first
+          value: "False" #Set to True to enable a LLAMA3 chatbot - Requires the AIDemo to be deployed first
         - name: PXBBQ_URI
           value: "http://EXTERNAL_PXBBQ_URL_GOES_HERE" #MUST Be the external svc name for the PXBBQ application (PXBBQ NodePort/LoadBalaner)
         - name: MODEL_SERVER_URI
