@@ -352,13 +352,14 @@ install_sealed_secrets () {
     SEALED_SECRET="${SEALED_SECRET//${TLS_CERT_PLACEHOLDER}/${SEALED_SECRET_TLS_CERT}}"
     SEALED_SECRET="${SEALED_SECRET//${TLS_KEY_PLACEHOLDER}/${SEALED_SECRET_TLS_KEY}}"
     kubectl apply -f <(echo "${SEALED_SECRET}")
-    kubectl delete pod -n kube-system -l app.kubernetes.io/name=sealed-secrets
+
 
 
     helm repo add sealed-secrets https://bitnami-labs.github.io/sealed-secrets
     helm repo update
     helm install sealed-secrets sealed-secrets/sealed-secrets -n kube-system --set=keyrenewperiod=0
     sleep 10
+    kubectl delete pod -n kube-system -l app.kubernetes.io/name=sealed-secrets
     # Sealed secret substitution
 
 
