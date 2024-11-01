@@ -434,6 +434,9 @@ install_px_operator () {
     ARGOAPP="${ARGOAPP//${ARGOCD_REPO_PATH_PLACEHOLDER}/${ARGOCD_PATH}}"
     kubectl apply -f <(echo "${ARGOAPP}")
 
+    log "Installing vsphere secret manually because we removed the sealed secret."
+    kubectl apply -f ~/temp/px-vsphere-secret.yaml
+
     #kubectl apply -k ${MANIFEST_LOCAL_DIR}/px-operator/overlays/${POOL_NAME}
 }
 
@@ -1046,6 +1049,30 @@ install_demo_async () {
 
 }
 
+px_deleteclusterpair () {
+    requires_poolname
+    requires_drpoolname
+    requires_storkctl
+    log "Removing a cluster pair between ${POOL_NAME} and ${DR_POOL_NAME}"
+
+    # Make sure we capture the pool names because we are going to be moving them around
+    POOL1=${POOL_NAME}
+    POOL2=${DR_POOL_NAME}
+
+    log "Getting environment variables"
+    env
+    log "deleting cluster pair"    
+
+    kubectl --context ${POOL1} -n portworx delete clusterpair demo
+    kubectl --context ${POOL1} -n portworx delete secret demo
+    kubectl --context ${POOL1} -n portworx delete backuplocations.stork.libopenstorage.org demo
+
+    kubectl --context ${POOL2} -n portworx delete clusterpair demo
+    kubectl --context ${POOL2} -n portworx delete secret demo
+    kubectl --context ${POOL2} -n portworx delete backuplocations.stork.libopenstorage.org demo
+
+}
+
 px_clusterpair () {
     requires_poolname
     requires_drpoolname
@@ -1074,6 +1101,7 @@ px_clusterpair () {
     --s3-access-key $MINIO_ACCESS_KEY \
     --s3-secret-key $MINIO_SECRET_KEY \
     --s3-region $S3_REGION \
+    --mode migration \
     $DISABLE_SSL \
 
     log "Cluster pair created"
@@ -1190,6 +1218,9 @@ while [[ ${1} != "" ]]; do
         ;;
         px_clusterpair)
             COMMAND="px_clusterpair"
+        ;;
+        px_deleteclusterpair)
+            COMMAND="px_deleteclusterpair"
         ;;
         install_demo)
             COMMAND="install_demo"
