@@ -346,16 +346,22 @@ install_sealed_secrets () {
     kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}" ${ERR_POOL_NOT_FOUND}
     requires_poolname
     log "Installing sealed secrets to ${POOL_NAME}"
-    helm repo add sealed-secrets https://bitnami-labs.github.io/sealed-secrets
-    helm repo update
-    helm install sealed-secrets sealed-secrets/sealed-secrets -n kube-system
-    sleep 10
-    # Sealed secret substitution
+
+
     SEALED_SECRET=$(< ${SEALED_SECRET_TEMPLATE})
     SEALED_SECRET="${SEALED_SECRET//${TLS_CERT_PLACEHOLDER}/${SEALED_SECRET_TLS_CERT}}"
     SEALED_SECRET="${SEALED_SECRET//${TLS_KEY_PLACEHOLDER}/${SEALED_SECRET_TLS_KEY}}"
     kubectl apply -f <(echo "${SEALED_SECRET}")
+
+
+
+    helm repo add sealed-secrets https://bitnami-labs.github.io/sealed-secrets
+    helm repo update
+    helm install sealed-secrets sealed-secrets/sealed-secrets -n kube-system --set=keyrenewperiod=0
+    sleep 10
     kubectl delete pod -n kube-system -l app.kubernetes.io/name=sealed-secrets
+    # Sealed secret substitution
+
 
 }
 
@@ -427,6 +433,9 @@ install_px_operator () {
     ARGOAPP="${ARGOAPP//${ARGOCD_REPO_URL_PLACEHOLDER}/${ARGOCD_REPO_URL}}"
     ARGOAPP="${ARGOAPP//${ARGOCD_REPO_PATH_PLACEHOLDER}/${ARGOCD_PATH}}"
     kubectl apply -f <(echo "${ARGOAPP}")
+
+    log "Installing vsphere secret manually because we removed the sealed secret."
+    kubectl apply -f ~/temp/px-vsphere-secret.yaml
 
     #kubectl apply -k ${MANIFEST_LOCAL_DIR}/px-operator/overlays/${POOL_NAME}
 }
@@ -1040,6 +1049,30 @@ install_demo_async () {
 
 }
 
+px_deleteclusterpair () {
+    requires_poolname
+    requires_drpoolname
+    requires_storkctl
+    log "Removing a cluster pair between ${POOL_NAME} and ${DR_POOL_NAME}"
+
+    # Make sure we capture the pool names because we are going to be moving them around
+    POOL1=${POOL_NAME}
+    POOL2=${DR_POOL_NAME}
+
+    log "Getting environment variables"
+    env
+    log "deleting cluster pair"    
+
+    kubectl --context ${POOL1} -n portworx delete clusterpair demo
+    kubectl --context ${POOL1} -n portworx delete secret demo
+    kubectl --context ${POOL1} -n portworx delete backuplocations.stork.libopenstorage.org demo
+
+    kubectl --context ${POOL2} -n portworx delete clusterpair demo
+    kubectl --context ${POOL2} -n portworx delete secret demo
+    kubectl --context ${POOL2} -n portworx delete backuplocations.stork.libopenstorage.org demo
+
+}
+
 px_clusterpair () {
     requires_poolname
     requires_drpoolname
@@ -1068,6 +1101,7 @@ px_clusterpair () {
     --s3-access-key $MINIO_ACCESS_KEY \
     --s3-secret-key $MINIO_SECRET_KEY \
     --s3-region $S3_REGION \
+    --mode migration \
     $DISABLE_SSL \
 
     log "Cluster pair created"
@@ -1184,6 +1218,9 @@ while [[ ${1} != "" ]]; do
         ;;
         px_clusterpair)
             COMMAND="px_clusterpair"
+        ;;
+        px_deleteclusterpair)
+            COMMAND="px_deleteclusterpair"
         ;;
         install_demo)
             COMMAND="install_demo"
