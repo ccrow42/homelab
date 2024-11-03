@@ -10,7 +10,7 @@ metadata:
     #  key: string
   namespace: fleet-default
 spec:
-  cloudCredentialSecretName: cattle-global-data:cc-r779j
+  cloudCredentialSecretName: cattle-global-data:cc-l7sqw
   clusterAgentDeploymentCustomization:
     appendTolerations:
     overrideAffinity:
@@ -20,7 +20,7 @@ spec:
     appendTolerations:
     overrideAffinity:
     overrideResourceRequirements:
-  kubernetesVersion: v1.29.8+rke2r1
+  kubernetesVersion: v1.30.5+rke2r1
   localClusterAuthEndpoint:
     caCerts: ''
     enabled: false

@@ -2,9 +2,20 @@ apiVersion: rke-machine-config.cattle.io/v1
 boot2dockerUrl: ""
 cfgparam:
 - disk.enableUUID=TRUE
-cloneFrom: /Tac/vm/templates/jammy-server-cloudimg-amd64
+cloneFrom: /TAC/vm/templates/noble-server-cloudimg-amd64
 cloudConfig: |+
   #cloud-config
+  users:
+    - default
+    - name: ubuntu
+      gecos: ubuntu
+      sudo: ALL=(ALL) NOPASSWD:ALL
+      groups: users, admin
+      lock_passwd: true
+      ssh_authorized_keys:
+        - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDODgWjfQt7/TKISqvXqn76mIpKEDKPrx9W7fNyBxWU4BvYGOi1G3aF8pBv5rW7/r99XczNCWfTylYlwhacDEKNWZDm9LbeBllZ0lzIzVeUXWpT3Hh/xe6ph/smLCSJclqkK3uFEgcRDQccOm04IEVZ7bQy7A3HuPqcPOHsplmdOQhXp2tTSg9kCwk48439o5boYjuAXNVHLLFazck6v84DPKiNYZEcqk45IFi3Twfv7rC6FPacA7JeAP5CJtAyes0DJWvKft5OU4k29M0hdLvr3kp+V3c3s/Dfl4MOH8LCeDJgeRj3EYDNQsEzR3mrPcy5wda3NbCdgFamthWQnNVn ccrow@ccrow--MacBookPro15
+        - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC+kx58yg6pGei4XrdXJhNfkRvfKWhGPUveM90+OGt74DbUc0B/BkfN5enpzEn3IciEOUm65TDQP0f1rmYxxWt9UPJWH2zvaWmaCdq0JUsf+V8N+G5gHpCVNJTMWeogtskpMGIKv7HJMH35RuBnM71ZHeMwTvhb422evYYq+8yUiRUc9B90p4w9Kshl+FjyOsSMn7m+9WS6HjX8Gbp+k8CGxqIrFz6t+ZE/uNmqlDaMZtXgJJIC+QrN/u14AfRX84VktNo4UPUgGmgrnCwk6fs6J5a55R6nEJ1qYHUnqkB+1AjwP2tZocHmeZkQilLT1kQvI3iIEHfyJya/c2zOZbiyu6XRsiYv/h28Ev6eevzoAQjeXq8IN/1PjZogRxgr7MpI/1GaHyq4SNBeCcgU6nk003kL6Y6o7GXTVaZbjCMdK6kF+Oi1MQtGygu4X9iy6pmCsSIIW+rFpqBHKPiiLPnpRDGFxyxee7uyWJFoBQ3owcCUabKHZigvZeehVfbxE7c= ccrow@ccrow-kubuntu
+        - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDsKjY15ms6B9yIYXM9V5Yy8QhyPHHqmk8M7UTUrGNnzQTK2PjBHaDcEMqIY5/fNTd3mXG8uc2N8o9dY/rlEB6QreQBLXbwpZ7YH0oHyeg2A5aOmBu6/LYtlM6/8skUIvks8qHMcqYLE77YG/qO8f1Y8uEAuPHg5wWFDSQZjySmOg34vw8Ll+G1y9jObqw58+AdjOtmzW7zt/5Dwc3WiWabLyps6S3smuazNLUJ0W3C3eveCumlARU58SymU9mTIgRNk7Qm0Myu7umhOVzEaASrWyBEvRy00YiJkzYImdMVxY462jTPj1pi2BXnTEebyTWD8ORVgC9TOU/2fhP+OFzWRFqajWSdJsOlAhdpipgeM+XL7ueiTQxa6PdtWWV+gxEsceK2SiGtEx+gLQfN788XoKZUGjxcNA1Ki8WyLFzovtQGWfpBv/kZ51nu7tp3olmhNsQrHm/7k1ZyN2ZL4wW6E3jFQ/8zK7xDFbLVGk0fhRFoBCJs04CVLQLJEDWIF9k= ccrow@ubuntu-jumpbox
 cloudinit: ""
 common:
   labels: null
@@ -13,8 +24,8 @@ contentLibrary: templates
 cpuCount: "4"
 creationType: template
 customAttribute: []
-datacenter: /Tac
-datastore: /Tac/datastore/esx2-local4
+datacenter: /TAC
+datastore: /TAC/datastore/esx2-local4
 datastoreCluster: ""
 diskSize: "100000"
 folder: null
@@ -23,17 +34,12 @@ hostsystem: null
 kind: VmwarevsphereConfig
 memorySize: "8192"
 metadata:
-  creationTimestamp: "2023-12-21T18:49:15Z"
-  generateName: nc-POOL_NAME_PLACEHOLDER-pool1-
-  generation: 1
   name: nc-POOL_NAME_PLACEHOLDER-control
   namespace: fleet-default
-  resourceVersion: "590813"
-  uid: f5dc5755-6b60-4dda-8fe6-63d07446b47d
 network: []
 os: linux
 password: ""
-pool: /Tac/host/Cluster1/Resources
+pool: /TAC/host/Cluster1/Resources
 sshPassword: tcuser
 sshPort: "22"
 sshUser: docker
