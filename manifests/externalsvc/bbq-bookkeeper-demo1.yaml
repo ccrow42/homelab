@@ -17,7 +17,7 @@ metadata:
   name: bbq-bookkeeper-demo1-svc
 subsets:
   - addresses:
-    - ip: 10.0.1.163
+    - ip: 10.0.1.166
     ports:
     - port: 8080
 ---

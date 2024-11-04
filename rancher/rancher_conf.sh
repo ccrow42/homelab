@@ -51,7 +51,7 @@ BINARY_DIR="/home/ccrow/bin"
 TEMP_DIR=${BASE_DIR}
 
 ### Templates we use
-RANCHER_SERVER_URL="https://rancher.lan.ccrow.org"
+RANCHER_SERVER_URL="https://10.0.1.104:8443"
 CONTROL_POOL_TEMPLATE="${BASE_DIR}/TEMPLATE-controlpool.yaml"
 WORKER_POOL_TEMPLATE="${BASE_DIR}/TEMPLATE-workerpool.yaml"
 CLUSTER_TEMPLATE="${BASE_DIR}/TEMPLATE-cluster.yaml"

@@ -261,7 +261,7 @@ kubectl_rancher_server () {
         log "Creating ${KUBECTL_CONTEXT} context"
         kubectl config set-cluster ${KUBECTL_CONTEXT} --server=${RANCHER_SERVER_URL}
         kubectl config set-credentials ${KUBECTL_CONTEXT} --token=${BEARER_TOKEN}
-        kubectl config set-context ${KUBECTL_CONTEXT} --cluster=rancher --user=rancher
+        kubectl config set-context ${KUBECTL_CONTEXT} --cluster=rancher --user=rancher --insecure-skip-tls-verify
         kubectl config use-context ${KUBECTL_CONTEXT}
     fi
 
@@ -337,7 +337,7 @@ create_context () {
     log "Creating a context for ${POOL_NAME}"
     CONTEXT_URL="$(kubectl --context ${KUBECTL_CONTEXT} config view --flatten --minify | yq -r .clusters[0].cluster.server)/k8s/clusters/$(kubectl --context ${KUBECTL_CONTEXT} -n fleet-default get clusters.provisioning.cattle.io ${POOL_NAME} -o yaml | yq -r .status.clusterName)"
     kubectl config set-cluster ${POOL_NAME} --server=${CONTEXT_URL}
-    kubectl config set-context ${POOL_NAME} --cluster=${POOL_NAME} --user=${KUBECTL_CONTEXT}
+    kubectl config set-context ${POOL_NAME} --cluster=${POOL_NAME} --user=${KUBECTL_CONTEXT} --insecure-skip-tls-verify
     kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}" ${ERR_POOL_NOT_FOUND}
 }
 
