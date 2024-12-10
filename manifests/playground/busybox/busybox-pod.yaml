@@ -10,8 +10,13 @@ spec:
     volumeMounts:
     - name: custom-volume
       mountPath: /mnt
+    - name: custom-volume2
+      mountPath: /mnt2
   volumes:
   - name: custom-volume
     persistentVolumeClaim:
-      claimName: vm-pvc-custom
+      claimName: rwx-volume
+  - name: custom-volume2
+    persistentVolumeClaim:
+      claimName: rwx-volume-2
 

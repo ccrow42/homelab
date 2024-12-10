@@ -463,6 +463,9 @@ install_px_ent () {
     ARGOAPP="${ARGOAPP//${ARGOCD_REPO_PATH_PLACEHOLDER}/${ARGOCD_PATH}}"
     kubectl apply -f <(echo "${ARGOAPP}")
 
+    # Add the correct secret util I figure out secret keys
+    kubectl -n portworx apply -f ~/temp/px-vsphere-secret.yaml
+
     #kubectl apply -k ${MANIFEST_LOCAL_DIR}/portworx/overlays/${POOL_NAME}
 }
 

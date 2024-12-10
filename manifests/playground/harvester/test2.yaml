@@ -1,0 +1,156 @@
+apiVersion: v1
+items:
+- apiVersion: kubevirt.io/v1
+  kind: VirtualMachineInstance
+  metadata:
+    annotations:
+      harvesterhci.io/sshNames: '[]'
+      kubevirt.io/latest-observed-api-version: v1
+      kubevirt.io/storage-observed-api-version: v1
+      kubevirt.io/vm-generation: "2"
+    creationTimestamp: "2024-11-26T01:03:24Z"
+    finalizers:
+    - kubevirt.io/virtualMachineControllerFinalize
+    - foregroundDeleteVirtualMachine
+    - wrangler.cattle.io/harvester-lb-vmi-controller
+    - wrangler.cattle.io/VMIController.UnsetOwnerOfPVCs
+    generation: 10
+    labels:
+      harvesterhci.io/vmName: test
+      kubevirt.io/nodeName: harvester3
+    name: test
+    namespace: default
+    ownerReferences:
+    - apiVersion: kubevirt.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: VirtualMachine
+      name: test
+      uid: 876df441-4193-4c77-9302-e223c3045ec4
+    resourceVersion: "16443734"
+    uid: e4549134-beaa-4b05-86ba-553cd43afa5b
+  spec:
+    affinity: {}
+    architecture: amd64
+    domain:
+      cpu:
+        cores: 2
+        model: host-model
+        sockets: 1
+        threads: 1
+      devices:
+        disks:
+        - bootOrder: 1
+          disk:
+            bus: virtio
+          name: disk-6
+        - disk:
+            bus: virtio
+          name: cloudinitdisk
+        inputs:
+        - bus: usb
+          name: tablet
+          type: tablet
+        interfaces:
+        - masquerade: {}
+          model: virtio
+          name: default
+      features:
+        acpi:
+          enabled: true
+      firmware:
+        uuid: feec480d-31a1-59fa-9199-a330c83aa404
+      machine:
+        type: q35
+      memory:
+        guest: 1948Mi
+      resources:
+        limits:
+          cpu: "2"
+          memory: 2Gi
+        requests:
+          cpu: 125m
+          memory: 1365Mi
+    evictionStrategy: LiveMigrate
+    hostname: test
+    networks:
+    - name: default
+      pod: {}
+    terminationGracePeriodSeconds: 120
+    volumes:
+    - name: disk-6
+      persistentVolumeClaim:
+        claimName: rwx-volume
+    - cloudInitNoCloud:
+        networkDataSecretRef:
+          name: test-mgrue
+        secretRef:
+          name: test-mgrue
+      name: cloudinitdisk
+  status:
+    activePods:
+      02c29e66-ec5c-4397-9559-376ee40a13ad: harvester3
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2024-11-26T01:03:26Z"
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: null
+      status: "True"
+      type: LiveMigratable
+    currentCPUTopology:
+      cores: 2
+      sockets: 1
+      threads: 1
+    guestOSInfo: {}
+    interfaces:
+    - infoSource: domain
+      ipAddress: 10.52.2.31
+      ipAddresses:
+      - 10.52.2.31
+      mac: 52:54:00:bc:0d:6c
+      name: default
+      queueCount: 1
+    launcherContainerImageVersion: registry.suse.com/suse/sles/15.5/virt-launcher:1.1.0-150500.8.6.1
+    machine:
+      type: pc-q35-7.1
+    memory:
+      guestAtBoot: 1948Mi
+      guestCurrent: 1948Mi
+      guestRequested: 1948Mi
+    migrationMethod: BlockMigration
+    migrationTransport: Unix
+    nodeName: harvester3
+    phase: Running
+    phaseTransitionTimestamps:
+    - phase: Pending
+      phaseTransitionTimestamp: "2024-11-26T01:03:24Z"
+    - phase: Scheduling
+      phaseTransitionTimestamp: "2024-11-26T01:03:24Z"
+    - phase: Scheduled
+      phaseTransitionTimestamp: "2024-11-26T01:03:26Z"
+    - phase: Running
+      phaseTransitionTimestamp: "2024-11-26T01:03:29Z"
+    qosClass: Burstable
+    runtimeUser: 107
+    selinuxContext: none
+    virtualMachineRevisionName: revision-start-vm-876df441-4193-4c77-9302-e223c3045ec4-1
+    volumeStatus:
+    - name: cloudinitdisk
+      size: 1048576
+      target: vdb
+    - name: disk-6
+      persistentVolumeClaimInfo:
+        accessModes:
+        - ReadWriteMany
+        capacity:
+          storage: 10Gi
+        filesystemOverhead: "0.055"
+        requests:
+          storage: 10Gi
+        volumeMode: Filesystem
+      target: vda
+kind: List
+metadata:
+  resourceVersion: ""

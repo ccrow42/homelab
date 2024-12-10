@@ -1,0 +1,17 @@
+metadata:
+  name: testvmi-pvc
+apiVersion: kubevirt.io/v1
+kind: VirtualMachineInstance
+spec:
+  domain:
+    resources:
+      requests:
+        memory: 1024M
+    devices:
+      disks:
+      - name: mypvcdisk
+        disk: {}
+  volumes:
+    - name: mypvcdisk
+      persistentVolumeClaim:
+        claimName: rwx-volume
