@@ -17,7 +17,3 @@ spec:
     args:
       admin-namespace: "portworx"
       webhook-controller: "true"
-  security:
-    enabled: false
-    auth:
-      guestAccess: 'Disabled'
