@@ -466,7 +466,7 @@ install_px_ent () {
     # Add the correct secret util I figure out secret keys
     kubectl -n portworx apply -f ~/temp/px-vsphere-secret.yaml
 
-    #kubectl apply -k ${MANIFEST_LOCAL_DIR}/portworx/overlays/${POOL_NAME}
+    kubectl apply -k ${MANIFEST_LOCAL_DIR}/portworx/overlays/${POOL_NAME}
 }
 
 ### Install Local Path Provisioner
