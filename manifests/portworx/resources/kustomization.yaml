@@ -2,7 +2,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-#- px-cluster.yaml
+- px-cluster.yaml
 #- https://install.portworx.com/?operator=true&mc=false&kbver=1.26.11+rke2r1&ns=portworx&b=true&iop=6&vsp=true&vc=10.0.1.10&vcp=443&ds=esx2-local4&s=%22type%3Dthin%2Csize%3D80%22&c=px-cluster&stork=true&csi=true&mon=true&tel=false&st=k8s&promop=true
-- https://install.portworx.com/3.1?operator=true&mc=false&kbver=v1.30.5&ns=portworx&b=true&iop=6&mz=4&vsp=true&vc=10.0.1.10&vcp=443&ds=esx2-local3&s=%22type%3Dthin%2Csize%3D100%22&c=px-cluster&stork=true&csi=true&mon=true&tel=false&st=k8s&promop=true
+#- https://install.portworx.com/3.1?operator=true&mc=false&kbver=v1.30.5&ns=portworx&b=true&iop=6&mz=4&vsp=true&vc=10.0.1.10&vcp=443&ds=esx2-local3&s=%22type%3Dthin%2Csize%3D100%22&c=px-cluster&stork=true&csi=true&mon=true&tel=false&st=k8s&promop=true
 #- sealed-px-vsphere-secret.yaml
