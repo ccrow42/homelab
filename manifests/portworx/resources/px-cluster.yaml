@@ -1,13 +1,11 @@
-# SOURCE: https://install.portworx.com/?operator=true&mc=false&kbver=v1.27.8%2Brke2r1&ns=portworx&b=true&iop=6&mz=4&vsp=true&vc=10.0.1.10&vcp=443&ds=esx2-local4&s=%22type%3Dthin%2Csize%3D100%22&c=px-cluster-d505660e-2ab1-49d1-ab27-fbd198b67bd4&stork=true&csi=true&mon=true&tel=true&st=k8s&promop=true
+# SOURCE: https://install.portworx.com/?operator=true&mc=false&kbver=v1.30.5&ns=portworx&b=true&iop=6&mz=4&vsp=true&vc=10.0.1.10&vcp=443&ds=esx2-local3&s=%22type%3Dthin%2Csize%3D100%22&c=px-cluster&stork=true&csi=true&mon=true&tel=false&st=k8s&promop=true
 kind: StorageCluster
 apiVersion: core.libopenstorage.org/v1
 metadata:
-  name: px-cluster-d505660e-2ab1-49d1-ab27-fbd198b67bd4
+  name: px-cluster
   namespace: portworx
-  annotations:
-    portworx.io/install-source: "https://install.portworx.com/?operator=true&mc=false&kbver=v1.30.3%2Brke2r1&ns=portworx&b=true&iop=6&mz=4&vsp=true&vc=10.0.1.10&vcp=443&ds=esx2-local4&s=%22type%3Dthin%2Csize%3D100%22&c=px-cluster-d505660e-2ab1-49d1-ab27-fbd198b67bd4&stork=true&csi=true&mon=true&tel=true&st=k8s&promop=true"
 spec:
-  image: portworx/oci-monitor:3.1.4
+  image: portworx/oci-monitor:3.1.7
   imagePullPolicy: Always
   kvdb:
     internal: true
@@ -28,7 +26,7 @@ spec:
     enabled: true
   monitoring:
     telemetry:
-      enabled: true
+      enabled: false
     prometheus:
       enabled: true
       exportMetrics: true
@@ -50,6 +48,6 @@ spec:
   - name: VSPHERE_VCENTER_PORT
     value: "443"
   - name: VSPHERE_DATASTORE_PREFIX
-    value: "esx2-local4"
+    value: "esx2-local3"
   - name: VSPHERE_INSTALL_MODE
     value: "shared"
