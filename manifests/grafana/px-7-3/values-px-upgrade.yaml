@@ -1,0 +1,3 @@
+persistentStorage:
+  enabled: true
+  storageClassName: px-csi-db
