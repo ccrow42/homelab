@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prowlarr-deployment
+  namespace: plexstack
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prowlarr
+  template:
+    metadata:
+      labels:
+        app: prowlarr
+    spec:
+      containers:
+        - name: prowlarr
+          image: ghcr.io/hotio/prowlarr
+          ports:
+            - containerPort: 9696
+          env:
+            - name: PUID
+              value: "999"  # Set PUID to 999
+            - name: PGID
+              value: "999"  # Set PGID to 999
+            - name: UMASK
+              value: "002"
+            - name: TZ
+              value: "Etc/UTC"
+          volumeMounts:
+            - name: prowlarr-config
+              mountPath: /config
+      volumes:
+        - name: prowlarr-config
+          persistentVolumeClaim:
+            claimName: prowlarr-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prowlarr-service
+  namespace: plexstack
+spec:
+  selector:
+    app: prowlarr
+  ports:
+    - protocol: TCP
+      port: 9696
+      targetPort: 9696
+  type: ClusterIP  
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod-dns01
+  labels:
+    app.kubernetes.io/instance: prod-plexstack
+  name: ingress-prowlarr
+  namespace: plexstack
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: prowlarr.lan.ccrow.org
+    http:
+      paths:
+      - backend:
+          service:
+            name: prowlarr-service
+            port:
+              number: 9696
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - prowlarr.lan.ccrow.org
+    secretName: prowlarr-tls

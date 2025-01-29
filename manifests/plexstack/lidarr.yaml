@@ -21,6 +21,8 @@ spec:
       creationTimestamp: null
       labels:
         app: lidarr
+      annotations:
+        backup.velero.io/backup-volumes-excludes: lidarr-downloads,lidarr-music
     spec:
       containers:
       - env:

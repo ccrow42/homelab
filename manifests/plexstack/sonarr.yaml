@@ -24,6 +24,8 @@ spec:
       creationTimestamp: null
       labels:
         app: sonarr
+      annotations:
+        backup.velero.io/backup-volumes-excludes: sonarr-norepl,sonarr-tv,sonarr-downloads
     spec:
       containers:
       - env:
