@@ -60,7 +60,7 @@ spec:
           claimName: qbittorrent-pvc
       - name: qbittorrent-downloads
         nfs:
-          server: 10.0.1.8
+          server: 10.0.2.8
           path: /volume1/uberplex/downloads
 ---
 apiVersion: v1

@@ -4,4 +4,4 @@ resources:
 - ../../resources
 - prod_dns01_issuer.yaml
 - prod_issuer.yaml
-- route53-secret.yaml
+

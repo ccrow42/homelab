@@ -69,7 +69,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-prod
+    cert-manager.io/cluster-issuer: letsencrypt-prod-dns01
   labels:
     app.kubernetes.io/instance: prod-plexstack
   name: ingress-tautulli

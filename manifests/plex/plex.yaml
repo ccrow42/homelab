@@ -11,11 +11,11 @@ metadata:
   namespace: plex
 spec:
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   resources:
     requests:
-      storage: 32Gi
-  storageClassName: longhorn
+      storage: 200Gi
+  storageClassName: local-path
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -44,18 +44,26 @@ spec:
       - name: nfs-plex-config     # < linkname of the volume for the pvc
         persistentVolumeClaim:
           claimName: plex-pvc  # < pvc name we created in the previous yaml
-      - name: plex-norepl
-        hostPath:
-          path: /mnt/plex-norepl
       - name: movies
-        hostPath:
-          path: /mnt/movies
+        nfs:
+          server: 10.0.2.8
+          path: /volume1/Movies
+      - name: plex-norepl
+        nfs:
+          server: 10.0.2.8
+          path: /volume1/Plex-norepl
+      - name: yml
+        nfs:
+          server: 10.0.2.8
+          path: /volume1/yml
       - name: tv
-        hostPath:
-          path: /mnt/tv
+        nfs:
+          server: 10.0.2.8
+          path: /volume1/TV
       - name: music
-        hostPath:
-          path: /mnt/music
+        nfs:
+          server: 10.0.2.8
+          path: /volume1/Music
       containers:
       - env:                       # < environment variables. See https://hub.docker.com/r/linuxserver/plex
         - name: PLEX_CLAIM
@@ -108,14 +116,16 @@ spec:
         volumeMounts:            # < the volume mount in the container. Look at the relation volumelabel->pvc->pv
         - mountPath: /config     # < mount location in the container
           name: nfs-plex-config  # < volumelabel configured earlier in the yaml file
-        - mountPath: /movies
+        - mountPath: /mnt/movies
           name: movies 
-        - mountPath: /plex-norepl
+        - mountPath: /mnt/plex-norepl
           name: plex-norepl
-        - mountPath: /tv
+        - mountPath: /mnt/tv
           name: tv
-        - mountPath: /music
-          name: music                     
+        - mountPath: /mnt/music
+          name: music
+        - mountPath: /mnt/yml
+          name: yml                     
       restartPolicy: Always
 ---
 kind: Service
@@ -154,7 +164,7 @@ spec:
     name: gdm-32414
     protocol: UDP
   type: LoadBalancer
-  loadBalancerIP: 10.0.1.60  # < IP to access your plexserver. Should be one from the MetalLB range and the same as the UDP yaml
+  loadBalancerIP: 10.0.3.50  # < IP to access your plexserver. Should be one from the MetalLB range and the same as the UDP yaml
 ---
 kind: Service
 apiVersion: v1
@@ -183,4 +193,4 @@ spec:
     name: dlna-tcp
     protocol: TCP
   type: LoadBalancer
-  loadBalancerIP: 10.0.1.60  # < IP to access your plexserver. Should be one from the MetalLB range and the same as the TCP yaml
+  loadBalancerIP: 10.0.3.50  # < IP to access your plexserver. Should be one from the MetalLB range and the same as the TCP yaml

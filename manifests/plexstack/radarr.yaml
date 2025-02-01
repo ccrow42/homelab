@@ -45,15 +45,15 @@ spec:
             claimName: radarr-pvc
         - name: radarr-downloads
           nfs:
-            server: 10.0.1.8
+            server: 10.0.2.8
             path: /volume1/uberplex/downloads
         - name: radarr-movies
           nfs:
-            server: 10.0.1.8
+            server: 10.0.2.8
             path: /volume1/Movies/Movies
         - name: radarr-movies-norepl
           nfs:
-            server: 10.0.1.8
+            server: 10.0.2.8
             path: /volume1/Plex-norepl/movies
 ---
 kind: Service

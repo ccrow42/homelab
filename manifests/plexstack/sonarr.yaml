@@ -62,15 +62,15 @@ spec:
           claimName: sonarr-pvc
       - name: sonarr-tv
         nfs:
-          server: 10.0.1.8
+          server: 10.0.2.8
           path: /volume1/TV
       - name: sonarr-downloads
         nfs:
-          server: 10.0.1.8
+          server: 10.0.2.8
           path: /volume1/uberplex/downloads
       - name: sonarr-norepl
         nfs:
-          server: 10.0.1.8
+          server: 10.0.2.8
           path: /volume1/Plex-norepl/tv
 ---
 apiVersion: v1
@@ -85,7 +85,7 @@ spec:
   - port: 8989
   selector:
     app: sonarr
-  type: LoadBalancer
+  type: ClusterIP
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
