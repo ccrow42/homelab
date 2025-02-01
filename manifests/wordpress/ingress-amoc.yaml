@@ -3,7 +3,7 @@ kind: Ingress
 metadata:
   annotations:
     acme.cert-manager.io/http01-edit-in-place: "true"
-    cert-manager.io/cluster-issuer: letsencrypt-prod
+    cert-manager.io/cluster-issuer: letsencrypt-prod-dns01
   name: ingress-wordpress-ccrow
   namespace: amoc
 spec:
