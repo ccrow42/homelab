@@ -17,7 +17,7 @@ metadata:
   name: plex-svc
 subsets:
   - addresses:
-    - ip: 10.0.1.144
+    - ip: 10.0.3.50
     ports:
     - port: 32400
 ---
@@ -27,7 +27,7 @@ metadata:
   name: ingress-plex
   namespace: externalsvc
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-prod
+    cert-manager.io/cluster-issuer: letsencrypt-prod-dns01
     kubernetes.io/ingress.class: nginx
 
 spec:
