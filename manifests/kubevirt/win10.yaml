@@ -1,0 +1,60 @@
+apiVersion: kubevirt.io/v1alpha3
+kind: VirtualMachine
+metadata:
+  name: win10
+spec:
+  runStrategy: Halted
+  template:
+    metadata:
+      labels:
+        kubevirt.io/domain: win10
+    spec:
+      domain:
+        cpu:
+          cores: 4
+        devices:
+          disks:
+          - bootOrder: 1
+            cdrom:
+              bus: sata
+            name: cdromiso
+          - disk:
+              bus: sata
+            name: harddrive
+          - disk:
+              bus: sata
+            name: harddrive2
+          - cdrom:
+              bus: sata
+            name: virtiocontainerdisk
+          interfaces:
+            - name: bridge-vm
+              model: e1000
+              bridge: {}
+            - name: default
+              model: e1000
+              masquerade: {}
+        machine:
+          type: q35
+        resources:
+          requests:
+            memory: 16G
+      networks:
+        - name: default
+          pod: {}
+        - name: bridge-vm
+          multus:
+            networkName: bridge-vm
+      volumes:
+      - name: cdromiso
+        persistentVolumeClaim:
+          claimName: iso-win10
+      - name: harddrive
+        persistentVolumeClaim:
+          claimName: winhd-c
+      - name: harddrive2
+        persistentVolumeClaim:
+          claimName: winhd-d
+      - containerDisk:
+          image: kubevirt/virtio-container-disk
+        name: virtiocontainerdisk
