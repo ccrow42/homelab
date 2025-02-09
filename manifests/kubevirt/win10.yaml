@@ -13,6 +13,9 @@ spec:
         cpu:
           cores: 4
         devices:
+          gpus:
+          - deviceName: "nvidia.com/TU117_GEFORCE_GTX_1650"
+            name: gpu1
           disks:
           - bootOrder: 1
             cdrom:
@@ -22,13 +25,13 @@ spec:
               bus: sata
             name: harddrive
           - disk:
-              bus: sata
+              bus: virtio
             name: harddrive2
           - cdrom:
               bus: sata
             name: virtiocontainerdisk
           interfaces:
-            - name: bridge-vm
+            - name: bridge-vlan1
               model: e1000
               bridge: {}
             - name: default
@@ -42,9 +45,9 @@ spec:
       networks:
         - name: default
           pod: {}
-        - name: bridge-vm
+        - name: bridge-vlan1
           multus:
-            networkName: bridge-vm
+            networkName: bridge-vlan1
       volumes:
       - name: cdromiso
         persistentVolumeClaim:
