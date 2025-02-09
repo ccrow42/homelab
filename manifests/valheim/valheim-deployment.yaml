@@ -28,9 +28,9 @@ spec:
       containers:
       - env:
         - name: SERVER_NAME
-          value: crowheim
+          value: crowheim2-electric-boogaloo
         - name: WORLD_NAME
-          value: crowheim
+          value: crowheim2-electric-boogaloo
         - name: SERVER_PASS
           value: weasel
         - name: SERVER_PORT

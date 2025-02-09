@@ -1,0 +1,47 @@
+apiVersion: kubevirt.io/v1alpha3
+kind: VirtualMachine
+metadata:
+  name: iiab
+  labels:
+    vm: iiab
+spec:
+  runStrategy: Halted
+  template:
+    metadata:
+      labels:
+        kubevirt.io/domain: iiab
+    spec:
+      domain:
+        cpu:
+          cores: 4
+        devices:
+          disks:
+          - disk:
+              bus: virtio
+            name: harddrive
+          - disk:
+              bus: virtio
+            name: cloudinitdisk
+          interfaces:
+            - name: default
+              model: virtio
+              masquerade: {}
+        machine:
+          type: q35
+        resources:
+          requests:
+            memory: 16G
+      networks:
+        - name: default
+          pod: {}
+      volumes:
+      - name: harddrive
+        persistentVolumeClaim:
+          claimName: iiab
+      - containerDisk:
+          image: kubevirt/virtio-container-disk
+        name: virtiocontainerdisk
+      - name: cloudinitdisk
+        cloudInitNoCloud:
+          secretRef:
+            name: iiab-userdata
