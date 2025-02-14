@@ -1,0 +1,32 @@
+# SOURCE: https://install.portworx.com/?operator=true&mc=false&kbver=v1.30.8%2Brke2r1&ns=portworx&b=true&s=%2Fdev%2Fvdb&j=auto&c=px-cluster-ce4c8816-6360-475a-956d-906e0a4f9d2d&stork=true&csi=true&tel=true&st=k8s
+kind: StorageCluster
+apiVersion: core.libopenstorage.org/v1
+metadata:
+  name: px-cluster-ce4c8816-6360-475a-956d-906e0a4f9d2d
+  namespace: portworx
+  annotations:
+    portworx.io/install-source: "https://install.portworx.com/?operator=true&mc=false&kbver=v1.30.8%2Brke2r1&ns=portworx&b=true&s=%2Fdev%2Fvdb&j=auto&c=px-cluster-ce4c8816-6360-475a-956d-906e0a4f9d2d&stork=true&csi=true&tel=true&st=k8s"
+spec:
+  image: portworx/oci-monitor:3.2.1.2
+  imagePullPolicy: Always
+  kvdb:
+    internal: true
+  storage:
+    devices:
+      - /dev/vdb
+
+    journalDevice: auto
+  secretsProvider: k8s
+  stork:
+    enabled: true
+    args:
+      webhook-controller: "true"
+  autopilot:
+    enabled: true
+  csi:
+    enabled: true
+  monitoring:
+    telemetry:
+      enabled: false
+    prometheus:
+      enabled: true
