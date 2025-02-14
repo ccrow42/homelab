@@ -62,10 +62,10 @@ ingress:
   # Defaults to true
   # options: true, false
   enabled: false
-  includeDefaultExtraAnnotations: true
-  extraAnnotations: 
-    cert-manager.io/cluster-issuer: letsencrypt-prod-dns01
-    nginx.ingress.kubernetes.io/whitelist-source-range: "10.0.0.0/16"
+  # includeDefaultExtraAnnotations: true
+  # extraAnnotations: 
+  #   cert-manager.io/cluster-issuer: letsencrypt-prod-dns01
+  #   nginx.ingress.kubernetes.io/whitelist-source-range: "10.0.0.0/16"
   ingressClassName: "nginx"
   # Certain ingress controllers will require the pathType or path to be set to a different value.
   pathType: ImplementationSpecific
@@ -85,7 +85,7 @@ ingress:
 ### service ###
 # Override to use NodePort or LoadBalancer service type - default is ClusterIP
 service:
-  type: ""
+  type: "LoadBalancer"
   annotations: {}
 
 ### LetsEncrypt config ###

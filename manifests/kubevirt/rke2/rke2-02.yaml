@@ -1,15 +1,15 @@
 apiVersion: kubevirt.io/v1alpha3
 kind: VirtualMachine
 metadata:
-  name: rke2-01
+  name: rke2-02
   labels:
-    vm: rke2-01
+    vm: rke2-02
 spec:
   runStrategy: Halted
   template:
     metadata:
       labels:
-        kubevirt.io/domain: rke2-01
+        kubevirt.io/domain: rke2-02
     spec:
       domain:
         cpu:
@@ -19,6 +19,9 @@ spec:
           - disk:
               bus: virtio
             name: harddrive
+          - disk:
+              bus: virtio
+            name: pxvol
           - disk:
               bus: virtio
             name: cloudinitdisk
@@ -44,7 +47,10 @@ spec:
       volumes:
       - name: harddrive
         persistentVolumeClaim:
-          claimName: rke2-01-boot
+          claimName: rke2-02-boot
+      - name: pxvol
+        persistentVolumeClaim:
+          claimName: rke2-02-px
       - containerDisk:
           image: kubevirt/virtio-container-disk
         name: virtiocontainerdisk
@@ -68,7 +74,7 @@ spec:
                     - 10.0.5.1
           userData: |
             #cloud-config
-            hostname: rke2-01
+            hostname: rke2-02
             manage_etc_hosts: true
             users:
               - name: ubuntu

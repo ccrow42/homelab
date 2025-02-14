@@ -4,7 +4,12 @@ metadata:
  name: rancher-ingress
  namespace: cattle-system
  annotations:
-   cert-manager.io/cluster-issuer: letsencrypt-prod-dns01
+    cert-manager.io/cluster-issuer: letsencrypt-prod-dns01
+    # nginx.org/ssl-services: "rancher"
+    # nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+    # nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    # nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    # nginx.ingress.kubernetes.io/proxy-body-size: "0"
 spec:
  ingressClassName: nginx
  tls:
