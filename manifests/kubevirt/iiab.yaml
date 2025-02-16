@@ -10,6 +10,7 @@ spec:
     metadata:
       labels:
         kubevirt.io/domain: iiab
+        vmname: iiab
     spec:
       domain:
         cpu:
