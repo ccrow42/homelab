@@ -26,3 +26,17 @@ spec:
     requests:
       storage: 200Gi
   storageClassName: local-path
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: winhd-e
+  annotations:
+    volume.kubernetes.io/selected-node: gentoo-prime
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 200Gi
+  storageClassName: longhorn

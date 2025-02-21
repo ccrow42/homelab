@@ -27,6 +27,9 @@ spec:
           - disk:
               bus: virtio
             name: harddrive2
+          - disk:
+              bus: virtio
+            name: harddrive3
           - cdrom:
               bus: sata
             name: virtiocontainerdisk
@@ -58,6 +61,9 @@ spec:
       - name: harddrive2
         persistentVolumeClaim:
           claimName: winhd-d
+      - name: harddrive3
+        persistentVolumeClaim:
+          claimName: winhd-e
       - containerDisk:
           image: kubevirt/virtio-container-disk
         name: virtiocontainerdisk
