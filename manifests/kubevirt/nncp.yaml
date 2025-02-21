@@ -66,3 +66,13 @@ spec:
             enabled: false
         port:
         - name: enp72s0f3.5
+    - name: br7
+      description: Linux bridge with eth1.7 as a port
+      type: linux-bridge
+      state: up
+      bridge:
+        options:
+          stp:
+            enabled: false
+        port:
+        - name: enp72s0f3.7

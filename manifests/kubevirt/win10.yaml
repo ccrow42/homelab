@@ -31,7 +31,7 @@ spec:
               bus: sata
             name: virtiocontainerdisk
           interfaces:
-            - name: bridge-vlan1
+            - name: bridge-vlan7
               model: e1000
               bridge: {}
             - name: default
@@ -45,9 +45,9 @@ spec:
       networks:
         - name: default
           pod: {}
-        - name: bridge-vlan1
+        - name: bridge-vlan7
           multus:
-            networkName: bridge-vlan1
+            networkName: bridge-vlan7
       volumes:
       - name: cdromiso
         persistentVolumeClaim:
