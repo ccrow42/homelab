@@ -7,8 +7,7 @@ spec:
   clusterPair: demo
   includeResources: true
   startApplications: true
+  includeVolumes: true
   namespaces:
     - pxbbq
   purgeDeletedResources: false
-  selectors: 
-    pxmigrate: "true"

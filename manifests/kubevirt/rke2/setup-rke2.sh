@@ -3,9 +3,10 @@
 kubectl port-forward -n cdi svc/cdi-uploadproxy 8080:443 &
 PID=$!
 
-#SERVERS=("util1" "rke2-01" "rke2-02" "rke2-03" "rke2-04")
+#SERVERS=("util1" "rke2-01" "rke2-02" "rke2-03" "rke2-04" "rke2-11" "rke2-12" "rke2-13" "rke2-14")
+SERVERS=("rke2-11" "rke2-12" "rke2-13" "rke2-14")
 #SERVERS=("rke2-11" "rke2-12" "rke2-13" "rke2-14")
-SERVERS=("rke2-14")
+#SERVERS=("rke2-14")
 AGENTINSTALL="curl --insecure -fL https://rancher.ccrow.org/system-agent-install.sh | sudo sh -s - --server https://rancher.ccrow.org --label 'cattle.io/os=linux' --token sqv6j4cvrblf6n5gbnc6l4wsqd9vcmcdmrmxjnsp4lsbzc8lr57f8f --ca-checksum b217853ea8af1e8dc2b70423db4d7bff65a2ebd15505905783e57fa1945af685"
 
 set -x
@@ -29,6 +30,18 @@ for server in "${SERVERS[@]}"; do
         #ssh -o StrictHostKeyChecking=accept-new ubuntu@${RKE2_IP} "${AGENTINSTALL} --etcd --controlplane"
         echo ""
     elif [[ $server == "util1" ]]; then
+        ssh -o StrictHostKeyChecking=accept-new ubuntu@${IP} "curl -sfL https://get.k3s.io | sh -"
+        ssh -o StrictHostKeyChecking=accept-new ubuntu@${IP} "curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash"
+        ssh -o StrictHostKeyChecking=accept-new ubuntu@${IP} "helm repo add rancher-prime https://charts.rancher.com/server-charts/prime"
+        ssh -o StrictHostKeyChecking=accept-new ubuntu@${IP} "helm repo update"
+        scp ../../rancher_prime/labrancher-values.yaml ubuntu@${IP}:/tmp/
+        ssh ubuntu@${IP} "sudo chmod 644 /etc/rancher/k3s/k3s.yaml"
+        ssh ubuntu@${IP} "kubectl --kubeconfig /etc/rancher/k3s/k3s.yaml create ns cattle-system"
+        ssh ubuntu@${IP} "kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.17.0/cert-manager.yaml"
+        ssh ubuntu@${IP} "helm --kubeconfig /etc/rancher/k3s/k3s.yaml install rancher rancher-prime/rancher --namespace cattle-system --values /tmp/labrancher-values.yaml"
+        sleep 100
+        RANCHER_POD=$(ssh ubuntu@${IP} "kubectl get pods -l app=rancher -n cattle-system -o jsonpath='{.items[0].metadata.name}'")
+        ssh ubuntu@${IP} "kubectl exec $RANCHER_POD -n cattle-system -- reset-password"
         echo ""
     else
         echo ""

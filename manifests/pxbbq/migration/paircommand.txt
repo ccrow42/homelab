@@ -1,0 +1,12 @@
+    storkctl create clusterpair demo \
+    --dest-kube-file ~/temp/rke2-dr.yaml \
+    --src-kube-file ~/temp/rke2-prod.yaml \
+    --dest-ep 10.0.5.115:30593 \
+    --src-ep 10.0.5.111:31630 \
+    --namespace portworx \
+    --provider s3 \
+    --s3-endpoint https://minio.ccrow.org \
+    --s3-access-key rke2lab \
+    --s3-secret-key '*************' \
+    --s3-region us-west-2 \
+    --mode migration 

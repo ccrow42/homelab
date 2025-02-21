@@ -4,19 +4,20 @@ apiVersion: core.libopenstorage.org/v1
 metadata:
   name: px-cluster
   namespace: portworx
+  annotations:
+    portworx.io/service-type: "portworx-api:NodePort"
 spec:
-  image: portworx/oci-monitor:3.1.7
+  image: portworx/oci-monitor:3.2.1.2
   imagePullPolicy: Always
   kvdb:
     internal: true
-  cloudStorage:
-    deviceSpecs:
-    - type=thin,size=100
-    maxStorageNodesPerZone: 4
+  storage:
+    useAll: true
   secretsProvider: k8s
   stork:
     enabled: true
     args:
+      admin-namespace: "portworx"
       webhook-controller: "true"
   autopilot:
     enabled: true
@@ -30,24 +31,3 @@ spec:
     prometheus:
       enabled: true
       exportMetrics: true
-  env:
-  - name: VSPHERE_INSECURE
-    value: "true"
-  - name: VSPHERE_USER
-    valueFrom:
-      secretKeyRef:
-        name: px-vsphere-secret
-        key: VSPHERE_USER
-  - name: VSPHERE_PASSWORD
-    valueFrom:
-      secretKeyRef:
-        name: px-vsphere-secret
-        key: VSPHERE_PASSWORD
-  - name: VSPHERE_VCENTER
-    value: "10.0.1.10"
-  - name: VSPHERE_VCENTER_PORT
-    value: "443"
-  - name: VSPHERE_DATASTORE_PREFIX
-    value: "esx2-local3"
-  - name: VSPHERE_INSTALL_MODE
-    value: "shared"
