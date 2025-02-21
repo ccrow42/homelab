@@ -1,0 +1,43 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  generation: 1
+  name: pxbbq-ingress-dr
+  namespace: pxbbq
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: dr.pxbbq.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: pxbbq-svc
+            port:
+              number: 80
+        path: /
+        pathType: Prefix
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  generation: 1
+  name: pxbbq-ingress
+  namespace: pxbbq
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: www.pxbbq.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: pxbbq-svc
+            port:
+              number: 80
+        path: /
+        pathType: Prefix
