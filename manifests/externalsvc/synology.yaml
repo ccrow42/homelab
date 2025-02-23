@@ -32,7 +32,7 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-body-size: "0"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
-    nginx.ingress.kubernetes.io/whitelist-source-range: "10.0.0.0/16,174.21.143.8/32,104.167.184.2/32,131.191.29.18/32,192.173.169.229/32,73.97.37.245/32"
+    nginx.ingress.kubernetes.io/whitelist-source-range: "10.0.0.0/16,174.21.143.8/32,104.167.184.2/32,131.191.29.18/32,192.173.169.229/32,73.97.37.245/32,76.146.65.221/32"
 spec:
   tls:
     - hosts:
