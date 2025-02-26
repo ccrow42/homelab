@@ -1,18 +1,21 @@
-# SOURCE: https://install.portworx.com/?operator=true&mc=false&kbver=v1.30.5&ns=portworx&b=true&iop=6&mz=4&vsp=true&vc=10.0.1.10&vcp=443&ds=esx2-local3&s=%22type%3Dthin%2Csize%3D100%22&c=px-cluster&stork=true&csi=true&mon=true&tel=false&st=k8s&promop=true
+# SOURCE: https://install.portworx.com/?operator=true&mc=false&kbver=v1.30.8%2Brke2r1&ns=portworx&b=true&s=%2Fdev%2Fvdb&j=auto&c=px-cluster-ce4c8816-6360-475a-956d-906e0a4f9d2d&stork=true&csi=true&tel=true&st=k8s
 kind: StorageCluster
 apiVersion: core.libopenstorage.org/v1
 metadata:
   name: px-cluster
   namespace: portworx
   annotations:
-    portworx.io/service-type: "portworx-api:LoadBalancer"
+    portworx.io/service-type: "portworx-api:LoadBalancer"    
 spec:
   image: portworx/oci-monitor:3.2.1.2
   imagePullPolicy: Always
   kvdb:
     internal: true
   storage:
-    useAll: true
+    devices:
+      - /dev/vdb
+
+    journalDevice: auto
   secretsProvider: k8s
   stork:
     enabled: true
@@ -21,8 +24,6 @@ spec:
       webhook-controller: "true"
   autopilot:
     enabled: true
-  runtimeOptions:
-    default-io-profile: "6"
   csi:
     enabled: true
   monitoring:
@@ -30,4 +31,3 @@ spec:
       enabled: false
     prometheus:
       enabled: true
-      exportMetrics: true

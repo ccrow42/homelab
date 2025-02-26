@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   namespace: externalsvc
-  name: synology-svc
+  name: nas02-svc
 spec:
   type: ClusterIP
   ports:
@@ -14,17 +14,17 @@ apiVersion: v1
 kind: Endpoints
 metadata:
   namespace: externalsvc
-  name: synology-svc
+  name: nas02-svc
 subsets:
   - addresses:
-    - ip: 10.0.2.8
+    - ip: 10.0.2.9
     ports:
     - port: 5000
 ---
 kind: Ingress
 apiVersion: networking.k8s.io/v1
 metadata:
-  name: ingress-synology
+  name: ingress-nas02
   namespace: externalsvc
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod-dns01
@@ -32,20 +32,20 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-body-size: "0"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
-    nginx.ingress.kubernetes.io/whitelist-source-range: "10.0.0.0/16,174.21.143.8/32,104.167.184.2/32,131.191.29.18/32,192.173.169.229/32,73.97.37.245/32,76.146.65.221/32,136.226.57.29/32"
+    nginx.ingress.kubernetes.io/whitelist-source-range: "10.0.0.0/16"
 spec:
   tls:
     - hosts:
-        - synology.ccrow.org
-      secretName: synology-tls
+        - nas02-web.lan.ccrow.org
+      secretName: nas02-tls
   rules:
-    - host: synology.ccrow.org
+    - host: nas02-web.lan.ccrow.org
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: synology-svc
+                name: nas02-svc
                 port:
                   number: 5000

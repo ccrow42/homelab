@@ -1,8 +1,8 @@
     storkctl create clusterpair demo \
     --dest-kube-file ~/temp/rke2-dr.yaml \
     --src-kube-file ~/temp/rke2-prod.yaml \
-    --dest-ep 10.0.5.115:30593 \
-    --src-ep 10.0.5.111:31630 \
+    --dest-ep 10.0.5.21:9001 \
+    --src-ep 10.0.5.11:9001 \
     --namespace portworx \
     --provider s3 \
     --s3-endpoint https://minio.ccrow.org \
