@@ -1,0 +1,12 @@
+    storkctl create clusterpair migrate \
+    --dest-kube-file ~/temp/eks.yaml \
+    --src-kube-file ~/temp/rke2-prod-ext.yaml \
+    --dest-ep a99d3d15dd5d04e9ebd8d4567a7ebc8c-545993921.us-west-2.elb.amazonaws.com:9001 \
+    --src-ep 131.191.104.138:9001 \
+    --namespace portworx \
+    --provider s3 \
+    --s3-endpoint https://minio.ccrow.org \
+    --s3-access-key rke2lab \
+    --s3-secret-key '****************' \
+    --s3-region us-west-2 \
+    --mode migration 

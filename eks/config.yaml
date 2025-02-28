@@ -1,0 +1,93 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+metadata:
+  name: ccrow-cluster
+  region: us-west-2
+  version: "1.30"
+  tags: 
+    owner: ccrow@purestorage.com
+    team: TME
+    org: CNBU
+    ExpiresOn: 23-03-2025 #dd-mm-yyyy
+iam:
+  withOIDC: true
+managedNodeGroups:
+  - name: storage-nodes-1
+    instanceType: m5.xlarge
+    minSize: 1
+    maxSize: 1
+    volumeSize: 150
+    amiFamily: AmazonLinux2
+    labels: {role: worker, "portworx.io/node-type": "storage", gpu: "false"}
+    tags:
+      nodegroup-role: worker
+      owner: ccrow@purestorage.com
+      team: TME
+      org: CNBU
+      ExpiresOn: 23-03-2025 #dd-mm-yyyy
+    ssh:  
+      allow: false
+      publicKeyPath: ~/.ssh/id_rsa.pub
+    iam:
+      attachPolicyARNs:
+        - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
+        - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+        - arn:aws:iam::aws:policy/ElasticLoadBalancingFullAccess
+        - arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy
+        - arn:aws:iam::438529519855:policy/AWS-EKS-Policy
+        - arn:aws:iam::438529519855:policy/Full-KMS
+    availabilityZones: ['us-west-2a']
+  - name: storage-nodes-2
+    instanceType: m5.xlarge
+    minSize: 1
+    maxSize: 1
+    volumeSize: 150
+    amiFamily: AmazonLinux2
+    labels: {role: worker, "portworx.io/node-type": "storage", gpu: "false"}
+    tags:
+      nodegroup-role: worker
+      owner: ccrow@purestorage.com
+      team: TME
+      org: CNBU
+      ExpiresOn: 23-03-2025 #dd-mm-yyyy
+    ssh:  
+      allow: false
+      publicKeyPath: ~/.ssh/id_rsa.pub
+    iam:
+      attachPolicyARNs:
+        - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
+        - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+        - arn:aws:iam::aws:policy/ElasticLoadBalancingFullAccess
+        - arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy
+        - arn:aws:iam::438529519855:policy/AWS-EKS-Policy
+        - arn:aws:iam::438529519855:policy/Full-KMS
+    availabilityZones: ['us-west-2b']
+  - name: gpu-nodes
+    instanceType: m5.xlarge # This is an example, you can choose the appropriate GPU instance type
+    minSize: 1
+    maxSize: 1
+    volumeSize: 150
+    amiFamily: AmazonLinux2
+    labels: {role: worker, "portworx.io/node-type": "storage", gpu: "true"}
+    tags:
+      nodegroup-role: gpu-worker
+      owner: ccrow@purestorage.com
+      team: TME
+      org: CNBU
+      ExpiresOn: 23-03-2025 #dd-mm-yyyy
+    ssh:  
+      allow: false
+      publicKeyPath: ~/.ssh/id_rsa.pub
+    iam:
+      attachPolicyARNs:
+        - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
+        - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+        - arn:aws:iam::aws:policy/ElasticLoadBalancingFullAccess
+        - arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy
+        - arn:aws:iam::438529519855:policy/AWS-EKS-Policy
+        - arn:aws:iam::438529519855:policy/Full-KMS
+    availabilityZones: ['us-west-2c']
+availabilityZones: [ 'us-west-2a', 'us-west-2b', 'us-west-2c' ]
