@@ -1,21 +1,21 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: plex-yml
+  name: plex
 ---
 #ref https://www.debontonline.com/2021/01/part-14-deploy-plexserver-yaml-with.html
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: plex-yml-pvc
-  namespace: plex-yml
+  namespace: plex
 spec:
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   resources:
     requests:
-      storage: 32Gi
-  storageClassName: longhorn
+      storage: 64Gi
+  storageClassName: local-path
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -23,7 +23,7 @@ metadata:
   labels:
     app: plexserver-yml              # < label for tagging and reference
   name: plexserver-yml                # < name of the deployment
-  namespace: plex-yml           # < namespace where to place the deployment and pods               # < namespace where place the deployment and pods
+  namespace: plex          # < namespace where to place the deployment and pods               # < namespace where place the deployment and pods
 spec:
   replicas: 1                     # < number of pods to deploy
   revisionHistoryLimit: 0
@@ -41,16 +41,17 @@ spec:
         app: plexserver-yml
     spec:
       volumes:
-      - name: nfs-plex-config     # < linkname of the volume for the pvc
+      - name: plex-config     # < linkname of the volume for the pvc
         persistentVolumeClaim:
           claimName: plex-yml-pvc  # < pvc name we created in the previous yaml
       - name: yml
-        hostPath:
-          path: /mnt/yml
+        nfs:
+          server: 10.0.2.8
+          path: /volume1/yml
       containers:
       - env:                       # < environment variables. See https://hub.docker.com/r/linuxserver/plex
-        - name: PLEX_CLAIM
-          value: claim-XwVPsHsaakdfaq66tha9
+        # - name: PLEX_CLAIM
+        #   value: claim-XwVPsHsaakdfaq66tha9
         - name: PGID
           value: "\x39\x39\x39"    # < ASCII code for '100'
         - name: PUID
@@ -98,7 +99,7 @@ spec:
         tty: true
         volumeMounts:            # < the volume mount in the container. Look at the relation volumelabel->pvc->pv
         - mountPath: /config     # < mount location in the container
-          name: nfs-plex-config  # < volumelabel configured earlier in the yaml file
+          name: plex-config  # < volumelabel configured earlier in the yaml file
         - mountPath: /yml
           name: yml                     
       restartPolicy: Always
@@ -107,7 +108,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: plex-yml-udp              # < name of the service
-  namespace: plex-yml       # < namespace where to place service
+  namespace: plex      # < namespace where to place service
   annotations:
     metallb.universe.tf/allow-shared-ip: plexserver # < annotation name to combine the Service IP, make sure it's same name as in the service UDP yaml
 spec:
@@ -139,20 +140,20 @@ spec:
     name: gdm-32414
     protocol: UDP
   type: LoadBalancer
-  loadBalancerIP: 10.0.1.61  # < IP to access your plexserver. Should be one from the MetalLB range and the same as the UDP yaml
+  loadBalancerIP: 10.0.3.51  # < IP to access your plexserver. Should be one from the MetalLB range and the same as the UDP yaml
 ---
 kind: Service
 apiVersion: v1
 metadata:
   name: plex-yml-tcp              # < name of the service
-  namespace: plex-yml       # < namespace where to place service
+  namespace: plex      # < namespace where to place service
   annotations:
     metallb.universe.tf/allow-shared-ip: plexserver  # < annotation name to combine the Service IP, make sure it's same name as in the service UDP yaml
 spec:
   selector:
     app: plexserver-yml           # < reference to the deployment (connects the service with the deployment)
   ports:                      
-  - port: 32400               # < port to open on the outside on the server
+  - port: 32401               # < port to open on the outside on the server
     targetPort: 32400         # < targetport. port on the pod to passthrough
     name: pms-web             # < reference name for the port in the deployment yaml
     protocol: TCP
@@ -168,4 +169,4 @@ spec:
     name: dlna-tcp
     protocol: TCP
   type: LoadBalancer
-  loadBalancerIP: 10.0.1.61  # < IP to access your plexserver. Should be one from the MetalLB range and the same as the TCP yaml
+  loadBalancerIP: 10.0.3.51  # < IP to access your plexserver. Should be one from the MetalLB range and the same as the TCP yaml
