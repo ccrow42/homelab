@@ -4,9 +4,9 @@ metadata:
   name: migrate
   namespace: portworx
 spec:
-  clusterPair: migrate
+  clusterPair: demo
   includeResources: true
-  startApplications: true
+  startApplications: false
   includeVolumes: true
   namespaces:
     - pxbbq

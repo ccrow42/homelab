@@ -1,0 +1,34 @@
+kind: Ingress
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: ingress-ubuntu-desktop
+  namespace: default
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod-dns01
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+    # type of authentication
+    nginx.ingress.kubernetes.io/auth-type: basic
+    # name of the secret that contains the user/password definitions
+    nginx.ingress.kubernetes.io/auth-secret: desktop-ingress
+    # message to display with an appropriate context why the authentication is required
+    nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required'
+    nginx.ingress.kubernetes.io/configuration-snippet: proxy_set_header Authorization "Basic dm5jOkNsYWI0OTExIQ==";
+spec:
+  tls:
+    - hosts:
+        - desktop.ccrow.org
+      secretName: desktop-ccrow-org-tls
+  rules:
+    - host: desktop.ccrow.org
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ubuntu-desktop-svc
+                port:
+                  number: 8444

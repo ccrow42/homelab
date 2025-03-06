@@ -1,0 +1,79 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ubuntu-desktop-boot
+  annotations:
+    volume.kubernetes.io/selected-node: gentoo-prime
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 40Gi
+  storageClassName: longhorn
+---
+apiVersion: kubevirt.io/v1alpha3
+kind: VirtualMachine
+metadata:
+  name: ubuntu-desktop
+spec:
+  runStrategy: Halted
+  template:
+    metadata:
+      labels:
+        kubevirt.io/domain: ubuntu-desktop
+    spec:
+      domain:
+        cpu:
+          cores: 4
+        devices:
+          disks:
+          # - bootOrder: 1
+          #   cdrom:
+          #     bus: sata
+          #   name: cdromiso
+          - disk:
+              bus: virtio
+            name: harddrive
+          interfaces:
+            - name: default
+              model: virtio
+              masquerade: {}
+        machine:
+          type: q35
+        resources:
+          requests:
+            memory: 16G
+      networks:
+        - name: default
+          pod: {}
+      volumes:
+      # - name: cdromiso
+      #   persistentVolumeClaim:
+      #     claimName: ubuntu-desktop-iso
+      - name: harddrive
+        persistentVolumeClaim:
+          claimName: ubuntu-desktop-boot
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ubuntu-desktop-svc
+spec:
+  externalTrafficPolicy: Cluster
+  ports:
+  - port: 22
+    protocol: TCP
+    targetPort: 22
+    name: ssh
+  - port: 8444
+    protocol: TCP
+    targetPort: 8444
+    name: vnc1
+  - port: 8445
+    protocol: TCP
+    targetPort: 8445
+    name: vnc2
+  selector:
+    kubevirt.io/domain: ubuntu-desktop
+  type: LoadBalancer

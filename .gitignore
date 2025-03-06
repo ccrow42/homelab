@@ -1,1 +1,5 @@
 firewall/fw2.sh
+manifests/kubevirt/desktop-vnc.htpasswd
+manifests/kubevirt/desktop-ingress.htpasswd
+manifests/kubevirt/desktop-vnc-secret.yaml
+manifests/kubevirt/desktop-ingress-secret.yaml
