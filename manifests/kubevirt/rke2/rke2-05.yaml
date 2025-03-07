@@ -1,23 +1,20 @@
 apiVersion: kubevirt.io/v1alpha3
 kind: VirtualMachine
 metadata:
-  name: rke2-04
+  name: rke2-05
   labels:
-    vm: rke2-04
+    vm: rke2-05
 spec:
   runStrategy: Halted
   template:
     metadata:
       labels:
-        kubevirt.io/domain: rke2-04
+        kubevirt.io/domain: rke2-05
     spec:
       domain:
         cpu:
           cores: 4
         devices:
-          gpus:
-          - deviceName: "nvidia.com/TU117_GEFORCE_GTX_1650"
-            name: gpu1
           disks:
           - disk:
               bus: virtio
@@ -50,10 +47,10 @@ spec:
       volumes:
       - name: harddrive
         persistentVolumeClaim:
-          claimName: rke2-04-boot
+          claimName: rke2-05-boot
       - name: pxvol
         persistentVolumeClaim:
-          claimName: rke2-04-px
+          claimName: rke2-05-px
       - containerDisk:
           image: kubevirt/virtio-container-disk
         name: virtiocontainerdisk
@@ -77,7 +74,7 @@ spec:
                     - 10.0.5.1
           userData: |
             #cloud-config
-            hostname: rke2-04
+            hostname: rke2-05
             manage_etc_hosts: true
             users:
               - name: ubuntu

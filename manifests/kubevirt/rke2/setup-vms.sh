@@ -3,9 +3,9 @@
 kubectl port-forward -n cdi svc/cdi-uploadproxy 8080:443 &
 PID=$!
 
-SERVERS=("rke2-01" "rke2-02" "rke2-03" "rke2-04" "rke2-11" "rke2-12" "rke2-13" "rke2-14")
+#SERVERS=("rke2-01" "rke2-02" "rke2-03" "rke2-04" "rke2-11" "rke2-12" "rke2-13" "rke2-14")
 #SERVERS=("rke2-11" "rke2-12" "rke2-13" "rke2-14")
-#SERVERS=("rke2-11" "rke2-12" "rke2-13" "rke2-14")
+SERVERS=("rke2-05")
 #SERVERS=("util1")
 AGENTINSTALL="curl --insecure -fL https://rancher.ccrow.org/system-agent-install.sh | sudo sh -s - --server https://rancher.ccrow.org --label 'cattle.io/os=linux' --token sqv6j4cvrblf6n5gbnc6l4wsqd9vcmcdmrmxjnsp4lsbzc8lr57f8f --ca-checksum b217853ea8af1e8dc2b70423db4d7bff65a2ebd15505905783e57fa1945af685"
 
@@ -14,7 +14,7 @@ set -x
 kubectl apply -f pvc.yaml
 ssh ubuntu@10.0.1.1 "echo \"##-##-##01\" | sudo tee -a /etc/hosts"
 for server in "${SERVERS[@]}"; do
-    virtctl image-upload pvc ${server}-boot --size 30G --insecure --image-path=/home/ccrow/Downloads/noble-server-cloudimg-amd64.img --uploadproxy-url=https://localhost:8080
+    virtctl image-upload pvc ${server}-boot --size 40G --insecure --image-path=/home/ccrow/Downloads/noble-server-cloudimg-amd64.img --uploadproxy-url=https://localhost:8080
     sleep 5
     kubectl apply -f ${server}.yaml
     sleep 5
