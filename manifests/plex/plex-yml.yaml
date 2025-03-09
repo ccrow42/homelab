@@ -50,8 +50,8 @@ spec:
           path: /volume1/yml
       containers:
       - env:                       # < environment variables. See https://hub.docker.com/r/linuxserver/plex
-        # - name: PLEX_CLAIM
-        #   value: claim-XwVPsHsaakdfaq66tha9
+        - name: PLEX_CLAIM
+          value: claim-XwVPsHsaakdfaq66tha9
         - name: PGID
           value: "\x39\x39\x39"    # < ASCII code for '100'
         - name: PUID
