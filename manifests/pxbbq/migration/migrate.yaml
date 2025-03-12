@@ -6,7 +6,7 @@ metadata:
 spec:
   clusterPair: demo
   includeResources: true
-  startApplications: true
+  startApplications: false
   includeVolumes: true
   namespaces:
     - pxbbq
