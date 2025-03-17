@@ -73,6 +73,7 @@ spec:
             users:
               - name: ubuntu
                 ssh_authorized_keys:
+                  - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCZA0EXunXfGEi0E1Sg+Yjd/TsgUUopGHcKBWEic3NElGKhB+Qg2NKgd4KKdpL+eQ/GwsIsO5eQBUrs3wx1Ta3M7bQlqdXAUJAezFQi0u11RkTV94DGASJv3pIlFgd/Uyhmg+qD/us8U124MFu9rvpxl4qIVKQKuqWQP07/7JA/EK8GwysHlFghhxo3Ol40BF4caXg98h43jcZ2XlL3gt4bw4YSR9/VcWeB9PJ7G65tVBMjOQ//24fw72O2Tw4jP9dvfanrGrrXKK4afH8LTtXCiN8AWHhqOEPZ9g0rkXS1XSLW4KO7jhlE55ESQKMK4HVu9kq1rq7Mlcj9yzAp+AIsjy/yMab6mWwGW75y7S5zsgljfSk56EjIQKV/lxd4XHzoE/dARREWqK4r5X4w2DN0drRAOQZjxhTJSIiuBet3WQcvs1RkgdhjcM2KbvzgwkVSxDlgXKnPhyoYW0nHZnmjHucabV2Bx3leZCfuPO8BagJgQKWrVkxDdHlB1ZtQjAc= ccrow@virt-desktop
                   - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC+kx58yg6pGei4XrdXJhNfkRvfKWhGPUveM90+OGt74DbUc0B/BkfN5enpzEn3IciEOUm65TDQP0f1rmYxxWt9UPJWH2zvaWmaCdq0JUsf+V8N+G5gHpCVNJTMWeogtskpMGIKv7HJMH35RuBnM71ZHeMwTvhb422evYYq+8yUiRUc9B90p4w9Kshl+FjyOsSMn7m+9WS6HjX8Gbp+k8CGxqIrFz6t+ZE/uNmqlDaMZtXgJJIC+QrN/u14AfRX84VktNo4UPUgGmgrnCwk6fs6J5a55R6nEJ1qYHUnqkB+1AjwP2tZocHmeZkQilLT1kQvI3iIEHfyJya/c2zOZbiyu6XRsiYv/h28Ev6eevzoAQjeXq8IN/1PjZogRxgr7MpI/1GaHyq4SNBeCcgU6nk003kL6Y6o7GXTVaZbjCMdK6kF+Oi1MQtGygu4X9iy6pmCsSIIW+rFpqBHKPiiLPnpRDGFxyxee7uyWJFoBQ3owcCUabKHZigvZeehVfbxE7c= ccrow@ccrow-kubuntu
                 sudo: ['ALL=(ALL) NOPASSWD:ALL']
                 groups: sudo
