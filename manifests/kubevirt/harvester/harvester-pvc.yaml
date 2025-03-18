@@ -1,0 +1,42 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: harvester1
+  annotations:
+    volume.kubernetes.io/selected-node: gentoo-prime
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 260Gi
+  storageClassName: longhorn
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: harvester2
+  annotations:
+    volume.kubernetes.io/selected-node: gentoo-prime
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 260Gi
+  storageClassName: longhorn
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: harvester3
+  annotations:
+    volume.kubernetes.io/selected-node: gentoo-prime
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 260Gi
+  storageClassName: longhorn
