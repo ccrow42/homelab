@@ -34,7 +34,6 @@ spec:
             - name: bridge-vlan7
               model: e1000
               bridge: {}
-
         machine:
           type: q35
         resources:
