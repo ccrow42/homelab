@@ -1,0 +1,42 @@
+---
+global: 
+  k8s_provider: "generic"
+  image_registry_host: "docker.io"
+  image_registry_namespace: "portworx"
+  environment: "DEV"
+  control_plane_endpoint: "pds.pxbbq.com"
+  rm_datakey_store: "kubernetes"
+  storage_class: "px-repl2"
+  backup_storage_class: "px-repl2"
+  teleport_server_addr: "teleport.pxbbq.com"
+  storage_size: "10Gi"
+  enable_control_plane_metrics: true
+  metrics_storage_size: "8Gi"
+  billing_reports_ttl: "7d"
+  billing_proxy_secret: "platform-proxy-secret"
+CACerts: ""
+ingress: 
+  enabled: true
+  class: "nginx"
+  annotations: {}
+  controlPlaneAnnotations: {}
+  teleportAnnotations: {}
+tls: 
+  secretName: "platform-tls"
+  caSecretName: "platform-tls-ca"
+  issuer: 
+    selfSigned: 
+      ca: 
+        orgName: "Portworx"
+        commonName: "portworx.local"
+        altNames: []
+        validity: "3650d"
+        renewBefore: "7d"
+  certificate: 
+    orgName: "Portworx"
+    commonName: "pxbbq.com"
+    altNames: 
+      - "pds.pxbbq.com"
+      - "teleport.pxbbq.com"
+    validity: "730d"
+    renewBefore: "7d"

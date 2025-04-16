@@ -51,8 +51,10 @@ BINARY_DIR="/home/ccrow/bin"
 TEMP_DIR=${BASE_DIR}
 
 ### Templates we use
-RANCHER_SERVER_URL="https://labrancher.lan.ccrow.org"
-#RANCHER_SERVER_URL="https://10.0.1.104:8443"
+HOST_KUBEVIRT_CONTEXT="gentoo"
+RANCHER_SERVER_URL="https://rancher.pxbbq.com"
+RANCHER_SERVER_IP="10.0.5.10"
+K3S_IP="10.0.5.10"
 CONTROL_POOL_TEMPLATE="${BASE_DIR}/TEMPLATE-controlpool.yaml"
 WORKER_POOL_TEMPLATE="${BASE_DIR}/TEMPLATE-workerpool.yaml"
 CLUSTER_TEMPLATE="${BASE_DIR}/TEMPLATE-cluster.yaml"
@@ -69,7 +71,8 @@ ARGOCD_HELM_VALUES_ROOT="manifests"
 
 ### Defaults
 # These vars can be overridden by the script
-KUBECTL_CONTEXT="rancher"
+KUBECTL_CONTEXT="k3s"
+K3S_CONTEXT="k3s"
 POOL_NAME=""
 BUCKET_NAME="bucket"
 S3_REGION="us-west-2"

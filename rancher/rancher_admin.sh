@@ -267,6 +267,20 @@ kubectl_rancher_server () {
 
 }
 
+kubectl_k3s_server () {
+
+    if kubectl config use-context ${K3S_CONTEXT}; then
+        log "${K3S_CONTEXT} context already exists. Switching to it."
+    else
+        log "Creating ${K3S_CONTEXT} context"
+        kubectl config set-cluster ${k3s_CONTEXT} --server=${RANCHER_SERVER_URL}
+        kubectl config set-credentials ${K3S_CONTEXT} --token=${BEARER_TOKEN}
+        kubectl config set-context ${K3S_CONTEXT} --cluster=rancher --user=rancher --insecure-skip-tls-verify
+        kubectl config use-context ${K3S_CONTEXT}
+    fi
+
+}
+
 ### View kubeconfig
 kubectl_view_configs () {
     log "Showing ${KUBECTL_CONTEXT} context"

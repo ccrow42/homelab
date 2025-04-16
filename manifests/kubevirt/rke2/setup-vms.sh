@@ -3,7 +3,7 @@
 kubectl port-forward -n cdi svc/cdi-uploadproxy 8080:443 &
 PID=$!
 
-SERVERS=("rke2-01" "rke2-02" "rke2-03" "rke2-04" "rke2-11" "rke2-12" "rke2-13" "rke2-14")
+SERVERS=("rke2-01" "rke2-02" "rke2-03" "rke2-04")
 #SERVERS=("rke2-11" "rke2-12" "rke2-13" "rke2-14")
 #SERVERS=("rke2-05")
 #SERVERS=("util1")
@@ -22,7 +22,8 @@ for server in "${SERVERS[@]}"; do
     sleep 60
 
     MAC=$(kubectl get vmi $server -o yaml | yq .spec.domain.devices.interfaces[1].macAddress)
-    IP=$(ssh ubuntu@10.0.1.1 "cat /opt/dnsmasq/dnsmasq.leases | grep $MAC" | awk '{print $3}')
+    #IP=$(ssh ubuntu@10.0.1.1 "cat /opt/dnsmasq/dnsmasq.leases | grep $MAC" | awk '{print $3}')
+    IP=$(kubectl get vmi $server -o json | jq -r .status.interfaces.[0].ipAddress)
     ssh ubuntu@10.0.1.1 "echo \"${IP} $server\" | sudo tee -a /etc/hosts"
 #    ssh -o StrictHostKeyChecking=accept-new ubuntu@${RKE2_IP} "sudo resolvectl dns enp1s0 10.0.5.1"
     sleep 10

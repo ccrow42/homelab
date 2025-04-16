@@ -1,0 +1,7 @@
+git clone https://github.com/k8snetworkplumbingwg/whereabouts && cd whereabouts
+kubectl apply \
+    -f doc/crds/daemonset-install.yaml \
+    -f doc/crds/whereabouts.cni.cncf.io_ippools.yaml \
+    -f doc/crds/whereabouts.cni.cncf.io_overlappingrangeipreservations.yaml
+
+

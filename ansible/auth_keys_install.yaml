@@ -1,6 +1,6 @@
 ---
 - name: update authorized keys
-  hosts: all
+  hosts: turing
   become: yes
   tasks:
     - name: Set authorized key taken from file

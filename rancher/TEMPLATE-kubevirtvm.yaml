@@ -1,0 +1,75 @@
+apiVersion: kubevirt.io/v1alpha3
+kind: VirtualMachine
+metadata:
+  name: _HOSTNAME_
+  labels:
+    vm: _HOSTNAME_
+spec:
+  runStrategy: Halted
+  template:
+    metadata:
+      labels:
+        kubevirt.io/domain: _HOSTNAME_
+    spec:
+      domain:
+        cpu:
+          cores: 4
+        devices:
+          disks:
+          - disk:
+              bus: virtio
+            name: harddrive
+          - disk:
+              bus: virtio
+            name: cloudinitdisk
+          interfaces:
+            - name: vlan5
+              model: virtio
+              bridge: {}
+        machine:
+          type: q35
+        resources:
+          requests:
+            memory: 16G
+      networks:
+        - name: vlan5
+          multus:
+            default: true
+            networkName: default/bridge-vlan5
+      volumes:
+      - name: harddrive
+        persistentVolumeClaim:
+          claimName: _HOSTNAME_-boot
+      - containerDisk:
+          image: kubevirt/virtio-container-disk
+        name: virtiocontainerdisk
+      - name: cloudinitdisk
+        cloudInitNoCloud:
+          networkData: |
+            version: 2
+            ethernets:
+              enp1s0:
+                dhcp4: false
+                addresses:
+                  - _IP_ADDRESS_/24
+                gateway4: 10.0.5.1
+                nameservers:
+                  addresses:
+                    - 10.0.5.1
+          userData: |
+            #cloud-config
+            hostname: _HOSTNAME_
+            manage_etc_hosts: true
+            users:
+              - name: ubuntu
+                plain_text_passwd: 'ubuntu'
+                lock_passwd: false
+                ssh_authorized_keys:
+                 - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC+kx58yg6pGei4XrdXJhNfkRvfKWhGPUveM90+OGt74DbUc0B/BkfN5enpzEn3IciEOUm65TDQP0f1rmYxxWt9UPJWH2zvaWmaCdq0JUsf+V8N+G5gHpCVNJTMWeogtskpMGIKv7HJMH35RuBnM71ZHeMwTvhb422evYYq+8yUiRUc9B90p4w9Kshl+FjyOsSMn7m+9WS6HjX8Gbp+k8CGxqIrFz6t+ZE/uNmqlDaMZtXgJJIC+QrN/u14AfRX84VktNo4UPUgGmgrnCwk6fs6J5a55R6nEJ1qYHUnqkB+1AjwP2tZocHmeZkQilLT1kQvI3iIEHfyJya/c2zOZbiyu6XRsiYv/h28Ev6eevzoAQjeXq8IN/1PjZogRxgr7MpI/1GaHyq4SNBeCcgU6nk003kL6Y6o7GXTVaZbjCMdK6kF+Oi1MQtGygu4X9iy6pmCsSIIW+rFpqBHKPiiLPnpRDGFxyxee7uyWJFoBQ3owcCUabKHZigvZeehVfbxE7c= ccrow@ccrow-kubuntu
+                 - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCZA0EXunXfGEi0E1Sg+Yjd/TsgUUopGHcKBWEic3NElGKhB+Qg2NKgd4KKdpL+eQ/GwsIsO5eQBUrs3wx1Ta3M7bQlqdXAUJAezFQi0u11RkTV94DGASJv3pIlFgd/Uyhmg+qD/us8U124MFu9rvpxl4qIVKQKuqWQP07/7JA/EK8GwysHlFghhxo3Ol40BF4caXg98h43jcZ2XlL3gt4bw4YSR9/VcWeB9PJ7G65tVBMjOQ//24fw72O2Tw4jP9dvfanrGrrXKK4afH8LTtXCiN8AWHhqOEPZ9g0rkXS1XSLW4KO7jhlE55ESQKMK4HVu9kq1rq7Mlcj9yzAp+AIsjy/yMab6mWwGW75y7S5zsgljfSk56EjIQKV/lxd4XHzoE/dARREWqK4r5X4w2DN0drRAOQZjxhTJSIiuBet3WQcvs1RkgdhjcM2KbvzgwkVSxDlgXKnPhyoYW0nHZnmjHucabV2Bx3leZCfuPO8BagJgQKWrVkxDdHlB1ZtQjAc= ccrow@virt-desktop
+                sudo: ['ALL=(ALL) NOPASSWD:ALL']
+                groups: sudo
+                shell: /bin/bash
+
+            runcmd:
+              - systemctl restart networking

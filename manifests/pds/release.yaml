@@ -1,0 +1,598 @@
+---
+apiVersion: "infra.portworx.com/v1"
+kind: "Release"
+metadata: 
+  annotations: 
+    commit: "d6e102a"
+  creationTimestamp: null
+  labels: 
+    commit: "d6e102a"
+  name: "v0.0.15-unstable"
+spec: 
+  components: 
+    - 
+      annotations: 
+        component.infra.portworx.com/bootstrap: "true"
+        component.infra.portworx.com/retain: "true"
+        component.infra.portworx.com/type: "helmrelease"
+      config: 
+        flux: 
+          enabled: true
+          global: 
+            imageRegistry: "{{image_registry}}"
+      image_path: "oci://docker.io/portworx/maas-infra-charts"
+      image_version: "1.0.0-1114788"
+      name: "flux"
+    - 
+      annotations: 
+        component.infra.portworx.com/bootstrap: "true"
+        component.infra.portworx.com/retain: "true"
+        component.infra.portworx.com/type: "helmrelease"
+      config: 
+        dbClusterName: "platform-db"
+        imagePullSecretName: "docker-registry-credentials"
+        imageRegistry: "{{image_registry}}"
+        imageRegistryCASecretName: "ca-certs"
+        k8sProvider: "{{k8s_provider}}"
+        pds-mutator: 
+          enabled: true
+          imageRegistry: "{{image_registry}}"
+          size: "{{size}}"
+        pdsPostgresTemplate: 
+          backupStorageClassName: "{{backup_storage_class}}"
+          configuration: 
+            MAX_CONNECTIONS: "200"
+          enabled: true
+          storageClassName: "{{storage_class}}"
+          storageSize: "{{storage_size}}"
+        postgresTemplate: 
+          enabled: false
+        selfManaged: true
+        teleportBackup: 
+          enabled: true
+      image_path: "oci://docker.io/portworx/maas-infra-operators-config"
+      image_version: "0.0.1-69de39e"
+      name: "platform-operator"
+    - 
+      annotations: 
+        component.infra.portworx.com/type: "helmrelease"
+      config: 
+        imagePullSecrets: 
+          - 
+            name: "docker-registry-credentials"
+        imageRegistry: "{{image_registry}}"
+        k8sProvider: "{{k8s_provider}}"
+        server: 
+          config: 
+            fullnameOverride: "temporal"
+            nameOverride: "temporal"
+            persistence: 
+              default: 
+                driver: "sql"
+                sql: 
+                  database: "temporal"
+                  driver: "postgres12"
+                  existingSecret: "platform-db-cluster-admin-creds"
+                  host: "platform-db-{{namespace}}.{{namespace}}.svc.cluster.local"
+                  port: 5432
+                  tls: 
+                    disableHostVerification: true
+                    enableHostVerification: false
+                    enabled: false
+                  user: "pds-cluster-admin"
+              visibility: 
+                driver: "sql"
+                sql: 
+                  database: "temporal_visibility"
+                  driver: "postgres12"
+                  existingSecret: "platform-db-cluster-admin-creds"
+                  host: "platform-db-{{namespace}}.{{namespace}}.svc.cluster.local"
+                  port: 5432
+                  tls: 
+                    disableHostVerification: true
+                    enableHostVerification: false
+                    enabled: false
+                  user: "pds-cluster-admin"
+          replicaCount: 2
+        web: 
+          enabled: false
+      image_path: "oci://docker.io/portworx/temporalio-charts"
+      image_version: "0.7.0-9e64ac8"
+      name: "temporal"
+    - 
+      annotations: 
+        component.infra.portworx.com/type: "helmrelease"
+      config: 
+        controlPlaneEndpoint: "{{control_plane_endpoint}}"
+        global: 
+          imageRegistry: "{{image_registry}}"
+          k8sProvider: "{{k8s_provider}}"
+        ingress: 
+          gateway: 
+            env: 
+              ADMIN_LISTEN: "0.0.0.0:8444 http2 ssl"
+              DATABASE: "off"
+              PLUGINS: "bundled,pxauth,clusterauth,pxlicense"
+              PLUGINSERVER_CLUSTERAUTH_QUERY_CMD: "/usr/local/bin/clusterauth -dump -kong-prefix /kong_prefix"
+              PLUGINSERVER_CLUSTERAUTH_SOCKET: "/kong_prefix/clusterauth.socket"
+              PLUGINSERVER_CLUSTERAUTH_START_CMD: "/usr/local/bin/clusterauth -kong-prefix /kong_prefix"
+              PLUGINSERVER_NAMES: "clusterauth,pxlicense"
+              PLUGINSERVER_PXLICENSE_QUERY_CMD: "/usr/local/bin/pxlicense -dump -kong-prefix /kong_prefix"
+              PLUGINSERVER_PXLICENSE_SOCKET: "/kong_prefix/pxlicense.socket"
+              PLUGINSERVER_PXLICENSE_START_CMD: "/usr/local/bin/pxlicense -kong-prefix /kong_prefix"
+              PROXY_LISTEN: "0.0.0.0:8000, 0.0.0.0:8443 http2 ssl"
+              ROLE: "traditional"
+              STATUS_LISTEN: "0.0.0.0:8100"
+            size: "{{size}}"
+        pxAuth: 
+          - 
+            issuer: "https://px-central-rest/central/api"
+            jwks_url: "http://px-central-rest/central/api/protocol/openid-connect/certs"
+          - 
+            issuer: "https://{{control_plane_endpoint}}/central/api"
+            jwks_url: "https://{{control_plane_endpoint}}/central/api/protocol/openid-connect/certs"
+        pxLicense: 
+          licenseAgent: "licensing-billing-agent-grpc"
+        selfManaged: true
+      image_path: "oci://docker.io/portworx/kong-charts"
+      image_version: "0.13.1-a824bb4"
+      name: "kong"
+    - 
+      annotations: 
+        component.infra.portworx.com/type: "helmrelease"
+      config: 
+        auth: 
+          extraContainers: 
+            - 
+              env: 
+                - 
+                  name: "TELEPORT_DATA_DIR"
+                  value: "/var/lib/teleport"
+                - 
+                  name: "BACKUPS_DIR"
+                  value: "/shared/teleport-backups"
+                - 
+                  name: "BACKUPS_RETENTION_DAYS"
+                  value: "1"
+              image: "{{image_registry}}/teleport-backups:b1289d3"
+              imagePullPolicy: "Always"
+              name: "backups"
+              securityContext: 
+                allowPrivilegeEscalation: false
+                capabilities: 
+                  drop: 
+                    - "ALL"
+                runAsGroup: 65532
+                runAsNonRoot: true
+                runAsUser: 65532
+                seccompProfile: 
+                  type: "RuntimeDefault"
+              volumeMounts: 
+                - 
+                  mountPath: "/var/lib/teleport"
+                  name: "data"
+                - 
+                  mountPath: "/shared/teleport-backups"
+                  name: "shared-backups"
+                  subPath: "teleport-backups"
+          extraVolumes: 
+            - 
+              configMap: 
+                name: "teleport-roles"
+              name: "teleport-roles-volume"
+            - 
+              name: "shared-backups"
+              persistentVolumeClaim: 
+                claimName: "sharedbackupsdir-platform-db"
+        clusterName: "{{teleport_server_addr}}"
+        imageRegistry: "{{image_registry}}"
+        k8sProvider: "{{k8s_provider}}"
+        persistence: 
+          storageClassName: "{{storage_class}}"
+        proxyListenerMode: "multiplex"
+        pxSetup: 
+          enabled: true
+          serverAddr: "{{teleport_server_addr}}"
+          serverName: "teleport-server"
+        service: 
+          type: "ClusterIP"
+        teleportVersionOverride: "16.4.18"
+        tls: 
+          existingCASecretName: "{{ca_secret_name}}"
+          existingSecretName: "{{tls_secret_name}}"
+      image_path: "oci://docker.io/portworx/teleport-server-charts"
+      image_version: "16.4.18-c8ea2ab"
+      name: "teleport-server"
+    - 
+      annotations: 
+        component.infra.portworx.com/type: "helmrelease"
+      config: 
+        prometheus: 
+          enabled: true
+          global: 
+            imageRegistry: "{{image_registry}}"
+          server: 
+            persistentVolume: 
+              size: "{{metrics_storage_size}}"
+              storageClass: "{{storage_class}}"
+      image_path: "oci://docker.io/portworx/maas-infra-charts"
+      image_version: "1.0.0-1114788"
+      name: "prometheus"
+    - 
+      annotations: 
+        component.infra.portworx.com/type: "helmrelease"
+      config: 
+        db: 
+          claim: true
+          host: "platform-db-{{namespace}}.{{namespace}}.svc.cluster.local"
+          name: "teleport_management_service"
+          pgConfig: "platform-db-{{namespace}}"
+          secret: "platform-db-cluster-admin-creds"
+        imagePullSecretName: "docker-registry-credentials"
+        imageRegistry: "{{image_registry}}"
+        k8sProvider: "{{k8s_provider}}"
+        metrics: 
+          enabled: "{{enable_control_plane_metrics}}"
+          port: "9090"
+        teleportServers: 
+          - 
+            auth_address: "teleport-server-auth:3025"
+            host: "teleport-server.{{namespace}}"
+            identity_file: "/etc/teleport/teleport/identityfile"
+            max_connections: 500
+            name: "teleport-server"
+            proxy_address: "{{teleport_server_addr}}"
+        volumeMounts: 
+          - 
+            mountPath: "/etc/teleport/"
+            name: "teleport-servers-config"
+          - 
+            mountPath: "/etc/teleport/teleport"
+            name: "teleport-identity"
+        volumes: 
+          - 
+            configMap: 
+              name: "teleport-servers-config"
+            name: "teleport-servers-config"
+          - 
+            name: "teleport-identity"
+            secret: 
+              secretName: "teleport-server"
+      depends_on: 
+        - 
+          name: "teleport-server"
+      image_path: "oci://docker.io/portworx/teleport-management-service"
+      image_version: "1.0.0-b1289d3"
+      name: "teleport-management-service"
+    - 
+      annotations: 
+        component.infra.portworx.com/type: "helmrelease"
+      config: 
+        apiPrefix: "/central"
+        appEnv: "onprem"
+        controlPlaneEndpoint: "{{control_plane_endpoint}}"
+        db: 
+          claim: true
+          host: "platform-db-{{namespace}}.{{namespace}}.svc.cluster.local"
+          name: "px_central_db"
+          pgConfig: "platform-db-{{namespace}}"
+          secret: "platform-db-cluster-admin-creds"
+          type: "pgsql"
+        imagePullSecretName: "docker-registry-credentials"
+        imageRegistry: "{{image_registry}}"
+        ingress: 
+          hostname: "{{control_plane_endpoint}}"
+          tls: 
+            enabled: "{{tls_enabled}}"
+            secretName: "{{tls_secret_name}}"
+        k8sProvider: "{{k8s_provider}}"
+        size: "{{size}}"
+      depends_on: 
+        - 
+          name: "temporal"
+      image_path: "oci://docker.io/portworx/px-central-charts"
+      image_version: "0.0.1-dev-d0d42a7"
+      name: "px-central"
+    - 
+      annotations: 
+        component.infra.portworx.com/type: "helmrelease"
+      config: 
+        agentTLSCert: 
+          certKey: "ca.pem"
+          enabled: true
+          secretName: "{{ca_secret_name}}"
+        appRegistry: 
+          caCertSecretName: "ca-certs"
+          credsSecretName: "docker-registry-credentials"
+          host: "{{image_registry_host}}"
+          insecureTLSVerify: true
+          namespace: "{{image_registry_namespace}}"
+        controlPlaneEndpoint: "{{control_plane_endpoint}}"
+        db: 
+          claim: true
+          host: "platform-db-{{namespace}}.{{namespace}}.svc.cluster.local"
+          name: "cluster_service_db"
+          pgConfig: "platform-db-{{namespace}}"
+          port: "5432"
+          secret: "cluster-service-admin.platform-db-{{namespace}}.infra.portworx.db"
+          users: 
+            cluster-service-admin: []
+        imageRegistry: "{{image_registry}}"
+        ingress: 
+          hostname: "{{control_plane_endpoint}}"
+          tls: 
+            enabled: "{{tls_enabled}}"
+            secretName: "{{tls_secret_name}}"
+        k8sProvider: "{{k8s_provider}}"
+        metrics: 
+          enabled: "{{enable_control_plane_metrics}}"
+          port: "9090"
+        size: "{{size}}"
+        teleportSvcAddr: "teleport-management-service-grpc"
+      depends_on: 
+        - 
+          name: "resource-manager"
+        - 
+          name: "teleport-management-service"
+        - 
+          name: "maas-identity"
+      image_path: "docker.io/portworx/maas-cluster-service-charts"
+      image_version: "2.7.0-7e64dac"
+      name: "target-cluster-service"
+    - 
+      annotations: 
+        component.infra.portworx.com/type: "helmrelease"
+      config: 
+        db: 
+          claim: true
+          host: "platform-db-{{namespace}}.{{namespace}}.svc.cluster.local"
+          name: "resource_manager_db"
+          pgConfig: "platform-db-{{namespace}}"
+          port: "5432"
+          secret: "resource-manager-admin.platform-db-{{namespace}}.infra.portworx.db"
+          users: 
+            resource-manager-admin: []
+        deploymentMode: "sm"
+        imageRegistry: "{{image_registry}}"
+        ingress: 
+          hostname: "{{control_plane_endpoint}}"
+          tls: 
+            enabled: "{{tls_enabled}}"
+            secretName: "{{tls_secret_name}}"
+        k8sProvider: "{{k8s_provider}}"
+        metrics: 
+          enabled: "{{enable_control_plane_metrics}}"
+          port: "9090"
+        opaNamespace: "{{namespace}}"
+        size: "{{size}}"
+      depends_on: 
+        - 
+          name: "iam-opa"
+      image_path: "docker.io/portworx/maas-resource-manager-charts"
+      image_version: "2.7.0-8eb815f"
+      name: "resource-manager"
+    - 
+      annotations: 
+        component.infra.portworx.com/type: "helmrelease"
+      config: 
+        imageRegistry: "{{image_registry}}"
+        k8sProvider: "{{k8s_provider}}"
+        size: "{{size}}"
+      image_path: "docker.io/portworx/maas-iam-opa-charts"
+      image_version: "2.7.0-8eb815f"
+      name: "iam-opa"
+    - 
+      annotations: 
+        component.infra.portworx.com/type: "helmrelease"
+      config: 
+        db: 
+          claim: true
+          host: "platform-db-{{namespace}}.{{namespace}}.svc.cluster.local"
+          name: "maas_identity_db"
+          pgConfig: "platform-db-{{namespace}}"
+          port: "5432"
+          secret: "maas-identity-admin.platform-db-{{namespace}}.infra.portworx.db"
+          users: 
+            maas-identity-admin: []
+        imageRegistry: "{{image_registry}}"
+        ingress: 
+          hostname: "{{control_plane_endpoint}}"
+          tls: 
+            enabled: "{{tls_enabled}}"
+            secretName: "{{tls_secret_name}}"
+        k8sProvider: "{{k8s_provider}}"
+        metrics: 
+          enabled: "{{enable_control_plane_metrics}}"
+          port: "9090"
+        pxCentral: 
+          apiPrefix: "/central/api"
+          hostname: "http://px-central-rest"
+        selfManaged: true
+        selfSigningSecret: 
+          key: "self_signing_secret"
+          kind: "secret"
+          name: "platform-signing-keys"
+        size: "{{size}}"
+      depends_on: 
+        - 
+          name: "px-central"
+      image_path: "docker.io/portworx/maas-identity-charts"
+      image_version: "2.7.0-6026814"
+      name: "maas-identity"
+    - 
+      annotations: 
+        component.infra.portworx.com/type: "helmrelease"
+      config: 
+        db: 
+          claim: true
+          host: "platform-db-{{namespace}}.{{namespace}}.svc.cluster.local"
+          name: "pds_db"
+          pgConfig: "platform-db-{{namespace}}"
+          port: "5432"
+          secret: "pds-admin.platform-db-{{namespace}}.infra.portworx.db"
+          users: 
+            pds-admin: []
+        encryptionKey: "{{self_signing_secret}}"
+        imageRegistry: "{{image_registry}}"
+        ingress: 
+          hostname: "{{control_plane_endpoint}}"
+          tls: 
+            enabled: "{{tls_enabled}}"
+            secretName: "{{tls_secret_name}}"
+        insecureImageRegistryPull: true
+        k8sProvider: "{{k8s_provider}}"
+        metrics: 
+          enabled: "{{enable_control_plane_metrics}}"
+          port: "9090"
+        size: "{{size}}"
+        teleport: 
+          address: "teleport-management-service-grpc"
+        temporal: 
+          address: "temporal-temporalio-charts-frontend:7233"
+          namespace: "{{namespace}}"
+      depends_on: 
+        - 
+          name: "temporal"
+        - 
+          name: "target-cluster-service"
+        - 
+          name: "resource-manager"
+        - 
+          name: "teleport-management-service"
+      image_path: "docker.io/portworx/pds-api-server"
+      image_version: "2.7.0-7bddf1f"
+      name: "pds-api-server"
+    - 
+      annotations: 
+        component.infra.portworx.com/type: "helmrelease"
+      config: 
+        db: 
+          claim: true
+          host: "platform-db-{{namespace}}.{{namespace}}.svc.cluster.local"
+          name: "pds_db"
+          pgConfig: "platform-db-{{namespace}}"
+          port: "5432"
+          secret: "pds-admin.platform-db-{{namespace}}.infra.portworx.db"
+          users: 
+            pds-admin: []
+        imageRegistry: "{{image_registry}}"
+        ingress: 
+          hostname: "{{control_plane_endpoint}}"
+          tls: 
+            enabled: "{{tls_enabled}}"
+            secretName: "{{tls_secret_name}}"
+        k8sProvider: "{{k8s_provider}}"
+        metrics: 
+          enabled: "{{enable_control_plane_metrics}}"
+          port: "9090"
+        resourceManagerService: 
+          name: "resource-manager-grpc"
+          port: "9001"
+        size: "{{size}}"
+        teleportManagementService: 
+          name: "teleport-management-service-grpc"
+          port: "9001"
+        temporal: 
+          address: "temporal-temporalio-charts-frontend:7233"
+          namespace: "{{namespace}}"
+          workflowRetentionPeriodInDays: 5
+      depends_on: 
+        - 
+          name: "temporal"
+        - 
+          name: "teleport-management-service"
+        - 
+          name: "pds-api-server"
+      image_path: "docker.io/portworx/pds-api-worker"
+      image_version: "2.7.0-c63dbba"
+      name: "pds-api-worker"
+    - 
+      annotations: 
+        component.infra.portworx.com/type: "helmrelease"
+      config: 
+        imageRegistry: "{{image_registry}}"
+        ingress: 
+          hostname: "{{control_plane_endpoint}}"
+          tls: 
+            enabled: "{{tls_enabled}}"
+            secretName: "{{tls_secret_name}}"
+        k8sProvider: "{{k8s_provider}}"
+        size: "{{size}}"
+      image_path: "docker.io/portworx/px-platform"
+      image_version: "2.7.0-6b310e7"
+      name: "platform-ui"
+    - 
+      annotations: 
+        component.infra.portworx.com/type: "helmrelease"
+      config: 
+        imageRegistry: "{{image_registry}}"
+        ingress: 
+          hostname: "{{control_plane_endpoint}}"
+          tls: 
+            enabled: "{{tls_enabled}}"
+            secretName: "{{tls_secret_name}}"
+        k8sProvider: "{{k8s_provider}}"
+        size: "{{size}}"
+      image_path: "docker.io/portworx/px-pds-ui"
+      image_version: "2.7.0-71d10bd"
+      name: "pds-ui"
+    - 
+      annotations: 
+        component.infra.portworx.com/type: "helmrelease"
+      config: 
+        db: 
+          claim: true
+          host: "platform-db-{{namespace}}.{{namespace}}.svc.cluster.local"
+          name: "lb_agent_db"
+          pgConfig: "platform-db-{{namespace}}"
+          port: "5432"
+          prune: false
+          secret: "lb-agent-admin.platform-db-{{namespace}}.infra.portworx.db"
+          users: 
+            lb-agent-admin: []
+        imageRegistry: "{{image_registry}}"
+        ingress: 
+          hostname: "{{control_plane_endpoint}}"
+          tls: 
+            enabled: "{{tls_enabled}}"
+            secretName: "{{tls_secret_name}}"
+        k8sProvider: "{{k8s_provider}}"
+        metrics: 
+          enabled: "{{enable_control_plane_metrics}}"
+          port: "9090"
+        proxySecretName: "{{billing_proxy_secret}}"
+        size: "{{size}}"
+        submittedReportTTL: "{{billing_reports_ttl}}"
+      depends_on: 
+        - 
+          name: "temporal"
+      image_path: "docker.io/portworx/maas-licensing-billing-agent-charts"
+      image_version: "0.0.0-7d7b09c"
+      name: "license-billing-agent"
+  configuration: 
+    - 
+      description: "Bootstrapper application config"
+      values: 
+        platform.io/application/chart/px-bootstrapper: "oci://docker.io/portworx/platform-agent:2.7.0-f4c661b"
+        platform.io/application/config/px-bootstrapper: "tags:\n  bootstrapper: true"
+    - 
+      description: "Platform agent application config"
+      values: 
+        platform.io/application/chart/px-agent: "oci://docker.io/portworx/platform-agent:2.7.0-f4c661b"
+        platform.io/application/config/px-agent: "tags:\n  core-agent: true\n  teleport-agent: true\nteleport-kube-agent:\n  proxyAddr: '{{.TeleportProxyAddr}}'\n  kubeClusterName: '{{.TeleportKubeClusterName}}'\n  authToken: '{{.TeleportJoinToken}}'\nglobal:\n  imageRegistry: '{{image_registry}}'\n  kubePlatform: '{{kube_platform}}'"
+    - 
+      description: "PDS application config"
+      values: 
+        platform.io/application/chart/pds: "oci://docker.io/portworx/pds-charts:2.7.0-c145d55"
+        platform.io/application/config/pds: "tags:\n  all: true\nglobal:\n  platform: '{{kube_platform}}'\n  customRegistry: '{{image_registry}}'"
+    - 
+      description: "Platform Feature Flags"
+      values: 
+        platform.io/feature/account-onboarding: "enabled"
+        platform.io/feature/enable-cms: "enabled"
+        platform.io/feature/enable-teleport: "enabled"
+    - 
+      description: "Datservices Schema"
+      values: 
+        pds.io/dataservices/schema: "docker.io/portworx/pds-dataservices-metadata:dev-6ff668e"
+status: {}

@@ -1,0 +1,15 @@
+---
+apiVersion: "infra.portworx.com/v1"
+kind: "ControlPlane"
+metadata: 
+  name: "pds-self-managed"
+  annotations: 
+    database.infra.portworx.com/driver: "pds"
+spec: 
+  size: "small"
+  release: "unstable"
+  retain: true
+  configReferences: 
+    - 
+      name: "platform-signing-keys"
+      type: "secret"
