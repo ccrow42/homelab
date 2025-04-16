@@ -302,25 +302,107 @@ create_rancher_cluster () {
     # Create the cluster
     kubectl config use-context ${KUBECTL_CONTEXT}
     
-    # Variable Substitution
-    CONTROL_POOL=$(< ${CONTROL_POOL_TEMPLATE})
-    debug "control pool: ${CONTROL_POOL}"
-    debug "control pool template: ${CONTROL_POOL_TEMPLATE}"
-    CONTROL_POOL="${CONTROL_POOL//${POOL_NAME_PLACEHOLDER}/${POOL_NAME}}"
-    debug "new control pool: ${CONTROL_POOL}"
+    ## Create VMs for Pool
+    # This is horrible and static
+    if [[ ${POOL_NAME} == "rke2-lab-01" ]]; then
+        ${BASE_DIR}/newvm.sh create --ip 10.0.5.11 --vmname rke2-lab-01-01 --pxdisk true
+        ${BASE_DIR}/newvm.sh create --ip 10.0.5.12 --vmname rke2-lab-01-02 --pxdisk true
+        ${BASE_DIR}/newvm.sh create --ip 10.0.5.13 --vmname rke2-lab-01-03 --pxdisk true
+    fi
+    kubectl config use-context ${KUBECTL_CONTEXT}
+    # Create the cluster
+      cat << EOF | kubectl apply -f -
+apiVersion: provisioning.cattle.io/v1
+kind: Cluster
+metadata:
+  name: ${POOL_NAME}
+  namespace: fleet-default
+spec:
+  kubernetesVersion: ${RANCHER_K8S_VERSION}
+  localClusterAuthEndpoint: {}
+  rkeConfig:
+    chartValues:
+      rke2-calico: {}
+    dataDirectories: {}
+    etcd:
+      snapshotRetention: 5
+      snapshotScheduleCron: 0 */5 * * *
+    machineGlobalConfig:
+      cni: calico
+      disable-kube-proxy: false
+      etcd-expose-metrics: false
+    machinePoolDefaults: {}
+    machineSelectorConfig:
+    - config:
+        protect-kernel-defaults: false
+    registries: {}
+    upgradeStrategy:
+      controlPlaneConcurrency: "1"
+      controlPlaneDrainOptions:
+        deleteEmptyDirData: true
+        disableEviction: false
+        enabled: false
+        force: false
+        gracePeriod: -1
+        ignoreDaemonSets: true
+        ignoreErrors: false
+        postDrainHooks: null
+        preDrainHooks: null
+        skipWaitForDeleteTimeoutSeconds: 0
+        timeout: 120
+      workerConcurrency: "1"
+      workerDrainOptions:
+        deleteEmptyDirData: true
+        disableEviction: false
+        enabled: false
+        force: false
+        gracePeriod: -1
+        ignoreDaemonSets: true
+        ignoreErrors: false
+        postDrainHooks: null
+        preDrainHooks: null
+        skipWaitForDeleteTimeoutSeconds: 0
+        timeout: 120
+EOF
 
-    WORKER_POOL=$(< ${WORKER_POOL_TEMPLATE})
-    debug "worker pool: ${WORKER_POOL}"
-    debug "worker pool template: ${WORKER_POOL_TEMPLATE}"
-    WORKER_POOL="${WORKER_POOL//${POOL_NAME_PLACEHOLDER}/${POOL_NAME}}"
-    debug "new worker pool: ${WORKER_POOL}"
+    CLUSTERID=$(kubectl --context ${KUBECTL_CONTEXT} -n fleet-default get clusters.provisioning.cattle.io ${POOL_NAME} -o yaml | yq -r .status.clusterName)
 
-    CLUSTER=$(< ${CLUSTER_TEMPLATE})
-    CLUSTER="${CLUSTER//${POOL_NAME_PLACEHOLDER}/${POOL_NAME}}"
+    log "CLUSTERID: $CLUSTERID"
 
-    kubectl apply -f <(echo "${CONTROL_POOL}")
-    kubectl apply -f <(echo "${WORKER_POOL}")
-    kubectl apply -f <(echo "${CLUSTER}")
+
+    curl -s '${RANCHER_SERVER_URL}/v3/clusterregistrationtoken' -H 'content-type: application/json' -H "Authorization: Bearer $BEARER_TOKEN" --data-binary '{"type":"clusterRegistrationToken","clusterId":"'$CLUSTERID'"}' #--insecure
+
+ until [[ $AGENTCMD != "" ]]; do
+    AGENTCMD=`curl -s ${RANCHER_SERVER_URL}'/v3/clusterregistrationtoken?id="'$CLUSTERID'"' -H 'content-type: application/json' -H "Authorization: Bearer $BEARER_TOKEN" | jq -r '.data[].nodeCommand' | head -1`
+    log "AGENTCMD: $AGENTCMD"
+    debug "agentcmd full output: "
+    sleep 10
+  done
+
+
+  sleep 40
+
+    # Again, aweful and static
+    if [[ ${POOL_NAME} == "rke2-lab-01" ]]; then
+
+          ssh ubuntu@rke2-lab-01-01 -o StrictHostKeyChecking=no << EOF
+            sleep 5
+
+            $AGENTCMD --controlplane --etcd --worker
+EOF
+          ssh ubuntu@rke2-lab-01-02 -o StrictHostKeyChecking=no << EOF
+            sleep 5
+
+            $AGENTCMD --controlplane --etcd --worker
+EOF
+          ssh ubuntu@rke2-lab-01-03 -o StrictHostKeyChecking=no << EOF
+            sleep 5
+
+            $AGENTCMD --controlplane --etcd --worker
+EOF
+
+    fi
+
 }
 
 ### List the available pools on the server
@@ -336,9 +418,13 @@ delete_rancher_cluster () {
     log "Deleting the cluster ${POOL_NAME}"
     kubectl config use-context ${KUBECTL_CONTEXT}
     kubectl delete -n fleet-default clusters ${POOL_NAME}
-    kubectl -n fleet-default delete VmwarevsphereConfig nc-${POOL_NAME}-control
-    kubectl -n fleet-default delete VmwarevsphereConfig nc-${POOL_NAME}-worker
 
+    if [[ ${POOL_NAME} == "rke2-lab-01" ]]; then
+        ${BASE_DIR}/newvm.sh delete --ip 10.0.5.11 --vmname rke2-lab-01-01 --pxdisk true
+        ${BASE_DIR}/newvm.sh delete --ip 10.0.5.12 --vmname rke2-lab-01-02 --pxdisk true
+        ${BASE_DIR}/newvm.sh delete --ip 10.0.5.13 --vmname rke2-lab-01-03 --pxdisk true
+    fi
+    kubectl config use-context ${KUBECTL_CONTEXT}
     kubectl config delete-context ${POOL_NAME}
     kubectl config delete-cluster ${POOL_NAME}
 

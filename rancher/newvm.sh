@@ -138,6 +138,8 @@ delete_vm () {
     kubectl delete pvc ${VMNAME}-px
     ssh-keygen -f '/home/ccrow/.ssh/known_hosts' -R \'${IP}\'
     ssh ubuntu@10.0.1.1 "sudo sed -i \"/^${IP//./\\.}/d\" /etc/hosts"
+    sudo sed -i "/^${IP//./\\.}/d" /etc/hosts
+    ssh-keygen -f '/home/ccrow/.ssh/known_hosts' -R $VMNAME
 }
 
 ### Begin code block

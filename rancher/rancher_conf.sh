@@ -78,8 +78,9 @@ BUCKET_NAME="bucket"
 S3_REGION="us-west-2"
 # should be set to --disable-ssl if you are using http, otherwise NULL
 DISABLE_SSL="--disable-ssl"
+RANCHER_K8S_VERSION="v1.31.7+rke2r1"
 
 ### Versions
-PXBACKUP_VERSION=${PXBACKUP_VERSION:-2.7.0}
+PXBACKUP_VERSION=${PXBACKUP_VERSION:-2.8.2}
 # We are using customize here
 #PORTWORX_VERSION=${PORTWORK_VERSION:-3.1}
