@@ -370,7 +370,7 @@ EOF
     log "CLUSTERID: $CLUSTERID"
 
 
-    curl -s '${RANCHER_SERVER_URL}/v3/clusterregistrationtoken' -H 'content-type: application/json' -H "Authorization: Bearer $BEARER_TOKEN" --data-binary '{"type":"clusterRegistrationToken","clusterId":"'$CLUSTERID'"}' #--insecure
+    curl -s ${RANCHER_SERVER_URL}'/v3/clusterregistrationtoken' -H 'content-type: application/json' -H "Authorization: Bearer $BEARER_TOKEN" --data-binary '{"type":"clusterRegistrationToken","clusterId":"'$CLUSTERID'"}' #--insecure
 
  until [[ $AGENTCMD != "" ]]; do
     AGENTCMD=`curl -s ${RANCHER_SERVER_URL}'/v3/clusterregistrationtoken?id="'$CLUSTERID'"' -H 'content-type: application/json' -H "Authorization: Bearer $BEARER_TOKEN" | jq -r '.data[].nodeCommand' | head -1`
@@ -435,9 +435,9 @@ delete_rancher_cluster () {
 create_context () {
     requires_poolname
     log "Creating a context for ${POOL_NAME}"
-    CONTEXT_URL="$(kubectl --context ${KUBECTL_CONTEXT} config view --flatten --minify | yq -r .clusters[0].cluster.server)/k8s/clusters/$(kubectl --context ${KUBECTL_CONTEXT} -n fleet-default get clusters.provisioning.cattle.io ${POOL_NAME} -o yaml | yq -r .status.clusterName)"
+    CONTEXT_URL="${RANCHER_SERVER_URL}/k8s/clusters/$(kubectl --context ${KUBECTL_CONTEXT} -n fleet-default get clusters.provisioning.cattle.io ${POOL_NAME} -o yaml | yq -r .status.clusterName)"
     kubectl config set-cluster ${POOL_NAME} --server=${CONTEXT_URL}
-    kubectl config set-context ${POOL_NAME} --cluster=${POOL_NAME} --user=${KUBECTL_CONTEXT} --insecure-skip-tls-verify
+    kubectl config set-context ${POOL_NAME} --cluster=${POOL_NAME} --user=rancher --insecure-skip-tls-verify
     kubectl config use-context ${POOL_NAME} || terminate "Could not switch to ${POOL_NAME}" ${ERR_POOL_NOT_FOUND}
 }
 
