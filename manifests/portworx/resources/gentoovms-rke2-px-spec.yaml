@@ -13,7 +13,7 @@ spec:
     internal: true
   storage:
     devices:
-      - /dev/vdb
+      - /dev/vdc
 
     journalDevice: auto
   secretsProvider: k8s
