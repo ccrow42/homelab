@@ -733,7 +733,7 @@ install_minio () {
     log "Installing minio to ${POOL_NAME} using fallback method"
     helm install minio \
     --set mode=standalone \
-    --set persistence.storageClass=px-csi-db \
+    --set persistence.storageClass=px-repl2 \
     --set persistence.accessMode=ReadWriteMany \
     --set persistence.size=10Gi \
     --set resources.requests.memory=1Gi \
@@ -859,7 +859,7 @@ install_pxbackup () {
     # kubectl apply -f <(echo "${ARGOAPP}")
 
     # This is the failback install command:
-    helm install px-central portworx/px-central --namespace central --create-namespace --version ${PXBACKUP_VERSION} --set persistentStorage.enabled=true,persistentStorage.storageClassName="px-csi-db",pxbackup.enabled=true,oidc.centralOIDC.updateAdminProfile=false
+    helm install px-central portworx/px-central --namespace central --create-namespace --version ${PXBACKUP_VERSION} --set persistentStorage.enabled=true,persistentStorage.storageClassName="px-repl2",pxbackup.enabled=true,oidc.centralOIDC.updateAdminProfile=false
 
 }
 configure_pxbackup() {
@@ -915,6 +915,22 @@ EOF
     pxbackupctl create rule -e $LB_SERVER_IP:10002 -f ${TEMP_DIR}/mongo-post-rule.yaml --name mongo-post
     unlink ${TEMP_DIR}/mongo-pre-rule.yaml
     unlink ${TEMP_DIR}/mongo-post-rule.yaml
+
+    log "create test users"
+    export KCIP=$(kubectl get svc -n central pxcentral-keycloak-http -o jsonpath='{.spec.clusterIP}')
+cat << EOF | kubectl -n central exec pxcentral-keycloak-0 -i -- bash
+sleep 1
+/opt/keycloak/bin/kcadm.sh config credentials --user admin --server http://${KCIP}:80/auth --realm master --password admin
+/opt/keycloak/bin/kcadm.sh create users -r master -s username=dev -s firstName=Developer -s lastName=Portworx -s email=developer@portworx.com  -s enabled=true
+/opt/keycloak/bin/kcadm.sh create users -r master -s username=platformadmin -s firstName=Platformadmin -s lastName=Portworx -s email=platformadmin@portworx.com  -s enabled=true
+/opt/keycloak/bin/kcadm.sh set-password -r master --username dev --new-password Password1
+/opt/keycloak/bin/kcadm.sh set-password -r master --username platformadmin --new-password Password1
+EOF
+
+    log "Add the cluster"
+    kubectl config view --flatten --minify > ./kubeconfig.yaml
+    pxbackupctl create cluster --name rke2 -k ./kubeconfig.yaml -e $LB_SERVER_IP:10002 --orgID default
+    unlink ./kubeconfig.yaml
 
     log "Stopping port forward"
     kill $PORT_FORWARD_PID
