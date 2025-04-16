@@ -60,15 +60,20 @@ spec:
       - name: jellyfin-config
         persistentVolumeClaim:
           claimName: jellyfin-config
-      - name: plex-norepl
-        hostPath:
-          path: /mnt/plex-norepl
       - name: movies
-        hostPath:
-          path: /mnt/movies
+        nfs:
+          server: 10.0.2.8
+          path: /volume1/Movies
+      - name: plex-norepl
+        nfs:
+          server: 10.0.2.8
+          path: /volume1/Plex-norepl
       - name: tv
-        hostPath:
-          path: /mnt/tv
+        nfs:
+          server: 10.0.2.8
+          path: /volume1/TV
       - name: music
-        hostPath:
-          path: /mnt/music
+        nfs:
+          server: 10.0.2.8
+          path: /volume1/Music
+
