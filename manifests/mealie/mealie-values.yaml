@@ -40,6 +40,8 @@ ingress:
 # @default -- See values.yaml
 persistence:
   api-data:
+    storageClass: local-path
+    type: pvc
     enabled: true
     mountPath: /app/data/
     accessMode: ReadWriteOnce

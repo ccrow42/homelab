@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod-dns01
+    nginx.ingress.kubernetes.io/whitelist-source-range: "10.0.0.0/16,174.21.143.8/32,136.226.57.29/32,104.167.184.2/32,131.191.29.18/32,192.173.169.229/32,73.97.37.245/32,76.146.65.221/32,71.212.134.133/32"
+
+  name: ingress-mealie
+  namespace: mealie
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: mealie.ccrow.org
+    http:
+      paths:
+      - backend:
+          service:
+            name: mealie
+            port:
+              number: 9000
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - mealie.ccrow.org
+    secretName: mealie-tls

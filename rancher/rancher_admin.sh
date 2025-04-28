@@ -875,6 +875,15 @@ configure_pxbackup() {
     # This is a hack
     LB_SERVER_IP="localhost"
 
+    log "#### Configuring PX Backup API for Checks"
+    # First, let's get what we need configured to run pxbackupctl commands:
+    kubectl patch svc px-backup -n central --type='json' -p '[{"op":"replace","path":"/spec/type","value":"LoadBalancer"}]'
+    log "Waiting for LoadBalancer IP to be assigned"
+    ip_regex='^([0-9]{1,3}\.){3}[0-9]{1,3}$'
+    until [[ $(kubectl -n central get svc px-backup -o json | jq -cr '.status.loadBalancer.ingress[0].ip') =~ $ip_regex ]]; do 
+    # do nothing!
+    sleep 5
+    done
 
     log "Logging in to pxbackup"
     until [[ $return_value == 0 ]]; do
