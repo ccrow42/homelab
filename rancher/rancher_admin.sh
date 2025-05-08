@@ -71,7 +71,10 @@ terminate () {
 
 log "Starting ${SCRIPT_NAME}"
 
+
+
 # Import the config file
+readonly ERR_CONF_FILE_NOT_FOUND=160
 source $CONFIG_FILE || terminate "Could not source ${CONFIG_FILE}" ${ERR_CONF_FILE_NOT_FOUND}
 #Secrets should be exported by the profile so I think we are fine
 #source ~/.bashrc || terminate "Could not source .bashrc which contains secrets" ${ERR_CONF_FILE_NOT_FOUND}
@@ -91,6 +94,7 @@ This script is used to build and configure a rancher cluster and server.
 This is a work in progress.
 
 Commands:
+    create_rancher          Create a new rancher server
     connect                 Connect to the rancher server
     cleanup                 Cleanup the rancher config from kubectl files
     view                    View the current kubectl config
@@ -246,6 +250,28 @@ wait_ready_argocd () {
     done
 
 }
+wait_ready_vm () {
+    VMNAME=$1
+    until ssh -o StrictHostKeyChecking=accept-new ${VM_USER_ACCOUNT}@${VMNAME} date; do
+        log "waiting for ${VMNAME} to boot"
+        sleep 10
+    done
+
+}
+wait_ready_rancher () {
+    log "Waiting for rancher to be availible"
+    until [[ $(curl -k "${RANCHER_SERVER_URL}/ping") == "pong" ]]; do
+        echo -n "."
+        sleep 15
+    done
+}
+wait_ready_k3s () {
+    log "Waiting for k3s service to be availible"
+    until [[ $(curl -k "https://${K3S_IP}:6443/ping") == "pong" ]]; do
+        echo -n "."
+        sleep 15
+    done
+}
 
 
 
@@ -296,6 +322,7 @@ kubectl_rancher_server_cleanup () {
     kubectl config delete-user rancher
 }
 
+
 ### Create a cluster
 create_rancher_cluster () {
     log "Creating a new cluster called ${POOL_NAME} using ${KUBECTL_CONTEXT}"
@@ -308,6 +335,11 @@ create_rancher_cluster () {
         ${BASE_DIR}/newvm.sh create --ip 10.0.5.11 --vmname rke2-lab-01-01 --pxdisk true
         ${BASE_DIR}/newvm.sh create --ip 10.0.5.12 --vmname rke2-lab-01-02 --pxdisk true
         ${BASE_DIR}/newvm.sh create --ip 10.0.5.13 --vmname rke2-lab-01-03 --pxdisk true
+    fi
+    if [[ ${POOL_NAME} == "rke2-lab-02" ]]; then
+        ${BASE_DIR}/newvm.sh create --ip 10.0.5.21 --vmname rke2-lab-02-01 --pxdisk true
+        ${BASE_DIR}/newvm.sh create --ip 10.0.5.22 --vmname rke2-lab-02-02 --pxdisk true
+        ${BASE_DIR}/newvm.sh create --ip 10.0.5.23 --vmname rke2-lab-02-03 --pxdisk true
     fi
     kubectl config use-context ${KUBECTL_CONTEXT}
     # Create the cluster
@@ -365,15 +397,17 @@ spec:
         timeout: 120
 EOF
 
+    login_rancher_server
+
     CLUSTERID=$(kubectl --context ${KUBECTL_CONTEXT} -n fleet-default get clusters.provisioning.cattle.io ${POOL_NAME} -o yaml | yq -r .status.clusterName)
 
     log "CLUSTERID: $CLUSTERID"
 
 
-    curl -s ${RANCHER_SERVER_URL}'/v3/clusterregistrationtoken' -H 'content-type: application/json' -H "Authorization: Bearer $BEARER_TOKEN" --data-binary '{"type":"clusterRegistrationToken","clusterId":"'$CLUSTERID'"}' #--insecure
+    RESPONSE=$(curl ${RANCHER_SERVER_URL}'/v3/clusterregistrationtoken' -H 'content-type: application/json' -H "Authorization: Bearer $RANCHER_TOKEN" --data-binary '{"type":"clusterRegistrationToken","clusterId":"'$CLUSTERID'"}') #--insecure
 
  until [[ $AGENTCMD != "" ]]; do
-    AGENTCMD=`curl -s ${RANCHER_SERVER_URL}'/v3/clusterregistrationtoken?id="'$CLUSTERID'"' -H 'content-type: application/json' -H "Authorization: Bearer $BEARER_TOKEN" | jq -r '.data[].nodeCommand' | head -1`
+    AGENTCMD=`curl -s ${RANCHER_SERVER_URL}'/v3/clusterregistrationtoken?id="'$CLUSTERID'"' -H 'content-type: application/json' -H "Authorization: Bearer $RANCHER_TOKEN" | jq -r '.data[].nodeCommand' | head -1`
     log "AGENTCMD: $AGENTCMD"
     debug "agentcmd full output: "
     sleep 10
@@ -396,6 +430,27 @@ EOF
             $AGENTCMD --controlplane --etcd --worker
 EOF
           ssh ubuntu@rke2-lab-01-03 -o StrictHostKeyChecking=no << EOF
+            sleep 5
+
+            $AGENTCMD --controlplane --etcd --worker
+EOF
+
+    fi
+
+    # Again, aweful and static
+    if [[ ${POOL_NAME} == "rke2-lab-02" ]]; then
+
+          ssh ubuntu@rke2-lab-02-01 -o StrictHostKeyChecking=no << EOF
+            sleep 5
+
+            $AGENTCMD --controlplane --etcd --worker
+EOF
+          ssh ubuntu@rke2-lab-02-02 -o StrictHostKeyChecking=no << EOF
+            sleep 5
+
+            $AGENTCMD --controlplane --etcd --worker
+EOF
+          ssh ubuntu@rke2-lab-02-03 -o StrictHostKeyChecking=no << EOF
             sleep 5
 
             $AGENTCMD --controlplane --etcd --worker
@@ -1257,6 +1312,147 @@ install_cluster () {
 
 }
 
+create_rancher () {
+    log "Creating new rancher instance"
+    echo "${RANCHER_SERVER_URL}"
+
+    # Ensure util1 doesn't already exist
+    if [[ $(kubectl get vm ${K3S_SERVER_NAME} -o name --no-headers --context ${KUBEVIRT_CONTEXT}) == "virtualmachine.kubevirt.io/${K3S_SERVER_NAME}" ]]; then
+        log "${K3S_SERVER_NAME} already present"
+    else
+        log "${K3S_SERVER_NAME} not found, provisioning"
+        ${BASE_DIR}/newvm.sh create --ip ${K3S_IP} --vmname ${K3S_SERVER_NAME} --cpu 2 --mem 8G
+    fi
+
+    wait_ready_vm ${K3S_SERVER_NAME}
+
+
+    if [[ $(curl -k https://${K3S_IP}:6443/ping) == "pong" ]]; then
+        log "K3S is already running"
+    else
+    # We can now assume that the rancher server is up
+    # Let's install K3S
+        ssh -o StrictHostKeyChecking=accept-new ${VM_USER_ACCOUNT}@${K3S_SERVER_NAME} << EOF
+curl -sfL https://get.k3s.io | INSTALL_K3S_CHANNEL=$K3S_VERSION sh -
+EOF
+    fi
+
+    wait_ready_k3s
+
+if kubectl --context $KUBECTL_CONTEXT get nodes; then
+    log "Our $KUBECTL_CONTEXT seems to be working"
+else
+
+    ssh ${VM_USER_ACCOUNT}@${K3S_SERVER_NAME} "sudo cat /etc/rancher/k3s/k3s.yaml" > tmp-k3s.yaml
+    sed \
+  -e "s|127.0.0.1|${K3S_IP}|g" \
+  -e "s| default| k3s|g" \
+  -e "s|name: default|name: k3s|g" \
+  -e "s|cluster: default|cluster: k3s|g" \
+  -e "s|user: default|user: k3s|g" \
+  "tmp-k3s.yaml" > tmp-k3s-2.yaml
+
+    # Merge your current config with k3s.yaml and save the result
+    KUBECONFIG=~/.kube/config:tmp-k3s-2.yaml kubectl config view --flatten > merged.yaml
+
+    # Backup your original config first
+    cp ~/.kube/config ~/.kube/config.bak
+
+    # Replace your kubeconfig with the merged one
+    mv merged.yaml ~/.kube/config
+    #unlink tmp-k3s.yaml
+    #unlink tmp-k3s-2.yaml
+fi
+    kubectl config use-context $KUBECTL_CONTEXT
+
+    # add the rancher prime chart
+    helm repo add rancher-prime https://charts.rancher.com/server-charts/prime
+    helm repo add jetstack https://charts.jetstack.io
+    helm repo update
+
+    # install cert-manager
+    helm install cert-manager jetstack/cert-manager \
+        --namespace cert-manager \
+        --create-namespace \
+        --set crds.enabled=true
+
+    sleep 15
+    
+    kubectl apply -f ${BASE_DIR}/k3s_issuer.yaml
+
+    kubectl create ns cattle-system
+
+    cat << EOF | kubectl apply -f -
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: rancher-ingress
+  namespace: cattle-system 
+spec:
+  secretName: tls-rancher-ingress
+  issuerRef:
+    name: letsencrypt-k3s
+    kind: ClusterIssuer
+  commonName: "${RANCHER_SERVER_HOSTNAME}"
+  dnsNames:
+  - "${RANCHER_SERVER_HOSTNAME}"
+EOF
+
+    # install rancher prime
+
+    # helm install rancher rancher-prime/rancher \
+    #     --namespace cattle-system \
+    #     --version ${RANCHER_CHART_VERSION} \
+    #     --set hostname=${RANCHER_SERVER_HOSTNAME} \
+    #     --set bootstrapPassword=admin \
+    #     --set ingress.tls.source=letsEncrypt \
+    #     --set replicas=1 \
+    #     --set letsEncrypt.email=chris@pxbbq.com \
+    #     --set letsEncrypt.ingress.class=traefik
+
+    helm install rancher rancher-prime/rancher \
+        --namespace cattle-system \
+        --version ${RANCHER_CHART_VERSION} \
+        --set hostname=${RANCHER_SERVER_HOSTNAME} \
+        --set bootstrapPassword=admin \
+        --set ingress.tls.source=secret \
+        --set ingress.tls.secret=tls-rancher-ingress \
+        --set replicas=1 
+
+    # wait for the rancher server to start
+    wait_ready_rancher
+    sleep 10
+
+    RANCHER_BOOTSTRAP_PASSWORD="admin"
+    debug "RANCHER_BOOTSTRAP_PASSWORD: $RANCHER_BOOTSTRAP_PASSWORD"
+
+    # Log in to rancher using the bootstrap password
+    RANCHER_RESPONSE=`curl -s "${RANCHER_SERVER_URL}/v3-public/localProviders/local?action=login" -H 'content-type: application/json' --data-binary "{\"username\":\"admin\",\"password\":\"$RANCHER_BOOTSTRAP_PASSWORD\"}" --insecure`
+    debug "RANCHER_RESPONSE: $RANCHER_RESPONSE"
+    RANCHER_TOKEN=`echo $RANCHER_RESPONSE | jq -r .token`
+    curl -s "${RANCHER_SERVER_URL}/v3/users?action=changepassword" -H 'content-type: application/json' -H "Authorization: Bearer $RANCHER_TOKEN" --data-binary "{\"currentPassword\":\"$RANCHER_BOOTSTRAP_PASSWORD\",\"newPassword\":\"$RANCHER_PASSWORD\"}" --insecure
+ 
+}
+
+delete_rancher () {
+    kubectl config delete-context $KUBECTL_CONTEXT
+    kubectl config delete-cluster $KUBECTL_CONTEXT
+    kubectl config delete-user $KUBECTL_CONTEXT
+
+    ${BASE_DIR}/newvm.sh delete --ip ${K3S_IP} --vmname ${K3S_SERVER_NAME}
+
+}
+
+login_rancher_server () {
+
+    #requires_poolname
+    RANCHER_RESPONSE=`curl -s "${RANCHER_SERVER_URL}/v3-public/localProviders/local?action=login" -H 'content-type: application/json' --data-binary "{\"username\":\"admin\",\"password\":\"$RANCHER_PASSWORD\"}" --insecure`
+    export RANCHER_TOKEN=`echo $RANCHER_RESPONSE | jq -r .token`
+
+    kubectl config set-credentials rancher --token ${RANCHER_TOKEN}
+
+}
+
 ###### Script Run Section
 #set -x
 ### Ensure we have an argument
@@ -1277,6 +1473,15 @@ while [[ ${1} != "" ]]; do
         ;;
         connect)
             COMMAND="kubectl_rancher_server"
+        ;;
+        login)
+            COMMAND="login_rancher_server"
+        ;;
+        create_rancher)
+            COMMAND="create_rancher"
+        ;;
+        delete_rancher)
+            COMMAND="delete_rancher"
         ;;
         cleanup)
             COMMAND="kubectl_rancher_server_cleanup"
@@ -1400,4 +1605,4 @@ fi
 
 $COMMAND
 
-log "Ending ${SCRIPT_NAME}"
+exit 0

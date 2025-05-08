@@ -1,11 +1,18 @@
 #!/usr/bin/env bash
 
 
+# Import rancher config:
+SCRIPT_NAME=$(basename $0)
+BASE_DIR=~/personal/homelab/rancher
+CONFIG_FILE="${BASE_DIR}/rancher_conf.sh"
+
 ### Global Config
-BASE_DIR=/home/ccrow/personal/homelab/rancher
-KUBEVIRT_VM_TEMPLATE="${BASE_DIR}/TEMPLATE-kubevirtvm.yaml"
-PX_PVC_TEMPLATE="${BASE_DIR}/TEMPLATE-pxpvc.yaml"
-IMAGE_PATH="/home/ccrow/Downloads/noble-server-cloudimg-amd64.img"
+
+
+
+### Defaults
+CPU="4"
+MEMORY="16G"
 
 ### Standard Functions
 
@@ -30,6 +37,15 @@ terminate () {
   exit "${code}"
 }
 
+### Import config
+log "Starting ${SCRIPT_NAME}"
+
+# Import the config file
+readonly ERR_CONF_FILE_NOT_FOUND=160
+source $CONFIG_FILE || terminate "Could not source ${CONFIG_FILE}" ${ERR_CONF_FILE_NOT_FOUND}
+#Secrets should be exported by the profile so I think we are fine
+#source ~/.bashrc || terminate "Could not source .bashrc which contains secrets" ${ERR_CONF_FILE_NOT_FOUND}
+log "Configuration files imported"
 
 
 create_bootdisk () {
@@ -62,6 +78,8 @@ create_kubevirtvm () {
 
     KUBEVIRTVM="${KUBEVIRTVM//_IP_ADDRESS_/${IP}}"
     KUBEVIRTVM="${KUBEVIRTVM//_HOSTNAME_/${VMNAME}}"
+    KUBEVIRTVM="${KUBEVIRTVM//_CPU_CORES_/${CPU}}"
+    KUBEVIRTVM="${KUBEVIRTVM//_MEMORY_/${MEMORY}}"
 
     if [[ $PXDISK == "true" ]]; then
         PVC_CLAIM="${VMNAME}-px"
@@ -76,6 +94,8 @@ create_kubevirtvm () {
     sleep 5
     virtctl start $VMNAME
 
+    sleep 30
+    
 }
 
 
@@ -108,6 +128,16 @@ while [[ ${1} != "" ]]; do
             IMAGE_PATH=$1
             log "overwriting image path with ${IMAGE_PATH}"
         ;;
+        --cpu)
+            shift
+            CPU=$1
+            log "overwriting default core count to ${CPU}"
+        ;;
+        --mem)
+            shift
+            MEMORY=$1
+            log "overwriting default memory value to ${MEMORY}"
+        ;;
         *)
             terminate "Unknown Arg: $1" 160
         ;;
@@ -133,6 +163,10 @@ create_vm () {
 }
 
 delete_vm () {
+    if [[ -z ${IP} ]];then
+        terminate "IP address MUST be specified"
+    fi
+
     kubectl delete vm $VMNAME
     kubectl delete pvc ${VMNAME}-boot
     kubectl delete pvc ${VMNAME}-px

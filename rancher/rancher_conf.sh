@@ -11,7 +11,6 @@
 # DEBUG - set to 1 to enable debug output
 
 ### Standard Error Codes
-readonly ERR_CONF_FILE_NOT_FOUND=160
 readonly ERR_DEFAULT_ERROR=1
 readonly ERR_NO_ARGS=161
 readonly ERR_UNKNOWN_COMMAND=162
@@ -52,9 +51,12 @@ TEMP_DIR=${BASE_DIR}
 
 ### Templates we use
 HOST_KUBEVIRT_CONTEXT="gentoo"
+K3S_SERVER_NAME="util1"
+VM_USER_ACCOUNT="ubuntu"
 RANCHER_SERVER_URL="https://rancher.pxbbq.com"
 RANCHER_SERVER_IP="10.0.5.10"
 K3S_IP="10.0.5.10"
+K3S_VERSION="v1.31"
 CONTROL_POOL_TEMPLATE="${BASE_DIR}/TEMPLATE-controlpool.yaml"
 WORKER_POOL_TEMPLATE="${BASE_DIR}/TEMPLATE-workerpool.yaml"
 CLUSTER_TEMPLATE="${BASE_DIR}/TEMPLATE-cluster.yaml"
@@ -71,7 +73,9 @@ ARGOCD_HELM_VALUES_ROOT="manifests"
 
 ### Defaults
 # These vars can be overridden by the script
+KUBEVIRT_CONTEXT="gentoo" # install we use to provision VMs
 KUBECTL_CONTEXT="k3s"
+RANCHER_K3S_SERVER="util1"
 K3S_CONTEXT="k3s"
 POOL_NAME=""
 BUCKET_NAME="bucket"
@@ -79,8 +83,18 @@ S3_REGION="us-west-2"
 # should be set to --disable-ssl if you are using http, otherwise NULL
 DISABLE_SSL="--disable-ssl"
 RANCHER_K8S_VERSION="v1.31.7+rke2r1"
+RANCHER_SERVER_HOSTNAME="rancher.pxbbq.com"
+RANCHER_SERVER_URL="https://${RANCHER_SERVER_HOSTNAME}"
+RANCHER_PASSWORD="gr9o3rNpvgrc6lpA"
+RANCHER_CHART_VERSION="2.10.5"
 
 ### Versions
 PXBACKUP_VERSION=${PXBACKUP_VERSION:-2.8.2}
 # We are using customize here
 #PORTWORX_VERSION=${PORTWORK_VERSION:-3.1}
+
+
+### NEWVM script vars
+KUBEVIRT_VM_TEMPLATE="${BASE_DIR}/TEMPLATE-kubevirtvm.yaml"
+PX_PVC_TEMPLATE="${BASE_DIR}/TEMPLATE-pxpvc.yaml"
+IMAGE_PATH="/home/ccrow/Downloads/noble-server-cloudimg-amd64.img"
