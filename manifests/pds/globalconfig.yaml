@@ -18,9 +18,13 @@ CACerts: ""
 ingress: 
   enabled: true
   class: "nginx"
-  annotations: {}
-  controlPlaneAnnotations: {}
-  teleportAnnotations: {}
+  annotations: 
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: "/"
+  controlPlaneAnnotations: 
+    nginx.ingress.kubernetes.io/backend-protocol: "GRPCS"
+  teleportAnnotations: 
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
 tls: 
   secretName: "platform-tls"
   caSecretName: "platform-tls-ca"

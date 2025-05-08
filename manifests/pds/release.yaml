@@ -3,11 +3,11 @@ apiVersion: "infra.portworx.com/v1"
 kind: "Release"
 metadata: 
   annotations: 
-    commit: "d6e102a"
+    commit: "72e43f4"
   creationTimestamp: null
   labels: 
-    commit: "d6e102a"
-  name: "v0.0.15-unstable"
+    commit: "72e43f4"
+  name: "v0.0.16-unstable"
 spec: 
   components: 
     - 
@@ -51,7 +51,7 @@ spec:
         teleportBackup: 
           enabled: true
       image_path: "oci://docker.io/portworx/maas-infra-operators-config"
-      image_version: "0.0.1-69de39e"
+      image_version: "0.0.1-7e3e51a"
       name: "platform-operator"
     - 
       annotations: 
@@ -135,7 +135,7 @@ spec:
           licenseAgent: "licensing-billing-agent-grpc"
         selfManaged: true
       image_path: "oci://docker.io/portworx/kong-charts"
-      image_version: "0.13.1-a824bb4"
+      image_version: "0.13.1-20132fc"
       name: "kong"
     - 
       annotations: 
@@ -337,7 +337,7 @@ spec:
         - 
           name: "maas-identity"
       image_path: "docker.io/portworx/maas-cluster-service-charts"
-      image_version: "2.7.0-7e64dac"
+      image_version: "2.9.0-b5f9e74"
       name: "target-cluster-service"
     - 
       annotations: 
@@ -369,7 +369,7 @@ spec:
         - 
           name: "iam-opa"
       image_path: "docker.io/portworx/maas-resource-manager-charts"
-      image_version: "2.7.0-8eb815f"
+      image_version: "2.9.0-a4d9fb9"
       name: "resource-manager"
     - 
       annotations: 
@@ -379,7 +379,7 @@ spec:
         k8sProvider: "{{k8s_provider}}"
         size: "{{size}}"
       image_path: "docker.io/portworx/maas-iam-opa-charts"
-      image_version: "2.7.0-8eb815f"
+      image_version: "2.9.0-a4d9fb9"
       name: "iam-opa"
     - 
       annotations: 
@@ -417,7 +417,7 @@ spec:
         - 
           name: "px-central"
       image_path: "docker.io/portworx/maas-identity-charts"
-      image_version: "2.7.0-6026814"
+      image_version: "2.9.0-8cd007e"
       name: "maas-identity"
     - 
       annotations: 
@@ -460,7 +460,7 @@ spec:
         - 
           name: "teleport-management-service"
       image_path: "docker.io/portworx/pds-api-server"
-      image_version: "2.7.0-7bddf1f"
+      image_version: "2.9.0-b0f68ae"
       name: "pds-api-server"
     - 
       annotations: 
@@ -504,7 +504,7 @@ spec:
         - 
           name: "pds-api-server"
       image_path: "docker.io/portworx/pds-api-worker"
-      image_version: "2.7.0-c63dbba"
+      image_version: "2.9.0-2508cb5"
       name: "pds-api-worker"
     - 
       annotations: 
@@ -519,7 +519,7 @@ spec:
         k8sProvider: "{{k8s_provider}}"
         size: "{{size}}"
       image_path: "docker.io/portworx/px-platform"
-      image_version: "2.7.0-6b310e7"
+      image_version: "2.7.0-244819f"
       name: "platform-ui"
     - 
       annotations: 
@@ -534,7 +534,7 @@ spec:
         k8sProvider: "{{k8s_provider}}"
         size: "{{size}}"
       image_path: "docker.io/portworx/px-pds-ui"
-      image_version: "2.7.0-71d10bd"
+      image_version: "2.9.0-6a47885"
       name: "pds-ui"
     - 
       annotations: 
@@ -567,23 +567,23 @@ spec:
         - 
           name: "temporal"
       image_path: "docker.io/portworx/maas-licensing-billing-agent-charts"
-      image_version: "0.0.0-7d7b09c"
+      image_version: "1.0.0-af62a6c"
       name: "license-billing-agent"
   configuration: 
     - 
       description: "Bootstrapper application config"
       values: 
-        platform.io/application/chart/px-bootstrapper: "oci://docker.io/portworx/platform-agent:2.7.0-f4c661b"
+        platform.io/application/chart/px-bootstrapper: "oci://docker.io/portworx/platform-agent:2.9.0-ea4cd5f"
         platform.io/application/config/px-bootstrapper: "tags:\n  bootstrapper: true"
     - 
       description: "Platform agent application config"
       values: 
-        platform.io/application/chart/px-agent: "oci://docker.io/portworx/platform-agent:2.7.0-f4c661b"
+        platform.io/application/chart/px-agent: "oci://docker.io/portworx/platform-agent:2.9.0-ea4cd5f"
         platform.io/application/config/px-agent: "tags:\n  core-agent: true\n  teleport-agent: true\nteleport-kube-agent:\n  proxyAddr: '{{.TeleportProxyAddr}}'\n  kubeClusterName: '{{.TeleportKubeClusterName}}'\n  authToken: '{{.TeleportJoinToken}}'\nglobal:\n  imageRegistry: '{{image_registry}}'\n  kubePlatform: '{{kube_platform}}'"
     - 
       description: "PDS application config"
       values: 
-        platform.io/application/chart/pds: "oci://docker.io/portworx/pds-charts:2.7.0-c145d55"
+        platform.io/application/chart/pds: "oci://docker.io/portworx/pds-charts:2.9.0-bf10c9c"
         platform.io/application/config/pds: "tags:\n  all: true\nglobal:\n  platform: '{{kube_platform}}'\n  customRegistry: '{{image_registry}}'"
     - 
       description: "Platform Feature Flags"
