@@ -1339,30 +1339,9 @@ EOF
 
     wait_ready_k3s
 
-if kubectl --context $KUBECTL_CONTEXT get nodes; then
-    log "Our $KUBECTL_CONTEXT seems to be working"
-else
 
-    ssh ${VM_USER_ACCOUNT}@${K3S_SERVER_NAME} "sudo cat /etc/rancher/k3s/k3s.yaml" > tmp-k3s.yaml
-    sed \
-  -e "s|127.0.0.1|${K3S_IP}|g" \
-  -e "s| default| k3s|g" \
-  -e "s|name: default|name: k3s|g" \
-  -e "s|cluster: default|cluster: k3s|g" \
-  -e "s|user: default|user: k3s|g" \
-  "tmp-k3s.yaml" > tmp-k3s-2.yaml
+    connect_k3s
 
-    # Merge your current config with k3s.yaml and save the result
-    KUBECONFIG=~/.kube/config:tmp-k3s-2.yaml kubectl config view --flatten > merged.yaml
-
-    # Backup your original config first
-    cp ~/.kube/config ~/.kube/config.bak
-
-    # Replace your kubeconfig with the merged one
-    mv merged.yaml ~/.kube/config
-    #unlink tmp-k3s.yaml
-    #unlink tmp-k3s-2.yaml
-fi
     kubectl config use-context $KUBECTL_CONTEXT
 
     # add the rancher prime chart
@@ -1382,6 +1361,9 @@ fi
 
     kubectl create ns cattle-system
 
+if [[ -z ${RANCHER_CERT_PATH} || $(kubectl -n cattle-system get secrets tls-rancher-ingress) == "secret/tls-rancher-ingress" ]]; then
+    log "No cert path provided, requesting a new cert"
+
     cat << EOF | kubectl apply -f -
 apiVersion: cert-manager.io/v1
 kind: Certificate
@@ -1398,6 +1380,11 @@ spec:
   - "${RANCHER_SERVER_HOSTNAME}"
 EOF
 
+else
+
+    kubectl apply -f ${RANCHER_CERT_PATH}
+
+fi
     # install rancher prime
 
     # helm install rancher rancher-prime/rancher \
@@ -1429,9 +1416,22 @@ EOF
     # Log in to rancher using the bootstrap password
     RANCHER_RESPONSE=`curl -s "${RANCHER_SERVER_URL}/v3-public/localProviders/local?action=login" -H 'content-type: application/json' --data-binary "{\"username\":\"admin\",\"password\":\"$RANCHER_BOOTSTRAP_PASSWORD\"}" --insecure`
     debug "RANCHER_RESPONSE: $RANCHER_RESPONSE"
+
+
+
+
     RANCHER_TOKEN=`echo $RANCHER_RESPONSE | jq -r .token`
     curl -s "${RANCHER_SERVER_URL}/v3/users?action=changepassword" -H 'content-type: application/json' -H "Authorization: Bearer $RANCHER_TOKEN" --data-binary "{\"currentPassword\":\"$RANCHER_BOOTSTRAP_PASSWORD\",\"newPassword\":\"$RANCHER_PASSWORD\"}" --insecure
  
+
+    login_rancher_server
+
+        curl -k -X PUT \
+  -H "Authorization: Bearer $RANCHER_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d "{\"value\":\"$RANCHER_SERVER_URL\"}" \
+  ${RANCHER_SERVER_URL}/v3/settings/server-url
+
 }
 
 delete_rancher () {
@@ -1445,12 +1445,41 @@ delete_rancher () {
 
 login_rancher_server () {
 
+    
+
     #requires_poolname
     RANCHER_RESPONSE=`curl -s "${RANCHER_SERVER_URL}/v3-public/localProviders/local?action=login" -H 'content-type: application/json' --data-binary "{\"username\":\"admin\",\"password\":\"$RANCHER_PASSWORD\"}" --insecure`
     export RANCHER_TOKEN=`echo $RANCHER_RESPONSE | jq -r .token`
 
     kubectl config set-credentials rancher --token ${RANCHER_TOKEN}
 
+}
+
+connect_k3s () {
+    if kubectl --context $KUBECTL_CONTEXT get nodes; then
+    log "Our $KUBECTL_CONTEXT seems to be working"
+else
+
+    ssh ${VM_USER_ACCOUNT}@${K3S_SERVER_NAME} "sudo cat /etc/rancher/k3s/k3s.yaml" > tmp-k3s.yaml
+    sed \
+  -e "s|127.0.0.1|${K3S_IP}|g" \
+  -e "s| default| k3s|g" \
+  -e "s|name: default|name: k3s|g" \
+  -e "s|cluster: default|cluster: k3s|g" \
+  -e "s|user: default|user: k3s|g" \
+  "tmp-k3s.yaml" > tmp-k3s-2.yaml
+
+    # Merge your current config with k3s.yaml and save the result
+    KUBECONFIG=~/.kube/config:tmp-k3s-2.yaml kubectl config view --flatten > merged.yaml
+
+    # Backup your original config first
+    cp ~/.kube/config ~/.kube/config.bak
+
+    # Replace your kubeconfig with the merged one
+    mv merged.yaml ~/.kube/config
+    unlink tmp-k3s.yaml
+    unlink tmp-k3s-2.yaml
+fi
 }
 
 ###### Script Run Section
@@ -1472,7 +1501,7 @@ while [[ ${1} != "" ]]; do
             DEBUG=1
         ;;
         connect)
-            COMMAND="kubectl_rancher_server"
+            COMMAND="connect_k3s"
         ;;
         login)
             COMMAND="login_rancher_server"
@@ -1590,6 +1619,11 @@ while [[ ${1} != "" ]]; do
             shift
             DR_POOL_NAME=$1
             log "Setting DR pool to ${DR_POOL_NAME}"
+        ;;
+        --rancher-cert)
+            shift
+            RANCHER_CERT_PATH=$1
+            log "Setting rancher cert path to ${RANCHER_CERT_PATH}"
         ;;
         # Default case
         *)
