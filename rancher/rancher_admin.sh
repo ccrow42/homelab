@@ -592,7 +592,7 @@ install_px_operator () {
     ARGOAPP="${ARGOAPP//${ARGOCD_REPO_PATH_PLACEHOLDER}/${ARGOCD_PATH}}"
     kubectl apply -f <(echo "${ARGOAPP}")
 
-    #log "Installing vsphere secret manually because we removed the sealed secret."
+    #   log "Installing vsphere secret manually because we removed the sealed secret."
     #kubectl apply -f ~/temp/px-vsphere-secret.yaml
 
     #kubectl apply -k ${MANIFEST_LOCAL_DIR}/px-operator/overlays/${POOL_NAME}
