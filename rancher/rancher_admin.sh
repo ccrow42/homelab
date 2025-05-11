@@ -95,6 +95,8 @@ This is a work in progress.
 
 Commands:
     create_rancher          Create a new rancher server
+    delete_rancher          Create a new rancher server
+    login                   Generate a new login token and save it in kubeconfig as the rancher user
     connect                 Connect to the rancher server
     cleanup                 Cleanup the rancher config from kubectl files
     view                    View the current kubectl config
@@ -132,6 +134,7 @@ Options:
     --context               The context to use for some kubectl command
     --pool                  specifies the pool name. 
     --dr-pool               specifies a secondary pool for DR workflows
+    --rancher-cert          specify a path to a secret in yaml format to use as an ingress cert for rancher instead of requesting one
 
 Examples:
     ${SCRIPT_NAME}          connect
@@ -589,7 +592,7 @@ install_px_operator () {
     ARGOAPP="${ARGOAPP//${ARGOCD_REPO_PATH_PLACEHOLDER}/${ARGOCD_PATH}}"
     kubectl apply -f <(echo "${ARGOAPP}")
 
-    log "Installing vsphere secret manually because we removed the sealed secret."
+    #log "Installing vsphere secret manually because we removed the sealed secret."
     #kubectl apply -f ~/temp/px-vsphere-secret.yaml
 
     #kubectl apply -k ${MANIFEST_LOCAL_DIR}/px-operator/overlays/${POOL_NAME}
@@ -1138,9 +1141,9 @@ install_demo () {
     requires_poolname
 
     log "Creating cluster"
-    create_rancher_cluster
-    wait_ready_racher_cluster
-    create_context
+    # create_rancher_cluster
+    # wait_ready_racher_cluster
+    # create_context
     install_sealed_secrets
     install_argocd
     wait_ready_argocd
@@ -1404,6 +1407,7 @@ fi
         --set bootstrapPassword=admin \
         --set ingress.tls.source=secret \
         --set ingress.tls.secret=tls-rancher-ingress \
+        --set agentTLSMode=system-store \
         --set replicas=1 
 
     # wait for the rancher server to start
