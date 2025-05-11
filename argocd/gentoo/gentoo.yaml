@@ -173,3 +173,19 @@ spec:
   project: default
   syncPolicy:
     automated: {}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kubemacpool
+spec:
+  destination:
+    name: 'in-cluster'
+    namespace: 'kubemacpool-system'
+  source:
+    path: manifests/kubemacpool
+    repoURL: 'https://github.com/ccrow42/homelab'
+    targetRevision: HEAD
+  project: default
+  syncPolicy:
+    automated: {}
