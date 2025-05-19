@@ -85,7 +85,7 @@ DISABLE_SSL="--disable-ssl"
 RANCHER_K8S_VERSION="v1.31.7+rke2r1"
 RANCHER_SERVER_HOSTNAME="rancher.pxbbq.com"
 RANCHER_SERVER_URL="https://${RANCHER_SERVER_HOSTNAME}"
-RANCHER_PASSWORD="gr9o3rNpvgrc6lpA"
+#RANCHER_PASSWORD="gr9o3rNpvgrc6lpA" # old leaked password
 RANCHER_CHART_VERSION="2.10.5"
 
 ### Versions

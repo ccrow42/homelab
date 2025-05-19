@@ -52,7 +52,7 @@ create_bootdisk () {
     kubectl port-forward -n cdi svc/cdi-uploadproxy 8080:443 &
     PID=$!
     sleep 5
-    virtctl image-upload pvc ${VMNAME}-boot --size 50G --insecure --image-path=${IMAGE_PATH} --uploadproxy-url=https://localhost:8080
+    virtctl image-upload pvc ${VMNAME}-boot --size 80G --insecure --image-path=${IMAGE_PATH} --uploadproxy-url=https://localhost:8080
     sleep 5
     kill $PID
 
