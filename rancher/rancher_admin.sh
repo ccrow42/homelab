@@ -482,6 +482,11 @@ delete_rancher_cluster () {
         ${BASE_DIR}/newvm.sh delete --ip 10.0.5.12 --vmname rke2-lab-01-02 --pxdisk true
         ${BASE_DIR}/newvm.sh delete --ip 10.0.5.13 --vmname rke2-lab-01-03 --pxdisk true
     fi
+    if [[ ${POOL_NAME} == "rke2-lab-02" ]]; then
+        ${BASE_DIR}/newvm.sh delete --ip 10.0.5.21 --vmname rke2-lab-02-01 --pxdisk true
+        ${BASE_DIR}/newvm.sh delete --ip 10.0.5.22 --vmname rke2-lab-02-02 --pxdisk true
+        ${BASE_DIR}/newvm.sh delete --ip 10.0.5.23 --vmname rke2-lab-02-03 --pxdisk true
+    fi
     kubectl config use-context ${KUBECTL_CONTEXT}
     kubectl config delete-context ${POOL_NAME}
     kubectl config delete-cluster ${POOL_NAME}
