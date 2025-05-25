@@ -1,0 +1,25 @@
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+ name: kubevirt-manager-ingress
+ annotations:
+   cert-manager.io/cluster-issuer: letsencrypt-prod-dns01
+ namespace: kubevirt-manager
+spec:
+ ingressClassName: nginx
+ tls:
+ - hosts:
+   - kubevirt.lan.ccrow.org
+   secretName: kubevirt-manager-tls-secret
+ rules:
+ - host: kubevirt.lan.ccrow.org
+   http:
+     paths:
+     - backend:
+         service:
+           name: kubevirt-manager
+           port:
+             number: 8080
+       path: /
+       pathType: Prefix
