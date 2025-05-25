@@ -10,3 +10,4 @@ resources:
 #  - media-storage.yaml
   - service.yaml
   - namespace.yaml
+  - jellystat.yaml
