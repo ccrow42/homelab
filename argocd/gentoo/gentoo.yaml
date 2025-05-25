@@ -189,3 +189,19 @@ spec:
   project: default
   syncPolicy:
     automated: {}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: metallb
+spec:
+  destination:
+    name: 'in-cluster'
+    namespace: 'metallb-system'
+  source:
+    path: manifests/metallb/overlays/gentoo
+    repoURL: 'https://github.com/ccrow42/homelab'
+    targetRevision: HEAD
+  project: default
+  syncPolicy:
+    automated: {}
