@@ -11,3 +11,4 @@ resources:
   - service.yaml
   - namespace.yaml
   - jellystat.yaml
+  - registry-secret-jellyfin-sealed.yaml
