@@ -8,6 +8,11 @@
         user: ubuntu
         state: present
         key: https://raw.githubusercontent.com/ccrow42/homelab/main/ansible/authorized_keys
+    - name: Set root authorized key taken from file
+      ansible.posix.authorized_key:
+        user: root
+        state: present
+        key: https://raw.githubusercontent.com/ccrow42/homelab/main/ansible/authorized_keys-root
     - name: Hardening sshd
       block:
        - name: Editing sshd config
@@ -19,7 +24,7 @@
            validate: "sshd -t -f %s"
          with_items:
            - regexp: "^PermitRootLogin\ "
-             line: "PermitRootLogin no"
+             line: "PermitRootLogin without-password"
            - regexp: "^PasswordAuthentication\ "
              line: "PasswordAuthentication no"
            - regexp: "^PermitEmptyPasswords\ "

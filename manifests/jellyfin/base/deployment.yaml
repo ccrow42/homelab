@@ -14,6 +14,8 @@ spec:
       labels:
         app: jellyfin
     spec:
+      imagePullSecrets:
+      - name: registry-secret
 #      tolerations:
 #        - key: "arch"
 #          operator: "Equal"
@@ -38,7 +40,8 @@ spec:
             fieldRef:
               apiVersion: v1
               fieldPath: metadata.namespace
-        image: docker.io/jellyfin/jellyfin:latest
+        #image: docker.io/jellyfin/jellyfin:latest
+        image: registry.lan.ccrow.org/jellyfin/jellyfin:latest
         imagePullPolicy: IfNotPresent
         name: jellyfin
         ports:
