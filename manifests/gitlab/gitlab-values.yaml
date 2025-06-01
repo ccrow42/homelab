@@ -962,7 +962,7 @@ upgradeCheck:
 ## Installation of certmananger.
 ## This value replaces `certmanager.install` to allow certmanager schema validation to pass.
 ## See requirements.yaml for current version
-installCertmanager: true
+installCertmanager: false
 
 ## Configuration of jetstack/cert-manager
 certmanager:
@@ -1379,6 +1379,11 @@ traefik:
 gitlab:
   ## https://docs.gitlab.com/charts/charts/gitlab/toolbox
   toolbox:
+    backups:
+      objectStorage:
+        config:
+          secret: storage-config
+          key: config
     replicas: 1
     antiAffinityLabels:
       matchLabels:
