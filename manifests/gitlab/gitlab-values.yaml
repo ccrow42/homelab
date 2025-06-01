@@ -71,7 +71,8 @@ global:
       name: gitlab-registry.lan.ccrow.org
     tls: {}
     smartcard: {}
-    kas: {}
+    kas:
+      name: kas2.lan.ccrow.org
     pages: {}
 
   ## https://docs.gitlab.com/charts/charts/globals#configure-ingress-settings
@@ -83,10 +84,11 @@ global:
     # class:
     annotations: 
       cert-manager.io/cluster-issuer: letsencrypt-prod-dns01
+      kubernetes.io/tsl-acme: true
     enabled: true
     tls: 
       enabled: true
-      secretName: gitlab-tls
+    #   secretName: gitlab-tls
     path: /
     pathType: Prefix
 
@@ -665,6 +667,11 @@ global:
 
   ## https://docs.gitlab.com/charts/charts/globals#configure-registry-settings
   registry:
+    ingress:
+      annotations: 
+        cert-manager.io/cluster-issuer: letsencrypt-prod-dns01
+      tls:
+        secretName: gitlab-registry-tls
     bucket: registry
 
     certificate: {}
@@ -1341,6 +1348,7 @@ gitlab-runner:
   rbac:
     create: true
   runners:
+    privileged: true
     locked: false
     # Set secret to an arbitrary value because the runner chart renders the gitlab-runner.secret template only if it is not empty.
     # The parent/GitLab chart overrides the template to render the actual secret name.
@@ -1378,6 +1386,18 @@ traefik:
 ## Settings for individual sub-charts under GitLab
 ## Note: Many of these settings are configurable via globals
 gitlab:
+  webservice:
+    ingress:
+      annotations: 
+        cert-manager.io/cluster-issuer: letsencrypt-prod-dns01
+      tls:
+        secretName: gitlab-tls
+  kas:
+    ingress:
+      annotations: 
+        cert-manager.io/cluster-issuer: letsencrypt-prod-dns01
+      tls:
+        secretName: gitlab-kas-tls
   ## https://docs.gitlab.com/charts/charts/gitlab/toolbox
   toolbox:
     backups:
