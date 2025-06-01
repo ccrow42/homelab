@@ -60,14 +60,15 @@ global:
     allowClusterRoles: true
   ## https://docs.gitlab.com/charts/charts/globals#configure-host-settings
   hosts:
-    domain: git.lan.ccrow.org
+    domain: lan.ccrow.org
     hostSuffix:
     https: true
     externalIP:
     ssh:
     gitlab: {}
     minio: {}
-    registry: {}
+    registry:
+      name: gitlab-registry.lan.ccrow.org
     tls: {}
     smartcard: {}
     kas: {}
