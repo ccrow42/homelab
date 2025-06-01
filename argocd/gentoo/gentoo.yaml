@@ -205,3 +205,19 @@ spec:
   project: default
   syncPolicy:
     automated: {}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: valheim
+spec:
+  destination:
+    name: 'in-cluster'
+    namespace: 'valheim'
+  source:
+    path: manifests/valheim
+    repoURL: 'https://github.com/ccrow42/homelab'
+    targetRevision: HEAD
+  project: default
+  syncPolicy:
+    automated: {}
