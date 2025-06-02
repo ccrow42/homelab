@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postfix-relay
+  namespace: smtprelay
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postfix-relay
+  template:
+    metadata:
+      labels:
+        app: postfix-relay
+    spec:
+      imagePullSecrets:
+        - name: registry-secret
+      containers:
+        - name: postfix
+          image: registry.lan.ccrow.org/smtprelay:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 25
+          volumeMounts:
+            - name: postfix-config
+              mountPath: /config
+            # - name: log-volume
+            #   mountPath: /var/log
+        # - name: log-tail
+        #   image: registry.lan.ccrow.org/busybox:latest
+        #   command: ["/bin/sh", "-c"]
+        #   args:
+        #     - tail -F /var/log/mail.log /var/log/mail.err
+        #   volumeMounts:
+        #     - name: log-volume
+        #       mountPath: /var/log
+      volumes:
+        - name: postfix-config
+          configMap:
+            name: postfix-config
+        # - name: log-volume
+        #   emptyDir: {}

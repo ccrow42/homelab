@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: postfix-relay
+  namespace: smtprelay
+spec:
+  selector:
+    app: postfix-relay
+  type: LoadBalancer  # or NodePort / ClusterIP
+  ports:
+    - name: smtp
+      port: 25
+      targetPort: 25
