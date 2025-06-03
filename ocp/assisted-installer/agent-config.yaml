@@ -1,0 +1,225 @@
+apiVersion: v1alpha1
+kind: AgentConfig
+metadata:
+  name: ocpbm1
+rendezvousIP: 10.13.18.13
+hosts:
+  - hostname: ocpbm-c1
+    role: master
+    interfaces:
+      - name: ens192
+        macAddress: 00:50:56:b5:75:8e
+    rootDeviceHints:
+      deviceName: /dev/sda
+    networkConfig:
+      interfaces:
+        - name: ens192
+          type: ethernet
+          state: up
+          mac-address: 00:50:56:b5:75:8e
+          ipv4:
+            enabled: true
+            address:
+              - ip: 10.13.18.13
+                prefix-length: 24
+            dhcp: false
+          ipv6:
+            enabled: false
+      dns-resolver:
+        config:
+          server:
+            - 10.13.18.10
+      routes:
+        config:
+          - destination: 0.0.0.0/0
+            next-hop-address: 10.13.18.1
+            next-hop-interface: ens192
+            table-id: 254
+  - hostname: ocpbm-c2
+    role: master
+    interfaces:
+      - name: ens192
+        macAddress: 00:50:56:b5:85:b5
+    rootDeviceHints:
+      deviceName: /dev/sda
+    networkConfig:
+      interfaces:
+        - name: ens192
+          type: ethernet
+          state: up
+          mac-address: 00:50:56:b5:85:b5
+          ipv4:
+            enabled: true
+            address:
+              - ip: 10.13.18.14
+                prefix-length: 24
+            dhcp: false
+          ipv6:
+            enabled: false
+      dns-resolver:
+        config:
+          server:
+            - 10.13.18.10
+      routes:
+        config:
+          - destination: 0.0.0.0/0
+            next-hop-address: 10.13.18.1
+            next-hop-interface: ens192
+            table-id: 254
+  - hostname: ocpbm-c3
+    role: master
+    interfaces:
+      - name: ens192
+        macAddress: 00:50:56:b5:09:60
+    rootDeviceHints:
+      deviceName: /dev/sda
+    networkConfig:
+      interfaces:
+        - name: ens192
+          type: ethernet
+          state: up
+          mac-address: 00:50:56:b5:09:60
+          ipv4:
+            enabled: true
+            address:
+              - ip: 10.13.18.15
+                prefix-length: 24
+            dhcp: false
+          ipv6:
+            enabled: false
+      dns-resolver:
+        config:
+          server:
+            - 10.13.18.10
+      routes:
+        config:
+          - destination: 0.0.0.0/0
+            next-hop-address: 10.13.18.1
+            next-hop-interface: ens192
+            table-id: 254
+  - hostname: ocpbm1-w1
+    role: worker
+    interfaces:
+      - name: enp94s0f1np1
+        macAddress: 40:a6:b7:31:7b:31
+    rootDeviceHints:
+      deviceName: /dev/sda
+    networkConfig:
+      interfaces:
+        - name: enp94s0f1np1
+          type: ethernet
+          state: down
+          mac-address: 40:a6:b7:31:7b:31
+          ipv4:
+            enabled: false
+            dhcp: false
+          ipv6:
+            enabled: false
+        - name: enp94s0f1np1.142
+          type: vlan
+          state: up
+          vlan:
+            base-iface: enp94s0f1np1
+            id: 142
+          ipv4:
+            enabled: true
+            address:
+              - ip: 10.13.18.16
+                prefix-length: 24
+            dhcp: false
+          ipv6:
+            enabled: false
+      dns-resolver:
+        config:
+          server:
+            - 10.13.18.10
+      routes:
+        config:
+          - destination: 0.0.0.0/0
+            next-hop-address: 10.13.18.1
+            next-hop-interface: enp94s0f1np1.142
+            table-id: 254
+  - hostname: ocpbm1-w2
+    role: worker
+    interfaces:
+      - name: enp94s0f1np1
+        macAddress: 40:a6:b7:31:86:9d
+    rootDeviceHints:
+      deviceName: /dev/sda
+    networkConfig:
+      interfaces:
+        - name: enp94s0f1np1
+          type: ethernet
+          state: down
+          mac-address: 40:a6:b7:31:86:9d
+          ipv4:
+            enabled: false
+            dhcp: false
+          ipv6:
+            enabled: false
+        - name: enp94s0f1np1.142
+          type: vlan
+          state: up
+          vlan:
+            base-iface: enp94s0f1np1
+            id: 142
+          ipv4:
+            enabled: true
+            address:
+              - ip: 10.13.18.17
+                prefix-length: 24
+            dhcp: false
+          ipv6:
+            enabled: false
+      dns-resolver:
+        config:
+          server:
+            - 10.13.18.10
+      routes:
+        config:
+          - destination: 0.0.0.0/0
+            next-hop-address: 10.13.18.1
+            next-hop-interface: enp94s0f1np1.142
+            table-id: 254
+  - hostname: ocpbm1-w3
+    role: worker
+    interfaces:
+      - name: enp94s0f1np1
+        macAddress: 40:a6:b7:31:9d:e4
+    rootDeviceHints:
+      deviceName: /dev/sda
+    networkConfig:
+      interfaces:
+        - name: enp94s0f1np1
+          type: ethernet
+          state: down
+          mac-address: 40:a6:b7:31:9d:e4
+          ipv4:
+            enabled: false
+            dhcp: false
+          ipv6:
+            enabled: false
+        - name: enp94s0f1np1.142
+          type: vlan
+          state: up
+          vlan:
+            base-iface: enp94s0f1np1
+            id: 142
+          ipv4:
+            enabled: true
+            address:
+              - ip: 10.13.18.18
+                prefix-length: 24
+            dhcp: false
+          ipv6:
+            enabled: false
+      dns-resolver:
+        config:
+          server:
+            - 10.13.18.10
+      routes:
+        config:
+          - destination: 0.0.0.0/0
+            next-hop-address: 10.13.18.1
+            next-hop-interface: enp94s0f1np1.142
+            table-id: 254
