@@ -1,0 +1,23 @@
+apiVersion: v1
+baseDomain: vlan142.local
+compute:
+  - name: worker
+    replicas: 3
+controlPlane:
+  name: master
+  replicas: 3
+metadata:
+  name: ocpbm1
+networking:
+  machineNetwork:
+    - cidr: 10.13.18.0/24
+  networkType: OVNKubernetes
+platform:
+  baremetal:
+    apiVIPs:
+      - 10.13.18.11
+    ingressVIPs:
+      - 10.13.18.12
+fips: false
+### pull secret here
+sshKey: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDODgWjfQt7/TKISqvXqn76mIpKEDKPrx9W7fNyBxWU4BvYGOi1G3aF8pBv5rW7/r99XczNCWfTylYlwhacDEKNWZDm9LbeBllZ0lzIzVeUXWpT3Hh/xe6ph/smLCSJclqkK3uFEgcRDQccOm04IEVZ7bQy7A3HuPqcPOHsplmdOQhXp2tTSg9kCwk48439o5boYjuAXNVHLLFazck6v84DPKiNYZEcqk45IFi3Twfv7rC6FPacA7JeAP5CJtAyes0DJWvKft5OU4k29M0hdLvr3kp+V3c3s/Dfl4MOH8LCeDJgeRj3EYDNQsEzR3mrPcy5wda3NbCdgFamthWQnNVn ccrow@ccrow--MacBookPro15'
