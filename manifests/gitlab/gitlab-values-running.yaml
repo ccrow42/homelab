@@ -80,8 +80,7 @@ global:
     applicationSettingsCacheSeconds: 60
     artifacts:
       bucket: gitlab-artifacts
-      connection:
-        secret: gitlab-rails-storage
+      connection: {}
       enabled: true
       proxy_download: true
     backups:
@@ -96,6 +95,7 @@ global:
       bucket: gitlab-ci-secure-files
       connection:
         secret: gitlab-rails-storage
+        key: connection
       enabled: false
     contentSecurityPolicy:
       enabled: false
@@ -114,6 +114,7 @@ global:
       bucket: gitlab-dependency-proxy
       connection:
         secret: gitlab-rails-storage
+        key: connection
       enabled: false
       proxy_download: true
     duoAuth:
@@ -125,6 +126,7 @@ global:
       bucket: gitlab-mr-diffs
       connection:
         secret: gitlab-rails-storage
+        key: connection
       enabled: false
       proxy_download: true
       when: null
@@ -185,8 +187,9 @@ global:
       servers: {}
     lfs:
       bucket: git-lfs
-      connection:
-        secret: gitlab-rails-storage
+      connection: {}
+        # secret: gitlab-rails-storage
+        # key: connection
       enabled: true
       proxy_download: true
     maxRequestDurationSeconds: null
@@ -203,7 +206,8 @@ global:
     object_store:
       connection:
         secret: gitlab-rails-storage
-      enabled: false
+        key: connection
+      enabled: true
       proxy_download: true
       storage_options: {}
     oidcProvider:
@@ -227,8 +231,9 @@ global:
       - secret: gitlab-saml
     packages:
       bucket: gitlab-packages
-      connection:
-        secret: gitlab-rails-storage
+      connection: {}
+        # secret: gitlab-rails-storage
+        # key: connection
       enabled: true
       proxy_download: true
     sentry:
@@ -272,11 +277,13 @@ global:
       bucket: gitlab-terraform-state
       connection:
         secret: gitlab-rails-storage
+        key: connection
       enabled: false
     uploads:
       bucket: gitlab-uploads
-      connection:
-        secret: gitlab-rails-storage
+      connection: {}
+        # secret: gitlab-rails-storage
+        # key: connection
       enabled: true
       proxy_download: true
     usernameChangingEnabled: true
@@ -407,7 +414,7 @@ global:
     apiSecret: {}
     artifactsServer: true
     authSecret: {}
-    enabled: false
+    enabled: true
     externalHttp: []
     externalHttps: []
     host: null
@@ -417,7 +424,9 @@ global:
     namespaceInPath: false
     objectStore:
       bucket: gitlab-pages
-      connection: {}
+      connection:
+        secret: gitlab-rails-storage
+        key: connection
       enabled: true
     path: null
     port: null
