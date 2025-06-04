@@ -3,32 +3,33 @@ kind: Namespace
 metadata:
   name: linkwarden
 ---
-apiVersion: batch/v1
-kind: Job
-metadata:
-  name: linkwarden-generate-secrets
-  namespace: linkwarden
-spec:
-  template:
-    spec:
-      restartPolicy: OnFailure
-      imagePullSecrets:
-        - name: registry-secret
-      containers:
-        - name: secret-gen
-          image: registry.lan.ccrow.org/bitnami/kubectl:latest
-          command:
-            - /bin/sh
-            - -c
-            - |
-              POSTGRES_PASSWORD=$(head -c 16 /dev/urandom | base64)
-              MEILI_MASTER_KEY=$(head -c 16 /dev/urandom | base64)
+# apiVersion: batch/v1
+# kind: Job
+# metadata:
+#   name: linkwarden-generate-secrets
+#   namespace: linkwarden
+# spec:
+#   template:
+#     spec:
+#       restartPolicy: OnFailure
+#       imagePullSecrets:
+#         - name: registry-secret
+#       containers:
+#         - name: secret-gen
+#           image: registry.lan.ccrow.org/bitnami/kubectl:latest
+#           command:
+#             - /bin/sh
+#             - -c
+#             - |
+#               POSTGRES_PASSWORD=$(head -c 16 /dev/urandom | base64)
+#               MEILI_MASTER_KEY=$(head -c 16 /dev/urandom | base64)
+#               NEXTAUTH_SECRET=$(head -c 16 /dev/urandom | base64)
 
-              kubectl create secret generic linkwarden-env \
-                --namespace=linkwarden \
-                --from-literal=POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
-                --from-literal=MEILI_MASTER_KEY=$MEILI_MASTER_KEY
----
+#               kubectl create secret generic linkwarden-env \
+#                 --namespace=linkwarden \
+#                 --from-literal=POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
+#                 --from-literal=MEILI_MASTER_KEY=$MEILI_MASTER_KEY
+# ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -169,6 +170,13 @@ spec:
                   key: MEILI_MASTER_KEY
             - name: DATABASE_URL
               value: postgres://postgres:$(POSTGRES_PASSWORD)@postgres:5432/postgres
+            - name: NEXTAUTH_URL
+              value: http://localhost:3000/api/v1/auth
+            - name: NEXTAUTH_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: linkwarden-env
+                  key: NEXTAUTH_URL
           volumeMounts:
             - name: linkwarden-storage
               mountPath: /data/data
