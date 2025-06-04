@@ -87,7 +87,7 @@ spec:
         - name: registry-secret
       containers:
         - name: postgres
-          image: registry.lan.ccrow.org/library/postgres:16-alpine
+          image: registry.lan.ccrow.org/postgres:16-alpine
           env:
             - name: POSTGRES_PASSWORD
               valueFrom:
