@@ -19,5 +19,5 @@ platform:
     ingressVIPs:
       - 10.13.18.12
 fips: false
-### pull secret here
+# pull secret
 sshKey: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDODgWjfQt7/TKISqvXqn76mIpKEDKPrx9W7fNyBxWU4BvYGOi1G3aF8pBv5rW7/r99XczNCWfTylYlwhacDEKNWZDm9LbeBllZ0lzIzVeUXWpT3Hh/xe6ph/smLCSJclqkK3uFEgcRDQccOm04IEVZ7bQy7A3HuPqcPOHsplmdOQhXp2tTSg9kCwk48439o5boYjuAXNVHLLFazck6v84DPKiNYZEcqk45IFi3Twfv7rC6FPacA7JeAP5CJtAyes0DJWvKft5OU4k29M0hdLvr3kp+V3c3s/Dfl4MOH8LCeDJgeRj3EYDNQsEzR3mrPcy5wda3NbCdgFamthWQnNVn ccrow@ccrow--MacBookPro15'

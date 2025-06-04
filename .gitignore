@@ -3,3 +3,5 @@ manifests/kubevirt/desktop-vnc.htpasswd
 manifests/kubevirt/desktop-ingress.htpasswd
 manifests/kubevirt/desktop-vnc-secret.yaml
 manifests/kubevirt/desktop-ingress-secret.yaml
+ocp/assisted-installer/agent.x86_64.iso
+ocp/assisted-installer/auth
