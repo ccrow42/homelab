@@ -180,6 +180,10 @@ spec:
               value: "true"
             - name: NEXT_PUBLIC_AUTHENTIK_ENABLED
               value: "true"
+            - name: NEXT_PUBLIC_OLLAMA_ENDPOINT_URL
+              value: http://10.0.6.144:11434
+            - name: OLLAMA_MODEL
+              value: llama3
             - name: AUTHENTIK_ISSUER
               value: https://auth.ccrow.org/application/o/linkwarden
             - name: NEXTAUTH_URL
