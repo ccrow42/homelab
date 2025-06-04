@@ -1,8 +1,4 @@
-# apiVersion: v1
-# kind: Namespace
-# metadata:
-#   name: linkwarden
-# ---
+
 # apiVersion: batch/v1
 # kind: Job
 # metadata:
@@ -181,7 +177,7 @@ spec:
             - name: DATABASE_URL
               value: postgres://postgres:$(POSTGRES_PASSWORD)@postgres:5432/postgres
             - name: NEXT_PUBLIC_DISABLE_REGISTRATION
-              value: "false"
+              value: "true"
             - name: NEXT_PUBLIC_AUTHENTIK_ENABLED
               value: "true"
             - name: AUTHENTIK_ISSUER
