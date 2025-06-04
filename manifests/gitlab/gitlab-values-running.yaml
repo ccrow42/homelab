@@ -213,16 +213,18 @@ global:
       allowSingleSignOn:
       - saml
       autoLinkLdapUser: false
-      autoLinkSamlUser: false
+      autoLinkSamlUser: true
       autoLinkUser: []
-      autoSignInWithProvider: null
-      blockAutoCreatedUsers: true
-      enabled: false
-      externalProviders: []
-      providers: []
+      autoSignInWithProvider: saml
+      syncEmailFromProvider: saml
+      blockAutoCreatedUsers: false
+      enabled: true
       syncProfileAttributes:
       - email
-      syncProfileFromProvider: []
+      syncProfileFromProvider: ['saml']
+      externalProviders: []
+      providers:
+      - secret: gitlab-saml
     packages:
       bucket: gitlab-packages
       connection:
@@ -511,19 +513,19 @@ global:
     tcp:
       proxyProtocol: false
   smtp:
-    address: 10.0.3.40
-    authentication: ""
+    address: "smtp.lan.ccrow.org"
+    authentication: "plain"
     enabled: true
     # open_timeout: 30
     # openssl_verify_mode: peer
-    # password:
-    #   key: password
-    #   secret: ""
+    password:
+      key: password
+      secret: "smtp-password"
     # pool: false
-    port: 25
+    port: 587
     # read_timeout: 60
-    # starttls_auto: false
-    # user_name: ""
+    starttls_auto: true
+    user_name: "ccrow"
   spamcheck:
     enabled: false
   time_zone: UTC
