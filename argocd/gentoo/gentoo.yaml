@@ -237,3 +237,35 @@ spec:
   project: default
   syncPolicy:
     automated: {}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: mealie
+spec:
+  destination:
+    name: 'in-cluster'
+    namespace: 'mealie'
+  source:
+    path: manifests/mealie
+    repoURL: 'https://github.com/ccrow42/homelab'
+    targetRevision: HEAD
+  project: default
+  syncPolicy:
+    automated: {}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: linkwarden
+spec:
+  destination:
+    name: 'in-cluster'
+    namespace: 'linkwarden'
+  source:
+    path: manifests/linkwarden
+    repoURL: 'https://github.com/ccrow42/homelab'
+    targetRevision: HEAD
+  project: default
+  syncPolicy:
+    automated: {}

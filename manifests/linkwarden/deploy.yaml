@@ -156,8 +156,18 @@ spec:
         - name: registry-secret
       containers:
         - name: linkwarden
-          image: registry.lan.ccrow.org/ghcr.io/linkwarden/linkwarden:latest
+          image: registry.lan.ccrow.org/ghcr.io/linkwarden/linkwarden:v2.10.2
           env:
+            - name: AUTHENTIK_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: linkwarden-env
+                  key: AUTHENTIK_CLIENT_ID
+            - name: AUTHENTIK_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: linkwarden-env
+                  key: AUTHENTIK_CLIENT_SECRET
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -172,8 +182,12 @@ spec:
               value: postgres://postgres:$(POSTGRES_PASSWORD)@postgres:5432/postgres
             - name: NEXT_PUBLIC_DISABLE_REGISTRATION
               value: "true"
+            - name: NEXT_PUBLIC_AUTHENTIK_ENABLED
+              value: "true"
+            - name: AUTHENTIK_ISSUER
+              value: https://auth.ccrow.org/application/o/linkwarden
             - name: NEXTAUTH_URL
-              value: http://localhost:3000/api/v1/auth
+              value: https://linkwarden.ccrow.org/api/v1/auth
             - name: NEXTAUTH_SECRET
               valueFrom:
                 secretKeyRef:
