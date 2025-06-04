@@ -176,7 +176,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: linkwarden-env
-                  key: NEXTAUTH_URL
+                  key: NEXTAUTH_SECRET
           volumeMounts:
             - name: linkwarden-storage
               mountPath: /data/data
