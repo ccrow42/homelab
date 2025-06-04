@@ -170,6 +170,8 @@ spec:
                   key: MEILI_MASTER_KEY
             - name: DATABASE_URL
               value: postgres://postgres:$(POSTGRES_PASSWORD)@postgres:5432/postgres
+            - name: NEXT_PUBLIC_DISABLE_REGISTRATION
+              value: true
             - name: NEXTAUTH_URL
               value: http://localhost:3000/api/v1/auth
             - name: NEXTAUTH_SECRET
