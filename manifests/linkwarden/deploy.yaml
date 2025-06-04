@@ -12,9 +12,11 @@ spec:
   template:
     spec:
       restartPolicy: OnFailure
+      imagePullSecrets:
+        - name: registry-secret
       containers:
         - name: secret-gen
-          image: bitnami/kubectl:latest
+          image: registry.lan.ccrow.org/bitnami/kubectl:latest
           command:
             - /bin/sh
             - -c
@@ -81,9 +83,11 @@ spec:
       labels:
         app: postgres
     spec:
+      imagePullSecrets:
+        - name: registry-secret
       containers:
         - name: postgres
-          image: postgres:16-alpine
+          image: registry.lan.ccrow.org/library/postgres:16-alpine
           env:
             - name: POSTGRES_PASSWORD
               valueFrom:
@@ -113,9 +117,11 @@ spec:
       labels:
         app: meilisearch
     spec:
+      imagePullSecrets:
+        - name: registry-secret
       containers:
         - name: meilisearch
-          image: getmeili/meilisearch:v1.12.8
+          image: registry.lan.ccrow.org/getmeili/meilisearch:v1.12.8
           env:
             - name: MEILI_MASTER_KEY
               valueFrom:
@@ -145,9 +151,11 @@ spec:
       labels:
         app: linkwarden
     spec:
+      imagePullSecrets:
+        - name: registry-secret
       containers:
         - name: linkwarden
-          image: ghcr.io/linkwarden/linkwarden:latest
+          image: registry.lan.ccrow.org/ghcr.io/linkwarden/linkwarden:latest
           env:
             - name: POSTGRES_PASSWORD
               valueFrom:
