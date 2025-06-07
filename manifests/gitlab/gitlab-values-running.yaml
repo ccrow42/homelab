@@ -12,14 +12,30 @@ gitlab:
       tls:
         secretName: kas2-tls
   toolbox:
+    extraEnvFrom:
+      AWS_ACCESS_KEY_ID:
+        secretKeyRef:
+          name: minio-secret
+          key: accesskey
+      AWS_SECRET_ACCESS_KEY:
+        secretKeyRef:
+          name: minio-secret
+          key: secretkey
+    extraEnv:
+      AWS_DEFAULT_REGION: us-east-1
+      AWS_REQUEST_CHECKSUM_CALCULATION: WHEN_REQUIRED
     antiAffinityLabels:
       matchLabels:
         app: gitaly
     backups:
-      objectStorage:
-        config:
-          key: config
-          secret: storage-config
+      cron:
+        enabled: true
+        schedule: "@daily"
+        extraArgs: "--s3tool awscli --aws-s3-endpoint-url https://minio.ccrow.org"
+      # objectStorage:
+      #   config:
+      #     key: config
+      #     secret: storage-config
     replicas: 1
   webservice:
     ingress:

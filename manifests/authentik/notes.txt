@@ -1,3 +1,7 @@
 helm repo add authentik https://charts.goauthentik.io
 helm repo update
 helm upgrade --install authentik authentik/authentik -f authentik-values.yaml -n authentik --create-namespace
+
+I had to overwrite the postgres tags after a resent upgrade to go back to 15.9
+
+the ingress was also missing the tls section, which caused a fake cert to be used

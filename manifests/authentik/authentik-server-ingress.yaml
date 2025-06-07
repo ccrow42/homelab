@@ -1,0 +1,43 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod-dns01
+    field.cattle.io/publicEndpoints: '[{"addresses":["10.0.3.10"],"port":80,"protocol":"HTTP","serviceName":"authentik:authentik-server","ingressName":"authentik:authentik-server","hostname":"auth.ccrow.org","path":"/","allNodes":false}]'
+    meta.helm.sh/release-name: authentik
+    meta.helm.sh/release-namespace: authentik
+  creationTimestamp: "2025-05-30T23:14:41Z"
+  generation: 4
+  labels:
+    app.kubernetes.io/component: server
+    app.kubernetes.io/instance: authentik
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: authentik
+    app.kubernetes.io/part-of: authentik
+    app.kubernetes.io/version: 2025.6.1
+    helm.sh/chart: authentik-2025.6.1
+  name: authentik-server
+  namespace: authentik
+  resourceVersion: "102236153"
+  uid: fe89ce75-5cc2-41ef-9a91-f0add1a4ff79
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - auth.ccrow.org
+      secretName: authentik-server-tls
+  rules:
+  - host: auth.ccrow.org
+    http:
+      paths:
+      - backend:
+          service:
+            name: authentik-server
+            port:
+              number: 80
+        path: /
+        pathType: Prefix
+status:
+  loadBalancer:
+    ingress:
+    - ip: 10.0.3.10
