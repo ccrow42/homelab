@@ -31,9 +31,11 @@ spec:
       labels:
         app: uptime-kuma
     spec:
+      imagePullSecrets:
+      - name: registry-secret
       containers:
         - name: uptime-kuma
-          image: louislam/uptime-kuma:latest
+          image: registry.lan.ccrow.org/louislam/uptime-kuma:latest
           env:
             - name: UPTIME_KUMA_PORT
               value: "3001"
