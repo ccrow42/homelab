@@ -26,13 +26,15 @@ spec:
       labels:
         app: ombi
     spec:
+      imagePullSecrets:
+      - name: registry-secret
       containers:
       - env:
         - name: PUID
           value: "999"
         - name: PGID
           value: "999"
-        image: ghcr.io/linuxserver/ombi
+        image: registry.lan.ccrow.org/ghcr.io/linuxserver/ombi
         imagePullPolicy: Always
         name: ombi
         ports:
