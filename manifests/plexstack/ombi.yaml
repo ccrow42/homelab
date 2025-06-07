@@ -128,6 +128,13 @@ spec:
           podSelector:
             matchLabels:
               app.kubernetes.io/instance: rke2-ingress-nginx
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: authentik
+          podSelector:
+            matchLabels:
+              app: authentik-outpost
   egress:
     - to:
         - namespaceSelector: {}
@@ -138,6 +145,15 @@ spec:
         - port: 53
           protocol: UDP
     - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: authentik
+          podSelector:
+            matchLabels:
+              app: authentik-outpost
+      ports:
+        - port: 9000
+    - to:
         - ipBlock:
             cidr: 0.0.0.0/0
             except:
@@ -145,4 +161,4 @@ spec:
     - to:
         - podSelector:
             matchLabels:
-              app: sonarr
+              app: smtp
