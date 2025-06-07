@@ -161,6 +161,15 @@ spec:
       ports:
         - port: 9000
     - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: plex
+          podSelector:
+            matchLabels:
+              app: plexserver
+      ports:
+        - port: 32400        
+    - to:
         - ipBlock:
             cidr: 0.0.0.0/0
             except:

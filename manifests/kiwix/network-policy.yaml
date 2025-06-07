@@ -16,7 +16,6 @@ spec:
           podSelector:
             matchLabels:
               app.kubernetes.io/instance: rke2-ingress-nginx
-
   egress:
     - to:
         - namespaceSelector: {}
