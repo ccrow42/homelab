@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: kiwix-serve
-        image: ghcr.io/kiwix/kiwix-serve
+        image: registry.lan.ccrow.org/ghcr.io/kiwix/kiwix-serve
         ports:
         - containerPort: 8080
         volumeMounts:
