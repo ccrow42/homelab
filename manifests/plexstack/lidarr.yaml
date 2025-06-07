@@ -24,13 +24,15 @@ spec:
       annotations:
         backup.velero.io/backup-volumes-excludes: lidarr-downloads,lidarr-music
     spec:
+      imagePullSecrets:
+      - name: registry-secret
       containers:
       - env:
         - name: PUID
           value: "999"
         - name: PGID
           value: "999"
-        image: ghcr.io/linuxserver/lidarr
+        image: registry.lan.ccrow.org/ghcr.io/linuxserver/lidarr
         imagePullPolicy: Always
         name: lidarr
         ports:
