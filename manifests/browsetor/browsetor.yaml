@@ -14,6 +14,8 @@ spec:
       labels:
         app: tor-browser
     spec:
+      imagePullSecrets:
+      - name: registry-secret
       containers:
       - name: tor-browser
         image: registry.lan.ccrow.org/domistyle/tor-browser

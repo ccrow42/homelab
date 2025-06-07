@@ -14,6 +14,8 @@ spec:
       labels:
         app: kiwix-serve
     spec:
+      imagePullSecrets:
+      - name: registry-secret
       containers:
       - name: kiwix-serve
         image: registry.lan.ccrow.org/ghcr.io/kiwix/kiwix-serve
