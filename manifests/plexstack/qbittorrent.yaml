@@ -23,6 +23,8 @@ spec:
       annotations:
         backup.velero.io/backup-volumes-excludes: qbittorrent-downloads
     spec:
+      imagePullSecrets:
+      - name: registry-secret
       tolerations:
         - key: "arch"
           operator: "Equal"
@@ -38,7 +40,7 @@ spec:
           value: "999"
         - name: WEBUI_PORT
           value: "8080"
-        image: ghcr.io/linuxserver/qbittorrent
+        image: registry.lan.ccrow.org/ghcr.io/linuxserver/qbittorrent
         imagePullPolicy: Always
         name: qbittorrent
         ports:

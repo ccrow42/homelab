@@ -20,9 +20,11 @@ spec:
       annotations:
         backup.velero.io/backup-volumes-excludes: radarr-downloads,radarr-movies-norepl,radarr-movies
     spec:
+      imagePullSecrets:
+      - name: registry-secret
       containers:
         - name: radarr
-          image: ghcr.io/linuxserver/radarr
+          image: registry.lan.ccrow.org/ghcr.io/linuxserver/radarr
           env:
             - name: PUID
               value: "999"

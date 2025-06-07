@@ -27,13 +27,15 @@ spec:
       annotations:
         backup.velero.io/backup-volumes-excludes: sonarr-norepl,sonarr-tv,sonarr-downloads
     spec:
+      imagePullSecrets:
+      - name: registry-secret
       containers:
       - env:
         - name: PUID
           value: "999"
         - name: PGID
           value: "999"
-        image: ghcr.io/linuxserver/sonarr:latest
+        image: registry.lan.ccrow.org/ghcr.io/linuxserver/sonarr:latest
         imagePullPolicy: IfNotPresent
         name: sonarr
         ports:

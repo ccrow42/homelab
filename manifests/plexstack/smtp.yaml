@@ -16,6 +16,8 @@
        labels:
          app: smtp
      spec:
+      imagePullSecrets:
+      - name: registry-secret
       tolerations:
         - key: "arch"
           operator: "Equal"
@@ -25,7 +27,7 @@
         kubernetes.io/arch: amd64
       containers:
          - name: smtp
-           image: pure/smtp-relay
+           image: registry.lan.ccrow.org/pure/smtp-relay
            env:
              - name: SMTP_HOSTNAME
                value: "localhost"

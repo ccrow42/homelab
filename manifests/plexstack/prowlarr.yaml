@@ -13,9 +13,11 @@ spec:
       labels:
         app: prowlarr
     spec:
+      imagePullSecrets:
+      - name: registry-secret
       containers:
         - name: prowlarr
-          image: ghcr.io/hotio/prowlarr
+          image: registry.lan.ccrow.org/ghcr.io/hotio/prowlarr
           ports:
             - containerPort: 9696
           env:

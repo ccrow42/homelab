@@ -25,6 +25,8 @@ spec:
       labels:
         app: tautulli
     spec:
+      imagePullSecrets:
+      - name: registry-secret
       containers:
       - env:
         - name: PUID
@@ -33,7 +35,7 @@ spec:
           value: "999"
         - name: TZ
           value: America/Los_Angeles
-        image: ghcr.io/linuxserver/tautulli
+        image: registry.lan.ccrow.org/ghcr.io/linuxserver/tautulli
         imagePullPolicy: Always
         name: tautulli
         ports:

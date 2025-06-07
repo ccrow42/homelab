@@ -15,9 +15,11 @@ spec:
       annotations:
         backup.velero.io/backup-volumes-excludes: whisparr-data,whisparr-downloads
     spec:
+      imagePullSecrets:
+      - name: registry-secret
       containers:
         - name: whisparr
-          image: ghcr.io/hotio/whisparr
+          image: registry.lan.ccrow.org/ghcr.io/hotio/whisparr
           ports:
             - containerPort: 6969
           env:
