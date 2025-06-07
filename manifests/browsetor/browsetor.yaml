@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: tor-browser
-        image: domistyle/tor-browser
+        image: registry.lan.ccrow.org/domistyle/tor-browser
         ports:
         - containerPort: 5800
         - containerPort: 5900
