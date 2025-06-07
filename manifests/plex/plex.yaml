@@ -40,6 +40,8 @@ spec:
       labels:
         app: plexserver
     spec:
+      imagePullSecrets:
+      - name: registry-secret
       volumes:
       - name: nfs-plex-config     # < linkname of the volume for the pvc
         persistentVolumeClaim:
@@ -76,7 +78,7 @@ spec:
           value: latest
         - name: TZ
           value: UTC  # < Timezone
-        image: ghcr.io/linuxserver/plex   # < the name of the docker image we will use
+        image: registry.lan.ccrow.org/ghcr.io/linuxserver/plex   # < the name of the docker image we will use
         imagePullPolicy: Always    # < always use the latest image when creating container/pod
         name: plexserver           # < name of container
         ports:
