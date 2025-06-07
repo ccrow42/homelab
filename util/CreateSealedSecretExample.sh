@@ -1,0 +1,2 @@
+#!/bin/bash
+kubectl apply -f ~/temp/registry-secret.yaml -n heimdall -o yaml --dry-run=client | kubeseal --controller-name=sealed-secrets --controller-namespace=kube-system -o yaml > heimdall/registry-secret-sealed.yaml
