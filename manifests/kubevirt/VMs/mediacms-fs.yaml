@@ -1,0 +1,47 @@
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: DataVolume
+metadata:
+  name: mediacms
+  namespace: default
+spec:
+  source: 
+    blank: {}
+  storage:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 1Ti
+    storageClassName: manual
+    volumeMode: Filesystem
+    volumeName: mediacms
+# ---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: mediacms
+#   annotations:
+# spec:
+#   accessModes:
+#   - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: 1Ti
+#   storageClassName: manual
+#   volumeMode: Filesystem
+#   volumeName: mediacms
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mediacms
+spec:
+  accessModes:
+  - ReadWriteOnce
+  capacity:
+    storage: 1.1Ti
+  hostPath:
+    path: /mnt/mediacms
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: manual
+  volumeMode: Filesystem

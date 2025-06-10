@@ -1,0 +1,122 @@
+# apiVersion: cdi.kubevirt.io/v1beta1
+# kind: DataVolume
+# metadata:
+#   name: mediacms-datavolume
+#   namespace: default
+# spec:
+#   source:
+#     pvc:
+#       namespace: default
+#       name: ubuntu-noble
+#   storage:
+#     storageClassName: local-path-vm
+#     accessModes:
+#       - ReadWriteOnce
+# ---
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: mediacms
+spec:
+  runStrategy: Halted
+  template:
+    metadata:
+      labels:
+        kubevirt.io/domain: mediacms
+    spec:
+      domain:
+        cpu:
+          cores: 4
+        devices:
+          # filesystems:
+          #   - name: media
+          #     virtiofs: {}
+          disks:
+          # - bootOrder: 1
+          #   cdrom:
+          #     bus: sata
+          #   name: cdromiso
+          - disk:
+              bus: virtio
+            name: harddrive
+          - disk:
+              bus: virtio
+            name: media
+          - disk:
+              bus: virtio
+            name: cloudinitdisk
+          interfaces:
+            - name: default
+              model: virtio
+              masquerade: {}
+        machine:
+          type: q35
+        resources:
+          requests:
+            memory: 16G
+      networks:
+        - name: default
+          pod: {}
+      volumes:
+      # - name: cdromiso
+      #   persistentVolumeClaim:
+      #     claimName: ubuntu-desktop-iso
+      - name: harddrive
+        persistentVolumeClaim:
+          claimName: mediacms-datavolume
+      - persistentVolumeClaim:
+          claimName: mediacms
+        name: media
+      - name: cloudinitdisk
+        cloudInitNoCloud:
+          networkData: |
+            version: 2
+            ethernets:
+              enp1s0:
+                dhcp4: true
+                dhcp4-overrides:
+                  route-metric: 50
+                  send-hostname: true
+                nameservers:
+                  addresses:
+                    - 10.0.5.1
+                routes:
+                - to: 0.0.0.0/0
+                  via: 10.0.5.1
+                  metric: 50
+          userData: |
+            #cloud-config
+            hostname: mediacms
+            manage_etc_hosts: true
+            users:
+              - name: ubuntu
+                plain_text_passwd: 'ubuntu'
+                lock_passwd: false
+                ssh_authorized_keys:
+                  - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC+kx58yg6pGei4XrdXJhNfkRvfKWhGPUveM90+OGt74DbUc0B/BkfN5enpzEn3IciEOUm65TDQP0f1rmYxxWt9UPJWH2zvaWmaCdq0JUsf+V8N+G5gHpCVNJTMWeogtskpMGIKv7HJMH35RuBnM71ZHeMwTvhb422evYYq+8yUiRUc9B90p4w9Kshl+FjyOsSMn7m+9WS6HjX8Gbp+k8CGxqIrFz6t+ZE/uNmqlDaMZtXgJJIC+QrN/u14AfRX84VktNo4UPUgGmgrnCwk6fs6J5a55R6nEJ1qYHUnqkB+1AjwP2tZocHmeZkQilLT1kQvI3iIEHfyJya/c2zOZbiyu6XRsiYv/h28Ev6eevzoAQjeXq8IN/1PjZogRxgr7MpI/1GaHyq4SNBeCcgU6nk003kL6Y6o7GXTVaZbjCMdK6kF+Oi1MQtGygu4X9iy6pmCsSIIW+rFpqBHKPiiLPnpRDGFxyxee7uyWJFoBQ3owcCUabKHZigvZeehVfbxE7c= ccrow@ccrow-kubuntu
+                sudo: ['ALL=(ALL) NOPASSWD:ALL']
+                groups: sudo
+                shell: /bin/bash
+
+            runcmd:
+              - systemctl restart networking
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mediacms-svc
+spec:   
+  ports:
+  - port: 22
+    protocol: TCP
+    targetPort: 22
+    name: ssh
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+    name: http
+  selector:
+    kubevirt.io/domain: mediacms
+  type: ClusterIP
