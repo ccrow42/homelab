@@ -1,0 +1,330 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: mediacms
+  labels:
+    cert-manager.io/cluster-issuer: letsencrypt-prod-dns01
+    app.kubernetes.io/ingress-class: nginx
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mediacms-data
+  namespace: mediacms
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-data
+  namespace: mediacms
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: db
+  namespace: mediacms
+spec:
+  ports:
+    - port: 5432
+  selector:
+    app: db
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db
+  namespace: mediacms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: db
+  template:
+    metadata:
+      labels:
+        app: db
+    spec:
+      imagePullSecrets:
+        - name: registry-secret
+      containers:
+        - name: postgres
+          image: registry.lan.ccrow.org/postgres:17.2-alpine
+          env:
+            - name: POSTGRES_DB
+              value: mediacms
+            - name: POSTGRES_USER
+              value: mediacms
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres
+                  key: password
+            - name: TZ
+              value: Europe/London
+          volumeMounts:
+            - name: postgres-storage
+              mountPath: /var/lib/postgresql/data
+          readinessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - mediacms
+            initialDelaySeconds: 5
+            periodSeconds: 10
+      volumes:
+        - name: postgres-storage
+          persistentVolumeClaim:
+            claimName: postgres-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  namespace: mediacms
+spec:
+  ports:
+    - port: 6379
+  selector:
+    app: redis
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  namespace: mediacms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      imagePullSecrets:
+        - name: registry-secret
+      containers:
+        - name: redis
+          image: registry.lan.ccrow.org/redis:alpine
+          readinessProbe:
+            exec:
+              command:
+                - redis-cli
+                - ping
+            initialDelaySeconds: 5
+            periodSeconds: 30
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: migrations
+  namespace: mediacms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: migrations
+  template:
+    metadata:
+      labels:
+        app: migrations
+    spec:
+      imagePullSecrets:
+        - name: registry-secret
+      containers:
+        - name: migrations
+          image: registry.lan.ccrow.org/mediacms/mediacms:latest
+          command: ["./deploy/docker/prestart.sh"]
+          env:
+            - name: ENABLE_UWSGI
+              value: "no"
+            - name: ENABLE_NGINX
+              value: "no"
+            - name: ENABLE_CELERY_SHORT
+              value: "no"
+            - name: ENABLE_CELERY_LONG
+              value: "no"
+            - name: ENABLE_CELERY_BEAT
+              value: "no"
+            - name: ADMIN_USER
+              value: admin
+            - name: ADMIN_EMAIL
+              value: admin@localhost
+          volumeMounts:
+            - name: mediacms-data
+              mountPath: /home/mediacms.io/mediacms/
+      volumes:
+        - name: mediacms-data
+          persistentVolumeClaim:
+            claimName: mediacms-data
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  namespace: mediacms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      imagePullSecrets:
+        - name: registry-secret
+      containers:
+        - name: web
+          image: registry.lan.ccrow.org/mediacms/mediacms:latest
+          ports:
+            - containerPort: 80
+          env:
+            - name: ENABLE_CELERY_BEAT
+              value: "no"
+            - name: ENABLE_CELERY_SHORT
+              value: "no"
+            - name: ENABLE_CELERY_LONG
+              value: "no"
+            - name: ENABLE_MIGRATIONS
+              value: "no"
+          volumeMounts:
+            - name: mediacms-data
+              mountPath: /home/mediacms.io/mediacms/
+      volumes:
+        - name: mediacms-data
+          persistentVolumeClaim:
+            claimName: mediacms-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+  namespace: mediacms
+spec:
+  ports:
+    - port: 80
+  selector:
+    app: web
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: celery-beat
+  namespace: mediacms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: celery-beat
+  template:
+    metadata:
+      labels:
+        app: celery-beat
+    spec:
+      imagePullSecrets:
+        - name: registry-secret
+      containers:
+        - name: celery-beat
+          image: registry.lan.ccrow.org/mediacms/mediacms:latest
+          env:
+            - name: ENABLE_UWSGI
+              value: "no"
+            - name: ENABLE_NGINX
+              value: "no"
+            - name: ENABLE_CELERY_SHORT
+              value: "no"
+            - name: ENABLE_CELERY_LONG
+              value: "no"
+            - name: ENABLE_MIGRATIONS
+              value: "no"
+          volumeMounts:
+            - name: mediacms-data
+              mountPath: /home/mediacms.io/mediacms/
+      volumes:
+        - name: mediacms-data
+          persistentVolumeClaim:
+            claimName: mediacms-data
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: celery-worker
+  namespace: mediacms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: celery-worker
+  template:
+    metadata:
+      labels:
+        app: celery-worker
+    spec:
+      imagePullSecrets:
+        - name: registry-secret
+      containers:
+        - name: celery-worker
+          image: registry.lan.ccrow.org/mediacms/mediacms:latest
+          env:
+            - name: ENABLE_UWSGI
+              value: "no"
+            - name: ENABLE_NGINX
+              value: "no"
+            - name: ENABLE_CELERY_BEAT
+              value: "no"
+            - name: ENABLE_MIGRATIONS
+              value: "no"
+          volumeMounts:
+            - name: mediacms-data
+              mountPath: /home/mediacms.io/mediacms/
+      volumes:
+        - name: mediacms-data
+          persistentVolumeClaim:
+            claimName: mediacms-data
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: mediacms
+  namespace: mediacms
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod-dns01
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: media.ccrow.org
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - media.ccrow.org
+      secretName: mediacms-tls
+
