@@ -1,47 +1,33 @@
-apiVersion: v1
-kind: Service
-metadata:
-  namespace: externalsvc
-  name: rancher-svc
-spec:
-  type: ClusterIP
-  ports:
-    - protocol: TCP
-      port: 8081
-      targetPort: 8081
----
-apiVersion: v1
-kind: Endpoints
-metadata:
-  namespace: externalsvc
-  name: rancher-svc
-subsets:
-  - addresses:
-    - ip: 10.0.1.104
-    ports:
-    - port: 8081
----
-kind: Ingress
 apiVersion: networking.k8s.io/v1
+kind: Ingress
 metadata:
-  name: ingress-rancher
-  namespace: externalsvc
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod-dns01
-    kubernetes.io/ingress.class: nginx
+    field.cattle.io/publicEndpoints: '[{"addresses":["10.0.3.10"],"port":443,"protocol":"HTTPS","serviceName":"cattle-system:rancher","ingressName":"cattle-system:rancher-ingress","hostname":"rancher.ccrow.org","path":"/","allNodes":false}]'
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"networking.k8s.io/v1","kind":"Ingress","metadata":{"annotations":{"cert-manager.io/cluster-issuer":"letsencrypt-prod-dns01"},"name":"rancher-ingress","namespace":"cattle-system"},"spec":{"ingressClassName":"nginx","rules":[{"host":"rancher.ccrow.org","http":{"paths":[{"backend":{"service":{"name":"rancher","port":{"number":80}}},"path":"/","pathType":"Prefix"}]}}],"tls":[{"hosts":["rancher.ccrow.org"],"secretName":"rancher-tls-secret"}]}}
+    nginx.ingress.kubernetes.io/whitelist-source-range: 10.0.0.0/8,73.97.37.245/32,136.226.0.0/16,104.167.184.2/32,71.212.35.212/32,174.21.143.8/32,76.22.86.230/32
+  generation: 2
+  name: rancher-ingress
+  namespace: cattle-system
 spec:
-  tls:
-    - hosts:
-        - rancher.lan.ccrow.org
-      secretName: rancher-tls
+  ingressClassName: nginx
   rules:
-    - host: rancher.lan.ccrow.org
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: rancher-svc
-                port:
-                  number: 8081
+  - host: rancher.ccrow.org
+    http:
+      paths:
+      - backend:
+          service:
+            name: rancher
+            port:
+              number: 80
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - rancher.ccrow.org
+    secretName: rancher-tls-secret
+status:
+  loadBalancer:
+    ingress:
+    - ip: 10.0.3.10
