@@ -154,11 +154,11 @@ create_vm () {
         create_pxdisk
     fi
 
-    create_bootdisk
+    #create_bootdisk
     create_kubevirtvm
 
 
-    update_dns
+    #update_dns
 
 }
 
