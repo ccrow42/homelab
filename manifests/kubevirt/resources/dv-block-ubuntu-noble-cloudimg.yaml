@@ -9,7 +9,7 @@ spec:
       url: "https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img"
   storage:
     # Optional: Set the storage class or omit to accept the default
-    storageClassName: longhorn
+    storageClassName: longhornv2-iso
     volumeMode: Filesystem
     accessModes:
       - ReadWriteOnce
