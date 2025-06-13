@@ -1,0 +1,1 @@
+kubectl -n cdi patch cdi cdi --patch '{"spec": {"config": {"podResourceRequirements": {"limits": {"memory": "5G"}}}}}' --type merge
