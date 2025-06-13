@@ -59,6 +59,7 @@ spec:
         "dataDir": "/opt/local-host-ipam/container-ipam-state"
       }
     }'
+---
 apiVersion: "k8s.cni.cncf.io/v1"
 kind: NetworkAttachmentDefinition
 metadata:
