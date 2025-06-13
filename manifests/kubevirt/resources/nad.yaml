@@ -63,7 +63,7 @@ spec:
 apiVersion: "k8s.cni.cncf.io/v1"
 kind: NetworkAttachmentDefinition
 metadata:
-  name: bridge-vlan5
+  name: bridge-vlan11
   namespace: kube-system
 spec:
   config: '{
