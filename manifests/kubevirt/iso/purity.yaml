@@ -1,18 +1,19 @@
+# http://10.0.4.101:8080/agent.x86_64.iso
 apiVersion: cdi.kubevirt.io/v1beta1
 kind: DataVolume
 metadata:
-  name: dv-block-ubuntu-noble-cloudimg
-  namespace: default
+  name: purity-iso
+  namespace: vmlab
 spec:
   source:
     http:
-      url: "https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img"
+      url: "http://10.0.4.101:8080/purity_6.8.7_202506052315+76a21ba50062-amd64.iso"
   storage:
     # Optional: Set the storage class or omit to accept the default
     storageClassName: longhornv2-iso
     volumeMode: Filesystem
     accessModes:
-      - ReadWriteOnce
+      - ReadWriteMany
     resources:
       requests:
-        storage: 40Gi
+        storage: 16Gi
