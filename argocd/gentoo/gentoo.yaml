@@ -232,7 +232,7 @@ spec:
     namespace: 'smtprelay'
   source:
     path: manifests/smtprelay
-    repoURL: 'https://github.com/ccrow42/homelab'
+    repoURL: 'https://gitlab.lan.ccrow.org/homelab/gitops-cd'
     targetRevision: HEAD
   project: default
   syncPolicy:
