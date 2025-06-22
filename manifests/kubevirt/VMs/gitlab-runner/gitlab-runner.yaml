@@ -2,21 +2,25 @@ apiVersion: cdi.kubevirt.io/v1beta1
 kind: DataVolume
 metadata:
   name: gitlab-runner-boot
-  namespace: vmlab
+  namespace: gitlab
 spec:
   source:
-    pvc:
-      namespace: default
-      name: dv-block-ubuntu-noble-cloudimg
+    http:
+      url: "http://registry.lan.ccrow.org:8080/noble-server-cloudimg-amd64.img"
   storage:
     volumeMode: Filesystem
-    storageClassName: longhorn
+    storageClassName: longhornv2
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 40Gi
 ---
 apiVersion: v1
 kind: Secret
 metadata:
   name: gitlab-runner-cloudinit-userdata
-  namespace: vmlab
+  namespace: gitlab
 type: Opaque
 stringData:
   userData: |
@@ -40,7 +44,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: gitlab-runner-cloudinit-network
-  namespace: vmlab
+  namespace: gitlab
 type: Opaque
 stringData:
   networkData: |
@@ -55,7 +59,7 @@ apiVersion: kubevirt.io/v1
 kind: VirtualMachine
 metadata:
   name: gitlab-runner
-  namespace: vmlab
+  namespace: gitlab
   labels:
     vm: gitlab-runner
 spec:
@@ -77,19 +81,17 @@ spec:
               bus: virtio
             name: cloudinitdisk
           interfaces:
-            - name: vlan4
+            - name: default
               model: virtio
-              bridge: {}
+              masquerade: {}
         machine:
           type: q35
         resources:
           requests:
-            memory: 8G
+            memory: 4G
       networks:
-        - name: vlan5
-          multus:
-            default: true
-            networkName: kube-system/bridge-vlan4
+        - name: default
+          pod: {}
       volumes:
       - name: harddrive
         persistentVolumeClaim:

@@ -1,0 +1,1 @@
+backup-utility  --s3tool awscli --aws-s3-endpoint-url https://minio.ccrow.org
