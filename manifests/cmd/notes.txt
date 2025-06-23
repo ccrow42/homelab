@@ -1,3 +1,0 @@
-kubectl run cmd  --overrides='{ "spec": { "serviceAccount": "cmd" }  }' --rm=true --image=ccrow42/cmd:latest --namespace=cmd --restart=Never -it -- /bin/sh
-
-kubectl run cmd  --overrides='{ "spec": { "serviceAccount": "cmd" }  }' --rm=true --image=ccrow42/cmd:latest --namespace=cmd --restart=Never -it -- /bin/sh "kubectl get pods -A"

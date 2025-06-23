@@ -1,3 +1,0 @@
-# be sure to set the secret in the values file
-helm upgrade loki grafana/loki -n monitoring -f loki-values.yaml
-helm install -n monitoring alloy grafana/alloy -f alloy-values.yaml
