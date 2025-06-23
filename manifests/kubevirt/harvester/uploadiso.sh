@@ -1,2 +1,0 @@
-kubectl port-forward -n cdi svc/cdi-uploadproxy 8080:443 &
-virtctl image-upload pvc harvester150rc1 --size 10G --insecure --image-path=/home/ccrow/Downloads/harvester-v1.5.0-rc1-amd64.iso --uploadproxy-url=https://localhost:8080

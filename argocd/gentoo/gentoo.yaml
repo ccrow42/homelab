@@ -8,7 +8,7 @@ spec:
     namespace: 'externalsvc'
   source:
     path: manifests/externalsvc
-    repoURL: 'https://github.com/ccrow42/homelab'
+    repoURL: 'https://gitlab.lan.ccrow.org/homelab/gitops-cd'
     targetRevision: HEAD
   project: default
   syncPolicy:
@@ -24,7 +24,7 @@ spec:
     namespace: 'argocd'
   source:
     path: manifests/argocd
-    repoURL: 'https://github.com/ccrow42/homelab'
+    repoURL: 'https://gitlab.lan.ccrow.org/homelab/gitops-cd'
     targetRevision: HEAD
   project: default
   syncPolicy:
@@ -40,7 +40,7 @@ spec:
     namespace: 'heimdall'
   source:
     path: manifests/heimdall
-    repoURL: 'https://github.com/ccrow42/homelab'
+    repoURL: 'https://gitlab.lan.ccrow.org/homelab/gitops-cd'
     targetRevision: HEAD
   project: default
   syncPolicy:
@@ -56,7 +56,7 @@ spec:
     namespace: 'browsetor'
   source:
     path: manifests/browsetor
-    repoURL: 'https://github.com/ccrow42/homelab'
+    repoURL: 'https://gitlab.lan.ccrow.org/homelab/gitops-cd'
     targetRevision: HEAD
   project: default
   syncPolicy:
@@ -72,7 +72,7 @@ spec:
     namespace: 'cert-manager'
   source:
     path: manifests/cert-manager/overlays/gentoo
-    repoURL: 'https://github.com/ccrow42/homelab'
+    repoURL: 'https://gitlab.lan.ccrow.org/homelab/gitops-cd'
     targetRevision: HEAD
   project: default
   syncPolicy:
@@ -88,7 +88,7 @@ spec:
     namespace: 'jellyfin'
   source:
     path: manifests/jellyfin/overlay
-    repoURL: 'https://github.com/ccrow42/homelab'
+    repoURL: 'https://gitlab.lan.ccrow.org/homelab/gitops-cd'
     targetRevision: HEAD
   project: default
   syncPolicy:
@@ -104,7 +104,7 @@ spec:
     namespace: 'kiwix'
   source:
     path: manifests/kiwix
-    repoURL: 'https://github.com/ccrow42/homelab'
+    repoURL: 'https://gitlab.lan.ccrow.org/homelab/gitops-cd'
     targetRevision: HEAD
   project: default
   syncPolicy:
@@ -120,7 +120,7 @@ spec:
     namespace: 'kubevirt'
   source:
     path: manifests/kubevirt/overlays/gentoo
-    repoURL: 'https://github.com/ccrow42/homelab'
+    repoURL: 'https://gitlab.lan.ccrow.org/homelab/gitops-cd'
     targetRevision: HEAD
   project: default
   syncPolicy:
@@ -136,7 +136,7 @@ spec:
     namespace: 'kubevirt-manager'
   source:
     path: manifests/kubevirt-manager/overlays/gentoo
-    repoURL: 'https://github.com/ccrow42/homelab'
+    repoURL: 'https://gitlab.lan.ccrow.org/homelab/gitops-cd'
     targetRevision: HEAD
   project: default
   syncPolicy:
@@ -152,7 +152,7 @@ spec:
     namespace: 'cdi'
   source:
     path: manifests/cdi/overlays/gentoo
-    repoURL: 'https://github.com/ccrow42/homelab'
+    repoURL: 'https://gitlab.lan.ccrow.org/homelab/gitops-cd'
     targetRevision: HEAD
   project: default
   syncPolicy:
@@ -168,7 +168,7 @@ spec:
     namespace: 'local-path-storage'
   source:
     path: manifests/local-path-provisioner/overlays/gentoo
-    repoURL: 'https://github.com/ccrow42/homelab'
+    repoURL: 'https://gitlab.lan.ccrow.org/homelab/gitops-cd'
     targetRevision: HEAD
   project: default
   syncPolicy:
@@ -184,7 +184,7 @@ spec:
     namespace: 'kubemacpool-system'
   source:
     path: manifests/kubemacpool
-    repoURL: 'https://github.com/ccrow42/homelab'
+    repoURL: 'https://gitlab.lan.ccrow.org/homelab/gitops-cd'
     targetRevision: HEAD
   project: default
   syncPolicy:
@@ -200,7 +200,7 @@ spec:
     namespace: 'metallb-system'
   source:
     path: manifests/metallb/overlays/gentoo
-    repoURL: 'https://github.com/ccrow42/homelab'
+    repoURL: 'https://gitlab.lan.ccrow.org/homelab/gitops-cd'
     targetRevision: HEAD
   project: default
   syncPolicy:
@@ -216,7 +216,7 @@ spec:
     namespace: 'valheim'
   source:
     path: manifests/valheim
-    repoURL: 'https://github.com/ccrow42/homelab'
+    repoURL: 'https://gitlab.lan.ccrow.org/homelab/gitops-cd'
     targetRevision: HEAD
   project: default
   syncPolicy:
@@ -248,7 +248,7 @@ spec:
     namespace: 'mealie'
   source:
     path: manifests/mealie
-    repoURL: 'https://github.com/ccrow42/homelab'
+    repoURL: 'https://gitlab.lan.ccrow.org/homelab/gitops-cd'
     targetRevision: HEAD
   project: default
   syncPolicy:
@@ -264,7 +264,7 @@ spec:
     namespace: 'linkwarden'
   source:
     path: manifests/linkwarden
-    repoURL: 'https://github.com/ccrow42/homelab'
+    repoURL: 'https://gitlab.lan.ccrow.org/homelab/gitops-cd'
     targetRevision: HEAD
   project: default
   syncPolicy:
@@ -280,7 +280,7 @@ spec:
     namespace: 'plexstack'
   source:
     path: manifests/plexstack
-    repoURL: 'https://github.com/ccrow42/homelab'
+    repoURL: 'https://gitlab.lan.ccrow.org/homelab/gitops-cd'
     targetRevision: HEAD
   project: default
   syncPolicy:
@@ -296,7 +296,7 @@ spec:
     namespace: 'plex'
   source:
     path: manifests/plex
-    repoURL: 'https://github.com/ccrow42/homelab'
+    repoURL: 'https://gitlab.lan.ccrow.org/homelab/gitops-cd'
     targetRevision: HEAD
   project: default
   syncPolicy:
@@ -312,7 +312,7 @@ spec:
     namespace: 'kuma'
   source:
     path: manifests/kuma
-    repoURL: 'https://github.com/ccrow42/homelab'
+    repoURL: 'https://gitlab.lan.ccrow.org/homelab/gitops-cd'
     targetRevision: HEAD
   project: default
   syncPolicy:
