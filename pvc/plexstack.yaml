@@ -53,6 +53,19 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  name: qbittorrent-private-pvc
+  namespace: plexstack
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: local-path
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
   name: radarr-pvc
   namespace: plexstack
 spec:
