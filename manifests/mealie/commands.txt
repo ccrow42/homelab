@@ -1,2 +1,0 @@
-helm repo add k8s-at-home https://k8s-at-home.com/charts/
-helm install mealie k8s-at-home/mealie --create-namespace -n mealie -f mealie-values.yaml
