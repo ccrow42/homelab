@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# --- Config ---
+### --- Config ---
 source /root/secrets.sh
 APIKEY=$TAUTULLI_API_TOKEN
 TAUTULLI_URL="https://tautulli.ccrow.org/api/v2"
@@ -32,7 +32,7 @@ INGRESS_FILES=(
   "$BASEDIR/manifests/kiwix/kiwix.yaml"
 )
 
-# --- Build CIDR file ---
+### --- Build CIDR file ---
 
 # Start fresh
 > "$CIDR_FILE"
@@ -54,10 +54,10 @@ for user in "${USERS[@]}"; do
   fi
 done
 
-# Deduplicate and sort
+### Deduplicate and sort
 sort -u "$CIDR_FILE" -o "$CIDR_FILE"
 
-echo "✅ CIDR list built at $CIDR_FILE"
+echo "CIDR list built at $CIDR_FILE"
 
 # --- Update ingress files ---
 
@@ -67,9 +67,9 @@ CIDR_LIST=$(paste -sd, "$CIDR_FILE")
 for file in "${INGRESS_FILES[@]}"; do
   if [[ -f "$file" ]]; then
     sed -i "s#nginx.ingress.kubernetes.io/whitelist-source-range:.*#nginx.ingress.kubernetes.io/whitelist-source-range: \"$CIDR_LIST\"#" "$file"
-    echo "✅ Updated whitelist-source-range in $file"
+    echo "Updated whitelist-source-range in $file"
   else
-    echo "⚠️  File not found: $file"
+    echo "File not found: $file"
   fi
 done
 
@@ -82,9 +82,9 @@ cd "$BASEDIR"
 if [[ -n "$(git status --porcelain)" ]]; then
   git add .
   git commit -m "automated whitelist update"
-  echo "✅ Changes committed in $BASEDIR"
+  echo "Changes committed in $BASEDIR"
 else
-  echo "ℹ️  No changes to commit in $BASEDIR"
+  echo "No changes to commit in $BASEDIR"
 fi
 
 git push
