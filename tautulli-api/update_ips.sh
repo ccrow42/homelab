@@ -21,6 +21,7 @@ USERS=(
   "raecrow"
   "ThePusherRobot"
   "slyboots"
+  "rlcrow"
 )
 
 # GitOps repo base directory
