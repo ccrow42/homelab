@@ -2,7 +2,8 @@
 set -euo pipefail
 
 # --- Config ---
-APIKEY="55b98340c04f4c10a2b66528e27b72e1"
+source /root/secrets.sh
+APIKEY=$TAUTULLI_API_TOKEN
 TAUTULLI_URL="https://tautulli.ccrow.org/api/v2"
 
 CIDR_FILE="$HOME/personal/homelab/tautulli-api/cidrs.txt"
@@ -21,6 +22,7 @@ USERS=(
   "raecrow"
   "ThePusherRobot"
   "slyboots"
+  "rlcrow"
 )
 
 # GitOps repo base directory
