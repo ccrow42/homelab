@@ -34,8 +34,8 @@ INGRESS_FILES=(
 
 ### --- Build CIDR file ---
 
-# Start fresh
-> "$CIDR_FILE"
+# Clear the CIDR file. We don't actually want to do this, we will use dedup instead
+#> "$CIDR_FILE"
 
 # Add static CIDRs
 for cidr in "${STATIC_CIDRS[@]}"; do
