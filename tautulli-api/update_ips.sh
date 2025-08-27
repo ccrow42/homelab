@@ -50,7 +50,7 @@ for user in "${USERS[@]}"; do
   if [[ -n "$ip" ]]; then
     echo "${ip}/32" >> "$CIDR_FILE"
   else
-    echo "⚠️  No IP found for $user" >&2
+    echo "No IP found for $user" >&2
   fi
 done
 
