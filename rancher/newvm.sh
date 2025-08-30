@@ -5,6 +5,7 @@
 SCRIPT_NAME=$(basename $0)
 BASE_DIR=~/personal/homelab/rancher
 CONFIG_FILE="${BASE_DIR}/rancher_conf.sh"
+NAMESPACE=vmlab
 
 ### Global Config
 
@@ -52,7 +53,7 @@ create_bootdisk () {
     kubectl port-forward -n cdi svc/cdi-uploadproxy 8080:443 &
     PID=$!
     sleep 5
-    virtctl image-upload pvc ${VMNAME}-boot --size 80G --insecure --image-path=${IMAGE_PATH} --uploadproxy-url=https://localhost:8080
+    virtctl -n $NAMESPACE image-upload pvc ${VMNAME}-boot --size 80G --insecure --image-path=${IMAGE_PATH} --uploadproxy-url=https://localhost:8080
     sleep 5
     kill $PID
 
@@ -92,7 +93,7 @@ create_kubevirtvm () {
 
     kubectl apply -f <(echo "${KUBEVIRTVM}")
     sleep 5
-    virtctl start $VMNAME
+    virtctl -n $NAMESPACE start $VMNAME
 
     sleep 30
     
@@ -138,6 +139,11 @@ while [[ ${1} != "" ]]; do
             MEMORY=$1
             log "overwriting default memory value to ${MEMORY}"
         ;;
+        --namespace)
+            shift
+            NAMESPACE=$1
+            log "overwriting namespace value to ${NAMESPACE}"
+        ;;
         *)
             terminate "Unknown Arg: $1" 160
         ;;
@@ -154,7 +160,7 @@ create_vm () {
         create_pxdisk
     fi
 
-    #create_bootdisk
+    create_bootdisk
     create_kubevirtvm
 
 
@@ -167,9 +173,9 @@ delete_vm () {
         terminate "IP address MUST be specified"
     fi
 
-    kubectl delete vm $VMNAME
-    kubectl delete pvc ${VMNAME}-boot
-    kubectl delete pvc ${VMNAME}-px
+    kubectl -n $NAMESPACE delete vm $VMNAME
+    kubectl -n $NAMESPACE delete pvc ${VMNAME}-boot
+    kubectl -n $NAMESPACE delete pvc ${VMNAME}-px
     ssh-keygen -f '/home/ccrow/.ssh/known_hosts' -R \'${IP}\'
     ssh ubuntu@10.0.1.1 "sudo sed -i \"/^${IP//./\\.}/d\" /etc/hosts"
     sudo sed -i "/^${IP//./\\.}/d" /etc/hosts
